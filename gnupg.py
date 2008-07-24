@@ -719,15 +719,12 @@ class GPG(object):
         # Internal method: open a pipe to a GPG subprocess and return
         # the file objects for communicating with it.
         cmd = self.make_args(args, passphrase)
-        pcmd = ' '.join(cmd)
         if self.verbose:
+            pcmd = ' '.join(cmd)
             print(pcmd)
         logger.debug("%s", cmd)
         # For some reason not yet established, shell=False fails on Windows.
-        if os.name == 'posix':
-            return Popen(cmd, shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        else:
-            return Popen(pcmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        return Popen(cmd, shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
     def _read_response(self, stream, result):
         # Internal method: reads all the stderr output from GPG, taking notice

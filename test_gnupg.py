@@ -468,14 +468,7 @@ class GPGTestCase(unittest.TestCase):
 
     def test_nogpg(self):
         "Test that absence of gpg is handled correctly"
-        # We use shell=False on POSIX, shell=True on Windows
-        # and this can lead to one of two possible exceptions
-        # depending on the platform.
-        if os.name == 'posix':
-            exc = OSError
-        else:
-            exc = ValueError
-        self.assertRaises(exc, gnupg.GPG, gnupghome=self.homedir,
+        self.assertRaises(OSError, gnupg.GPG, gnupghome=self.homedir,
                           gpgbinary='frob')
 
     def test_make_args(self):
