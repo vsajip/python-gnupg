@@ -556,11 +556,11 @@ Status and Further Work
 =======================
 The ``gnupg`` module, being based on proven earlier versions, is quite usable. However, there are many features of GnuPG which this module does not take advantage of, or provide access to. How this module evolves will be determined by feedback from the user community.
 
-If you find bugs and want to raise issues, please do so via the `Google Code project`__.
+If you find bugs and want to raise issues, please do so via the `BitBucket project`__.
 
 __ issues_
 
-.. _issues: http://code.google.com/p/python-gnupg/issues/list
+.. _issues: https://bitbucket.org/vinay.sajip/python-gnupg/issues/new
 
 All feedback will be gratefully received; please send it to the `discussion group`__.
 
