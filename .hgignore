@@ -1,0 +1,4 @@
+(build|dist|keys)/
+(MANIFEST|random_binary_data)$
+\.(pyc|log)$
+
