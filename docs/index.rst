@@ -400,7 +400,7 @@ The resulting encrypted data contains the signature. When decrypting the data, u
 At this point, if a signature is verified, signer information is held in attributes of ``decrpyted_data``: ``username``, ``key_id``, ``signature_id``,
 ``fingerprint``, ``trust_level`` and ``trust_text``. If the message wasn't signed, these attributes will all be set to ``None``.
 
-The trust levels are (in increasing order) TRUST_UNDEFINED, TRUST_NEVER, TRUST_MARGINAL, TRUST_FULLY and TRUST_ULTIMATE. If verification succeeded,
+The trust levels are (in increasing order) ``TRUST_UNDEFINED``, ``TRUST_NEVER``, ``TRUST_MARGINAL``, ``TRUST_FULLY`` and ``TRUST_ULTIMATE``. If verification succeeded,
 you can test the trust level against known values as in the following example::
 
     decrypted_data = gpg.decrypt(data, passphrase=recipient_passphrase))
@@ -542,7 +542,8 @@ sign
 key
     Run tests relating to key management
 basic
-    Run basic tests relating to environment setup
+    Run basic tests relating to environment setup, or which don't fit into one
+    of the above categories
 
 Download
 ========
@@ -572,6 +573,4 @@ Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
