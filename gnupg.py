@@ -466,7 +466,21 @@ class SearchKeys(list):
     def handle_status(self, key, value):
         pass
 
-class Crypt(Verify):
+
+class TextHandler(object):
+    def _as_text(self):
+        return self.data.decode(self.gpg.encoding, self.gpg.decode_errors)
+
+    if _py3k:
+        __str__ = _as_text
+    else:
+        __unicode__ = _as_text
+
+        def __str__(self):
+            return self.data
+
+
+class Crypt(Verify, TextHandler):
     "Handle status messages for --encrypt and --decrypt"
     def __init__(self, gpg):
         Verify.__init__(self, gpg)
@@ -479,9 +493,6 @@ class Crypt(Verify):
         return False
 
     __bool__ = __nonzero__
-
-    def __str__(self):
-        return self.data.decode(self.gpg.encoding, self.gpg.decode_errors)
 
     def handle_status(self, key, value):
         if key in ("ENC_TO", "USERID_HINT", "GOODMDC", "END_DECRYPTION",
@@ -569,7 +580,7 @@ class DeleteResult(object):
     __bool__ = __nonzero__
 
 
-class Sign(object):
+class Sign(TextHandler):
     "Handle status messages for --sign"
     def __init__(self, gpg):
         self.gpg = gpg
@@ -581,9 +592,6 @@ class Sign(object):
         return self.fingerprint is not None
 
     __bool__ = __nonzero__
-
-    def __str__(self):
-        return self.data.decode(self.gpg.encoding, self.gpg.decode_errors)
 
     def handle_status(self, key, value):
         if key in ("USERID_HINT", "NEED_PASSPHRASE", "BAD_PASSPHRASE",
@@ -1286,4 +1294,3 @@ class GPG(object):
         self._handle_io(args, file, result, passphrase, binary=True)
         logger.debug('decrypt result: %r', result.data)
         return result
-
