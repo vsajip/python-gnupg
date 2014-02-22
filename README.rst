@@ -52,6 +52,9 @@ N.B: GCnn refers to an issue nn on Google Code.
 
 Released: Not yet.
 
+* Handled 'UNEXPECTED' message during verification. Thanks to
+  David Andersen for the patch.
+
 0.3.6
 -----
 

@@ -66,6 +66,7 @@ I've gratefully incorporated improvements contributed by:
 * Robert Leftwich (handle INV_SGNR, KEY_NOT_CREATED)
 * Michal Niklas (Trust levels for signature verification)
 * David Noël (``search_keys``, ``send_keys`` functionality)
+* David Andersen (handle UNEXPECTED during verification)
 
 and Google Code users
 
