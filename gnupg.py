@@ -840,7 +840,7 @@ class GPG(object):
         elif clearsign:
             args.append("--clearsign")
         if keyid:
-            args.extend(['--default-key', shell_quote(keyid)])
+            args.extend(['--default-key', keyid])
         result = self.result_map['sign'](self)
         #We could use _handle_io here except for the fact that if the
         #passphrase is bad, gpg bails and you can't write the message.
