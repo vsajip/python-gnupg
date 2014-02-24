@@ -106,6 +106,11 @@ class GPGTestCase(unittest.TestCase):
                 gpg.options = ['--debug-quick-random']
             else:
                 gpg.options = ['--quick-random']
+        self.test_fn = test_fn = 'random_binary_data'
+        if not os.path.exists(test_fn):
+            data_file = open(test_fn, 'wb')
+            data_file.write(os.urandom(5120 * 1024))
+            data_file.close()
 
     def test_environment(self):
         "Test the environment by ensuring that setup worked"
@@ -147,7 +152,7 @@ class GPGTestCase(unittest.TestCase):
         params['Passphrase'] = passphrase
         cmd = self.gpg.gen_key_input(**params)
         return self.gpg.gen_key(cmd)
-    
+
     def do_key_generation(self):
         "Test that key generation succeeds"
         result = self.generate_key("Barbara", "Brown", "beta.com")
@@ -217,7 +222,7 @@ class GPGTestCase(unittest.TestCase):
         params['key_type'] = 'DSA'
         cmd = self.gpg.gen_key_input(**params)
         self.assertTrue('Key-Type: DSA\n' in cmd)
-        
+
     def test_list_keys_after_generation(self):
         "Test that after key generation, the generated key is available"
         self.test_list_keys_initial()
@@ -353,12 +358,7 @@ class GPGTestCase(unittest.TestCase):
                          "Fingerprints must match")
         self.assertEqual(verified.trust_level, verified.TRUST_ULTIMATE)
         self.assertEqual(verified.trust_text, 'TRUST_ULTIMATE')
-        test_fn = 'random_binary_data'
-        if not os.path.exists(test_fn):
-            data_file = open(test_fn, 'wb')
-            data_file.write(os.urandom(5120 * 1024))
-            data_file.close()
-        data_file = open(test_fn, 'rb')
+        data_file = open(self.test_fn, 'rb')
         sig = self.gpg.sign_file(data_file, keyid=key.fingerprint,
                                  passphrase='aable')
         data_file.close()
@@ -375,7 +375,7 @@ class GPGTestCase(unittest.TestCase):
             logger.debug("ver: %r", verified.fingerprint)
         self.assertEqual(key.fingerprint, verified.fingerprint,
                          "Fingerprints must match")
-        data_file = open(test_fn, 'rb')
+        data_file = open(self.test_fn, 'rb')
         sig = self.gpg.sign_file(data_file, keyid=key.fingerprint,
                                  passphrase='aable', detach=True)
         data_file.close()
@@ -383,7 +383,7 @@ class GPGTestCase(unittest.TestCase):
         self.assertTrue(sig.hash_algo)
         try:
             file = gnupg._make_binary_stream(sig.data, self.gpg.encoding)
-            verified = self.gpg.verify_file(file, test_fn)
+            verified = self.gpg.verify_file(file, self.test_fn)
         except UnicodeDecodeError: #happens in Python 2.6
             from io import BytesIO
             verified = self.gpg.verify_file(BytesIO(sig.data))
@@ -393,7 +393,7 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(key.fingerprint, verified.fingerprint,
                          "Fingerprints must match")
         # Test in-memory verification
-        data_file = open(test_fn, 'rb')
+        data_file = open(self.test_fn, 'rb')
         data = data_file.read()
         data_file.close()
         fd, fn = tempfile.mkstemp()
@@ -527,8 +527,21 @@ class GPGTestCase(unittest.TestCase):
         finally:
             shutil.rmtree(workdir)
 
+    def test_signing_with_uid(self):
+        "Test that signing with uids works"
+        logger.debug("test_signing_with_uid begins")
+        key = self.generate_key("Andrew", "Able", "alpha.com")
+        uid = self.gpg.list_keys(True)[-1]['uids'][0]
+        with open(self.test_fn,'rb') as signfile:
+            signed = self.gpg.sign_file(signfile, keyid=uid,
+                                        passphrase='aable',
+                                        detach=True)
+        self.assertTrue(signed.data)
+        logger.debug("test_signing_with_uid ends")
+
 TEST_GROUPS = {
-    'sign' : set(['test_signature_verification']),
+    'sign' : set(['test_signature_verification',
+                  'test_signing_with_uid']),
     'crypt' : set(['test_encryption_and_decryption',
                    'test_file_encryption_and_decryption']),
     'key' : set(['test_deletion', 'test_import_and_export',
@@ -542,6 +555,7 @@ TEST_GROUPS = {
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
+#    'test': set(['test_signing_with_uid']),
 }
 
 def suite(args=None):
@@ -559,7 +573,7 @@ def suite(args=None):
             elif arg == "doc":
                 want_doctests = True
             else:
-                print("Ignoring unknown test group %r" % arg)        
+                print("Ignoring unknown test group %r" % arg)
         result = unittest.TestSuite(list(map(GPGTestCase, tests)))
     if want_doctests:
         result.addTest(doctest.DocTestSuite(gnupg))
