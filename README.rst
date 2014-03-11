@@ -55,6 +55,9 @@ Released: Not yet.
 * Handled 'UNEXPECTED' message during verification. Thanks to
   David Andersen for the patch.
 
+* Fixed #2: Raised ValueError if no recipients were specified
+  for an asymmetric encryption request.
+
 0.3.6
 -----
 
