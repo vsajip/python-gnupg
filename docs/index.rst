@@ -518,6 +518,16 @@ the same as for the other verification methods.
 .. versionadded:: 0.3.6
    The ``verify_data`` method was added.
 
+Passphrases
+===========
+
+Passphrases provided to ``python-gnupg`` are not stored persistently, and
+just passed through to the ``GnuPG`` executable through a pipe. The user of
+``python-gnupg``  is responsible for taking care not to store passphrases
+where they may become available to malicious code or malicious users, as well
+as the physical and security aspects of managing their private keys.
+
+
 .. index:: Logging
 
 .. _logging:
