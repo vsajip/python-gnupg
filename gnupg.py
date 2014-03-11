@@ -1209,7 +1209,9 @@ class GPG(object):
                 args.extend(['--cipher-algo', shell_quote(symmetric)])
             # else use the default, currently CAST5
         else:
-            args = ['--encrypt']
+            if not recipients:
+                raise ValueError('No recipients specified with asymmetric '
+                                 'encryption')
             if not _is_sequence(recipients):
                 recipients = (recipients,)
             for recipient in recipients:

@@ -278,11 +278,12 @@ class GPGTestCase(unittest.TestCase):
         ddata = gpg.decrypt(edata, passphrase='bbrown')
         self.assertEqual(data, str(ddata))
         # Test symmetric encryption with non-default cipher
-        data = "chippy was here"
         edata = str(gpg.encrypt(data, None, passphrase='bbrown',
                     symmetric='AES256'))
         ddata = gpg.decrypt(edata, passphrase='bbrown')
         self.assertEqual(data, str(ddata))
+        # Test that you can't encrypt with no recipients
+        self.assertRaises(ValueError, self.gpg.encrypt, data, [])
 
     def test_import_and_export(self):
         "Test that key import and export works"
