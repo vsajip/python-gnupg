@@ -67,6 +67,7 @@ I've gratefully incorporated improvements contributed by:
 * Michal Niklas (Trust levels for signature verification)
 * David Noël (``search_keys``, ``send_keys`` functionality)
 * David Andersen (handle UNEXPECTED during verification)
+* Jannis Leidel (output signature to a file)
 
 and Google Code users
 
@@ -443,7 +444,7 @@ detach (defaults to ``False``)
 binary (defaults to ``False``)
     If ``True``, a binary signature (rather than armored ASCII) is created.
 output (defaults to ``None``)
-    If set is used as the file path at which GPG outputs the signature. Convention dictates to use a ``.asc`` or ``.sig`` file extension for this.
+    If specified, this is used as the file path where GPG outputs the signature. Convention dictates a ``.asc`` or ``.sig`` file extension for this.
 
 Note: If the data being signed is binary, calling ``str(signed_data)`` may raise exceptions. In that case, use the fact that ``signed_data.data`` holds the binary signed data. Usually the signature itself is ASCII; it's the message itself which may cause the exceptions to be raised. (Unless a detached signature is requested, the result of signing is the message with the signature appended.)
 
@@ -454,6 +455,10 @@ The ``detach`` keyword argument was added in version 0.2.5.
 .. versionadded 0.2.6
 
 The ``binary`` keyword argument was added in version 0.2.6.
+
+.. versionadded 0.3.7
+
+The ``output`` keyword argument was added in version 0.3.7.
 
 .. index:: Verification
 

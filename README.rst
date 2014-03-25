@@ -58,6 +58,10 @@ Released: Not yet.
 * Fixed #2: Raised ValueError if no recipients were specified
   for an asymmetric encryption request.
 
+* Added an ``output`` keyword parameter to the ``sign`` and
+  ``sign_file`` methods, to allow writing the signature to a file.
+  Thanks to Jannis Leidel for the patch.
+
 0.3.6
 -----
 
