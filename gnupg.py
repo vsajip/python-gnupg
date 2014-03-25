@@ -826,7 +826,7 @@ class GPG(object):
         return result
 
     def sign_file(self, file, keyid=None, passphrase=None, clearsign=True,
-                  detach=False, binary=False):
+                  detach=False, binary=False, output=None):
         """sign file"""
         logger.debug("sign_file: %s", file)
         if binary:
@@ -841,6 +841,12 @@ class GPG(object):
             args.append("--clearsign")
         if keyid:
             args.extend(['--default-key', shell_quote(keyid)])
+        if output:  # write the output to a file with the specified name
+            if os.path.exists(output):
+                # We need to avoid an overwrite confirmation message
+                args.extend(['--batch', '--yes'])
+            args.extend(['--output', shell_quote(output)])
+
         result = self.result_map['sign'](self)
         #We could use _handle_io here except for the fact that if the
         #passphrase is bad, gpg bails and you can't write the message.

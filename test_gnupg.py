@@ -411,6 +411,34 @@ class GPGTestCase(unittest.TestCase):
                          "Fingerprints must match")
         logger.debug("test_signature_verification ends")
 
+    def test_signature_file(self):
+        "Test that signing and verification works via the GPG output"
+        logger.debug("test_signature_file begins")
+        key = self.generate_key("Andrew", "Able", "alpha.com")
+        data_file = open(self.test_fn, 'rb')
+        sig_file = self.test_fn + '.asc'
+        sig = self.gpg.sign_file(data_file, keyid=key.fingerprint,
+                                 passphrase='aable', detach=True,
+                                 output=sig_file)
+        data_file.close()
+        self.assertTrue(sig, "File signing should succeed")
+        self.assertTrue(sig.hash_algo)
+        self.assertTrue(os.path.exists(sig_file))
+        # Test in-memory verification
+        data_file = open(self.test_fn, 'rb')
+        data = data_file.read()
+        data_file.close()
+        try:
+            verified = self.gpg.verify_data(sig_file, data)
+        finally:
+            os.unlink(sig_file)
+        if key.fingerprint != verified.fingerprint:
+            logger.debug("key: %r", key.fingerprint)
+            logger.debug("ver: %r", verified.fingerprint)
+        self.assertEqual(key.fingerprint, verified.fingerprint,
+                         "Fingerprints must match")
+        logger.debug("test_signature_file ends")
+
     def test_deletion(self):
         "Test that key deletion works"
         logger.debug("test_deletion begins")

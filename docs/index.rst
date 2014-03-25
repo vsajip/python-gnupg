@@ -442,6 +442,8 @@ detach (defaults to ``False``)
     specified a ``False`` value for *clearsign*. This is because if both are specified, gpg ignores the request for a detached signature.
 binary (defaults to ``False``)
     If ``True``, a binary signature (rather than armored ASCII) is created.
+output (defaults to ``None``)
+    If set is used as the file path at which GPG outputs the signature. Convention dictates to use a ``.asc`` or ``.sig`` file extension for this.
 
 Note: If the data being signed is binary, calling ``str(signed_data)`` may raise exceptions. In that case, use the fact that ``signed_data.data`` holds the binary signed data. Usually the signature itself is ASCII; it's the message itself which may cause the exceptions to be raised. (Unless a detached signature is requested, the result of signing is the message with the signature appended.)
 
