@@ -500,7 +500,7 @@ class Crypt(Verify, TextHandler):
 
     def handle_status(self, key, value):
         if key in ("ENC_TO", "USERID_HINT", "GOODMDC", "END_DECRYPTION",
-                   "BEGIN_SIGNING", "NO_SECKEY", "ERROR", "NODATA",
+                   "BEGIN_SIGNING", "NO_SECKEY", "ERROR", "NODATA", "PROGRESS",
                    "CARDCTRL", "BADMDC", "SC_OP_FAILURE", "SC_OP_SUCCESS"):
             # in the case of ERROR, this is because a more specific error
             # message will have come first
