@@ -611,7 +611,7 @@ class Sign(TextHandler):
         else:
             raise ValueError("Unknown status message: %r" % key)
 
-VERSION_RE = re.compile(r'gpg \(GnuPG\) (\d+(\.\d+)*)'.encode('utf-8'), re.I)
+VERSION_RE = re.compile(r'gpg \(GnuPG\) (\d+(\.\d+)*)'.encode('ascii'), re.I)
 
 class GPG(object):
 
@@ -664,13 +664,11 @@ class GPG(object):
         if isinstance(options, str):
             options = [options]
         self.options = options
-        self.encoding = locale.getpreferredencoding()
-        if self.encoding is None: # This happens on Jython!
-            self.encoding = sys.stdin.encoding
-        if self.encoding is None:
-            logger.warning('No encoding found via locale.getpreferredencoding '
-                           'or sys.stdin.encoding, defaulting to utf-8.')
-            self.encoding = 'utf-8'
+        # Changed in 0.3.7 to use Latin-1 encoding rather than
+        # locale.getpreferredencoding falling back to sys.stdin.encoding
+        # falling back to utf-8, because gpg itself uses latin-1 as the default
+        # encoding.
+        self.encoding = 'latin-1'
         if gnupghome and not os.path.isdir(self.gnupghome):
             os.makedirs(self.gnupghome,0x1C0)
         p = self._open_subprocess(["--version"])
@@ -683,7 +681,7 @@ class GPG(object):
         if not m:
             self.version = None
         else:
-            dot = '.'.encode('utf-8')
+            dot = '.'.encode('ascii')
             self.version = tuple([int(s) for s in m.groups()[0].split(dot)])
 
     def make_args(self, args, passphrase):
@@ -1067,7 +1065,8 @@ class GPG(object):
         which='keys'
         if secret:
             which='secret-keys'
-        args = ["--list-%s" % which, "--fixed-list-mode", "--fingerprint", "--with-colons"]
+        args = ["--list-%s" % which, "--fixed-list-mode", "--fingerprint",
+                "--with-colons"]
         p = self._open_subprocess(args)
 
         # there might be some status thingumy here I should handle... (amk)

@@ -583,7 +583,7 @@ TEST_GROUPS = {
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-#    'test': set(['test_signing_with_uid']),
+    'test': set(['test_search_keys']),
 }
 
 def suite(args=None):
