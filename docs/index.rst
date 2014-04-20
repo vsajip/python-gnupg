@@ -125,14 +125,18 @@ secret_keyring (defaults to ``None``)
 .. note:: If you specify values in ``options``, make sure you don't specify values which will conflict with other values added by python-gnupg. You
    should be familiar with GPG command-line arguments and how they affect GPG's operation.
 
+.. versionchanged:: 0.3.7
+   The default encoding was changed to ``latin-1``. In earlier versions, it was either ``locale.getpreferredencoding()`` or, failing that, ``sys.stdin.encoding``, and failing that, ``utf-8``.
+
+
 If the ``gpgbinary`` executable cannot be found, a ``ValueError`` is raised in :meth:`GPG.__init__`.
 
-The low-level communication between the ``gpg`` executable and python-gnupg is in terms of bytes, and ``python-gnupg`` tries to convert gpg's ``stderr`` stream to text using an encoding. The default value of this is whatever is returned by :func:`locale.getpreferredencoding`, but you can override this by setting the encoding name in the GPG instance's ``encoding`` attribute after instantiation, like this::
+The low-level communication between the ``gpg`` executable and python-gnupg is in terms of bytes, and ``python-gnupg`` tries to convert gpg's ``stderr`` stream to text using an encoding. The default value of this is ``latin-1``, but you can override this by setting the encoding name in the GPG instance's ``encoding`` attribute after instantiation, like this::
 
     >>> gpg = gnupg.GPG(gnupghome='/path/to/home/directory')
     >>> gpg.encoding = 'utf-8'
 
-.. note:: If you use the wrong encoding, you may get exceptions. The ``'latin-1'`` encoding leaves bytes as-is and shouldn't fail with encoding/decoding errors, though it may not decode text correctly (so you may see odd characters in the decoding output). The ``gpg`` executable will use an output encoding based on your environment settings (e.g. environment variables, code page etc.)
+.. note:: If you use the wrong encoding, you may get exceptions. The ``'latin-1'`` encoding leaves bytes as-is and shouldn't fail with encoding/decoding errors, though it may not decode text correctly (so you may see odd characters in the decoding output). The ``gpg`` executable will use an output encoding based on your environment settings (e.g. environment variables, code page etc.) but defaults to latin-1.
 
 __ logging_
 
