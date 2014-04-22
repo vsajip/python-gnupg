@@ -612,6 +612,7 @@ class Sign(TextHandler):
             raise ValueError("Unknown status message: %r" % key)
 
 VERSION_RE = re.compile(r'gpg \(GnuPG\) (\d+(\.\d+)*)'.encode('ascii'), re.I)
+HEX_DIGITS_RE = re.compile(r'[0-9a-f]+$', re.I)
 
 class GPG(object):
 
@@ -1106,7 +1107,9 @@ class GPG(object):
         >>> assert result
 
         """
-
+        query = query.strip()
+        if HEX_DIGITS_RE.match(query):
+            query = '0x' + query
         args = ['--fixed-list-mode', '--fingerprint', '--with-colons',
                 '--keyserver', shell_quote(keyserver), '--search-keys',
                 shell_quote(query)]
