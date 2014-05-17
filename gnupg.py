@@ -216,7 +216,7 @@ class Verify(object):
                      "PLAINTEXT_LENGTH", "POLICY_URL", "DECRYPTION_INFO",
                      "DECRYPTION_OKAY", "INV_SGNR", "FILE_START", "FILE_ERROR",
                      "FILE_DONE", "PKA_TRUST_GOOD", "PKA_TRUST_BAD", "BADMDC",
-                     "GOODMDC", "NO_SGNR"):
+                     "GOODMDC", "NO_SGNR", "NOTATION_NAME", "NOTATION_DATA"):
             pass
         elif key == "BADSIG":
             self.valid = False
@@ -600,9 +600,13 @@ class Sign(TextHandler):
     def handle_status(self, key, value):
         if key in ("USERID_HINT", "NEED_PASSPHRASE", "BAD_PASSPHRASE",
                    "GOOD_PASSPHRASE", "BEGIN_SIGNING", "CARDCTRL", "INV_SGNR",
-                   "KEYEXPIRED", "SIGEXPIRED", "KEYREVOKED", "NO_SGNR",
-                   "MISSING_PASSPHRASE", "SC_OP_FAILURE", "SC_OP_SUCCESS"):
+                   "NO_SGNR", "MISSING_PASSPHRASE",
+                   "SC_OP_FAILURE", "SC_OP_SUCCESS"):
             pass
+        elif key in ("KEYEXPIRED", "SIGEXPIRED"):
+            self.status = 'key expired'
+        elif key == "KEYREVOKED":
+            self.status = 'key revoked'
         elif key == "SIG_CREATED":
             (self.type,
              algo, self.hash_algo, cls,
