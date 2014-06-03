@@ -62,6 +62,11 @@ Released: Not yet.
   ``sign_file`` methods, to allow writing the signature to a file.
   Thanks to Jannis Leidel for the patch.
 
+* Allowed specifying ``True`` for the ``sign`` keyword parameter,
+  which allows use of the default key for signing and avoids having to
+  specify a key id when it's desired to use the default. Thanks to
+  Fabian Beutel for the patch.
+
 0.3.6
 -----
 

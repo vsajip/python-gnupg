@@ -1236,10 +1236,12 @@ class GPG(object):
                 #os.remove(output)
                 args.extend(['--batch', '--yes'])
             args.extend(['--output', shell_quote(output)])
-        if sign:
+        if sign is True:
+            args.append('--sign')
+        elif sign:
             args.extend(['--sign', '--default-key', shell_quote(sign)])
         if always_trust:
-            args.append("--always-trust")
+            args.append('--always-trust')
         result = self.result_map['crypt'](self)
         self._handle_io(args, file, result, passphrase=passphrase, binary=True)
         logger.debug('encrypt result: %r', result.data)

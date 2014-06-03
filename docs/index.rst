@@ -341,7 +341,7 @@ These methods both return an object such that ``str(encrypted_ascii_data)`` give
 In both cases, ``recipients`` is a list of key fingerprints for those recipients. For your convenience, if there is a single recipient, you can pass the fingerprint rather than a 1-element array containing the fingerprint. Both methods accept the following optional keyword arguments:
 
 sign (defaults to ``None``)
-    The fingerprint of a key which is used to sign the encrypted data. When not specified, the data is not signed.
+    Either the Boolean value ``True``, or the fingerprint of a key which is used to sign the encrypted data. If ``True`` is specified, the default key is used for signing. When not specified, the data is not signed.
 always_trust (defaults to ``False``)
     Skip key validation and assume that used keys are always fully trusted.
 passphrase (defaults to ``None``)
