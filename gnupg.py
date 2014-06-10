@@ -343,8 +343,8 @@ class ImportResult(object):
                 'problem': reason, 'text': self.problem_reason[reason]})
         elif key == "IMPORT_RES":
             import_res = value.split()
-            for i in range(len(self.counts)):
-                setattr(self, self.counts[i], int(import_res[i]))
+            for i, count in enumerate(self.counts):
+                setattr(self, count, int(import_res[i]))
         elif key == "KEYEXPIRED":
             self.results.append({'fingerprint': None,
                 'problem': '0', 'text': 'Key expired'})
@@ -406,8 +406,8 @@ class ListKeys(list):
             type trust length algo keyid date expires dummy ownertrust uid
         """).split()
         self.curkey = {}
-        for i in range(len(vars)):
-            self.curkey[vars[i]] = args[i]
+        for i, var in enumerate(vars):
+            self.curkey[var] = args[i]
         self.curkey['uids'] = []
         if self.curkey['uid']:
             self.curkey['uids'].append(self.curkey['uid'])
@@ -454,8 +454,8 @@ class SearchKeys(list):
             type keyid algo length date expires
         """).split()
         self.curkey = {}
-        for i in range(len(vars)):
-            self.curkey[vars[i]] = args[i]
+        for i, var in enumerate(vars):
+            self.curkey[var] = args[i]
         self.curkey['uids'] = []
         self.append(self.curkey)
 
