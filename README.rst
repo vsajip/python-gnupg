@@ -67,6 +67,11 @@ Released: Not yet.
   specify a key id when it's desired to use the default. Thanks to
   Fabian Beutel for the patch.
 
+* Replaced old range(len(X)) idiom with enumerate().
+
+* Refactored ``ListKeys`` / ``SearchKeys`` classes to maximise use of common
+  functions.
+
 0.3.6
 -----
 

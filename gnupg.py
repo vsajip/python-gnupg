@@ -378,7 +378,46 @@ class SendResult(object):
     def handle_status(self, key, value):
         logger.debug('SendResult: %s: %s', key, value)
 
-class ListKeys(list):
+class SearchKeys(list):
+    ''' Handle status messages for --search-keys.
+
+        Handle pub and uid (relating the latter to the former).
+
+        Don't care about the rest
+    '''
+
+    UID_INDEX = 1
+    FIELDS = 'type keyid algo length date expires'.split()
+
+    def __init__(self, gpg):
+        self.gpg = gpg
+        self.curkey = None
+        self.fingerprints = []
+        self.uids = []
+
+    def get_fields(self, args):
+        result = {}
+        for i, var in enumerate(self.FIELDS):
+            result[var] = args[i]
+        result['uids'] = []
+        return result
+
+    def pub(self, args):
+        self.curkey = curkey = self.get_fields(args)
+        self.append(curkey)
+
+    def uid(self, args):
+        uid = args[self.UID_INDEX]
+        uid = ESCAPE_PATTERN.sub(lambda m: chr(int(m.group(1), 16)), uid)
+        for k, v in BASIC_ESCAPES.items():
+            uid = uid.replace(k, v)
+        self.curkey['uids'].append(uid)
+        self.uids.append(uid)
+
+    def handle_status(self, key, value):
+        pass
+
+class ListKeys(SearchKeys):
     ''' Handle status messages for --list-keys.
 
         Handle pub and uid (relating the latter to the former).
@@ -395,25 +434,17 @@ class ListKeys(list):
         grp = reserved for gpgsm
         rvk = revocation key
     '''
-    def __init__(self, gpg):
-        self.gpg = gpg
-        self.curkey = None
-        self.fingerprints = []
-        self.uids = []
+
+    UID_INDEX = 9
+    FIELDS = 'type trust length algo keyid date expires dummy ownertrust uid'.split()
 
     def key(self, args):
-        vars = ("""
-            type trust length algo keyid date expires dummy ownertrust uid
-        """).split()
-        self.curkey = {}
-        for i, var in enumerate(vars):
-            self.curkey[var] = args[i]
-        self.curkey['uids'] = []
-        if self.curkey['uid']:
-            self.curkey['uids'].append(self.curkey['uid'])
-        del self.curkey['uid']
-        self.curkey['subkeys'] = []
-        self.append(self.curkey)
+        self.curkey = curkey = self.get_fields(args)
+        if curkey['uid']:
+            curkey['uids'].append(curkey['uid'])
+        del curkey['uid']
+        curkey['subkeys'] = []
+        self.append(curkey)
 
     pub = sec = key
 
@@ -421,54 +452,9 @@ class ListKeys(list):
         self.curkey['fingerprint'] = args[9]
         self.fingerprints.append(args[9])
 
-    def uid(self, args):
-        uid = args[9]
-        uid = ESCAPE_PATTERN.sub(lambda m: chr(int(m.group(1), 16)), uid)
-        for k, v in BASIC_ESCAPES.items():
-            uid = uid.replace(k, v)
-        self.curkey['uids'].append(uid)
-        self.uids.append(uid)
-
     def sub(self, args):
         subkey = [args[4], args[11]]
         self.curkey['subkeys'].append(subkey)
-
-    def handle_status(self, key, value):
-        pass
-
-class SearchKeys(list):
-    ''' Handle status messages for --search-keys.
-
-        Handle pub and uid (relating the latter to the former).
-
-        Don't care about the rest
-    '''
-    def __init__(self, gpg):
-        self.gpg = gpg
-        self.curkey = None
-        self.fingerprints = []
-        self.uids = []
-
-    def pub(self, args):
-        vars = ("""
-            type keyid algo length date expires
-        """).split()
-        self.curkey = {}
-        for i, var in enumerate(vars):
-            self.curkey[var] = args[i]
-        self.curkey['uids'] = []
-        self.append(self.curkey)
-
-    def uid(self, args):
-        uid = args[1]
-        uid = ESCAPE_PATTERN.sub(lambda m: chr(int(m.group(1), 16)), uid)
-        for k, v in BASIC_ESCAPES.items():
-            uid = uid.replace(k, v)
-        self.curkey['uids'].append(uid)
-        self.uids.append(uid)
-
-    def handle_status(self, key, value):
-        pass
 
 
 class TextHandler(object):
