@@ -575,10 +575,13 @@ class GPGTestCase(unittest.TestCase):
         logger.debug("test_signing_with_uid begins")
         key = self.generate_key("Andrew", "Able", "alpha.com")
         uid = self.gpg.list_keys(True)[-1]['uids'][0]
-        with open(self.test_fn,'rb') as signfile:
+        try:
+            signfile = open(self.test_fn,'rb')
             signed = self.gpg.sign_file(signfile, keyid=uid,
                                         passphrase='aable',
                                         detach=True)
+        finally:
+            signfile.close()
         self.assertTrue(signed.data)
         logger.debug("test_signing_with_uid ends")
 
