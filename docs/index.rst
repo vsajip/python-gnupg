@@ -8,7 +8,7 @@
 ###########################################
 
 :Release: |release|
-:Date: February 05, 2014
+:Date: July 27, 2014
 
 .. module:: gnupg
    :synopsis: A Python wrapper for the GNU Privacy Guard (GnuPG)
@@ -55,7 +55,7 @@ Acknowledgements
 ================
 This module is based on an earlier version, ``GPG.py``, written by Andrew Kuchling. This was further improved by Richard Jones, and then even further by Steve Traugott. The ``gnupg`` module is derived from `Steve Traugott's module`__, and uses Python's ``subprocess`` module to communicate with the GnuPG executable, which it uses to spawn a subprocess to do the real work.
 
-I've gratefully incorporated improvements contributed by:
+I've gratefully incorporated improvements contributed or suggested by:
 
 * Paul Cunnane (detached signature support)
 * Daniel Folkinshteyn (``recv_keys``, handling of subkeys and SIGEXPIRED, KEYEXPIRED while verifying, EXPKEYSIG, REVKEYSIG)
@@ -68,6 +68,7 @@ I've gratefully incorporated improvements contributed by:
 * David Noël (``search_keys``, ``send_keys`` functionality)
 * David Andersen (handle UNEXPECTED during verification)
 * Jannis Leidel (output signature to a file)
+* Venzen Khaosan (scan_keys functionality)
 
 and Google Code users
 
@@ -268,6 +269,20 @@ Now that we've seen how to generate, import and export keys, let's move on to fi
     >>> private_keys = gpg.list_keys(True) # True => private keys
 
 The returned value from :meth:`list_keys` is a subclass of Python's ``list`` class. Each entry represents one key and is a Python dictionary which contains useful information about the corresponding key.
+
+.. index:: Key; scanning
+
+Scanning keys
+-------------
+
+We can also scan keys in files without importing them into a local keyring, as follows::
+
+    >>> keys = gpg.scan_keys(key_file_name)
+
+The returned value from :meth:`scan_keys` has the same format as for :meth:`list_keys`.
+
+.. versionadded:: 0.3.7
+   The ``scan_keys`` method was added.
 
 .. index:: Key; deleting
 

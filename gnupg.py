@@ -32,9 +32,9 @@ Modifications Copyright (C) 2008-2014 Vinay Sajip. All rights reserved.
 A unittest harness (test_gnupg.py) has also been added.
 """
 
-__version__ = "0.3.6"
+__version__ = "0.3.7.dev0"
 __author__ = "Vinay Sajip"
-__date__  = "$05-Feb-2014 17:47:10$"
+__date__  = "$27-Jul-2014 12:07:55$"
 
 try:
     from io import StringIO
@@ -457,6 +457,15 @@ class ListKeys(SearchKeys):
         self.curkey['subkeys'].append(subkey)
 
 
+class ScanKeys(ListKeys):
+    ''' Handle status messages for --with-fingerprint.'''
+
+    def sub(self, args):
+        # --with-fingerprint --with-colons somehow outputs fewer colons,
+        # use the last value args[-1] instead of args[11]
+        subkey = [args[4], args[-1]]
+        self.curkey['subkeys'].append(subkey)
+
 class TextHandler(object):
     def _as_text(self):
         return self.data.decode(self.gpg.encoding, self.gpg.decode_errors)
@@ -615,6 +624,7 @@ class GPG(object):
         'import': ImportResult,
         'send': SendResult,
         'list': ListKeys,
+        'scan': ScanKeys,
         'search': SearchKeys,
         'sign': Sign,
         'verify': Verify,
@@ -1036,6 +1046,27 @@ class GPG(object):
         logger.debug('export_keys result: %r', result.data)
         return result.data.decode(self.encoding, self.decode_errors)
 
+    def _get_list_output(self, p, kind):
+        # Get the response information
+        result = self.result_map[kind](self)
+        self._collect_output(p, result, stdin=p.stdin)
+        lines = result.data.decode(self.encoding,
+                                   self.decode_errors).splitlines()
+        valid_keywords = 'pub uid sec fpr sub'.split()
+        for line in lines:
+            if self.verbose:
+                print(line)
+            logger.debug("line: %r", line.rstrip())
+            if not line:
+                break
+            L = line.strip().split(':')
+            if not L:
+                continue
+            keyword = L[0]
+            if keyword in valid_keywords:
+                getattr(result, keyword)(L)
+        return result
+
     def list_keys(self, secret=False):
         """ list the keys currently in the keyring
 
@@ -1059,29 +1090,20 @@ class GPG(object):
         args = ["--list-%s" % which, "--fixed-list-mode", "--fingerprint",
                 "--with-colons"]
         p = self._open_subprocess(args)
+        return self._get_list_output(p, 'list')
 
-        # there might be some status thingumy here I should handle... (amk)
-        # ...nope, unless you care about expired sigs or keys (stevegt)
+    def scan_keys(self, filename):
+        """
+        List details of an ascii armored or binary key file
+        without first importing it to the local keyring.
 
-        # Get the response information
-        result = self.result_map['list'](self)
-        self._collect_output(p, result, stdin=p.stdin)
-        lines = result.data.decode(self.encoding,
-                                   self.decode_errors).splitlines()
-        valid_keywords = 'pub uid sec fpr sub'.split()
-        for line in lines:
-            if self.verbose:
-                print(line)
-            logger.debug("line: %r", line.rstrip())
-            if not line:
-                break
-            L = line.strip().split(':')
-            if not L:
-                continue
-            keyword = L[0]
-            if keyword in valid_keywords:
-                getattr(result, keyword)(L)
-        return result
+        The function achieves this by running:
+        $ gpg --with-fingerprint --with-colons filename
+        """
+        args = ['--with-fingerprint', '--with-colons']
+        args.append(shell_quote(filename))
+        p = self._open_subprocess(args)
+        return self._get_list_output(p, 'scan')
 
     def search_keys(self, query, keyserver='pgp.mit.edu'):
         """ search keyserver by query (using --search-keys option)

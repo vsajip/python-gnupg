@@ -17,7 +17,7 @@ import unittest
 import gnupg
 
 __author__ = "Vinay Sajip"
-__date__  = "$05-Feb-2014 17:48:48$"
+__date__  = "$27-Jul-2014 12:07:26$"
 
 ALL_TESTS = True
 
@@ -242,6 +242,20 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(public_keys_2, public_keys)
         private_keys_2 = gpg.list_keys(secret=True)
         self.assertEqual(private_keys_2, private_keys)
+
+    def test_scan_keys(self):
+        "Test that external key files can be scanned"
+        expected = set([
+            'Andrew Able (A test user) <andrew.able@alpha.com>',
+            'Barbara Brown (A test user) <barbara.brown@beta.com>',
+            'Charlie Clark (A test user) <charlie.clark@gamma.com>',
+        ])
+        for fn in ('test_pubring.gpg', 'test_secring.gpg'):
+            data = self.gpg.scan_keys(fn)
+            uids = set()
+            for d in data:
+                uids.add(d['uids'][0])
+            self.assertEqual(uids, expected)
 
     def test_encryption_and_decryption(self):
         "Test that encryption and decryption works"
@@ -578,7 +592,7 @@ TEST_GROUPS = {
                  'test_key_generation_with_escapes',
                  'test_key_generation_with_empty_value',
                  'test_key_generation_with_colons',
-                 'test_search_keys']),
+                 'test_search_keys', 'test_scan_keys']),
     'import' : set(['test_import_only']),
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
