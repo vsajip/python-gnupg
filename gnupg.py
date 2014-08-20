@@ -1026,7 +1026,7 @@ class GPG(object):
         self._collect_output(p, result, stdin=p.stdin)
         return result
 
-    def export_keys(self, keyids, secret=False):
+    def export_keys(self, keyids, secret=False, armor=True, minimal=False):
         "export the indicated keys. 'keyid' is anything gpg accepts"
         which=''
         if secret:
@@ -1035,7 +1035,11 @@ class GPG(object):
             keyids = [shell_quote(k) for k in keyids]
         else:
             keyids = [shell_quote(keyids)]
-        args = ['--armor', '--export%s' % which]
+        args = ['--export%s' % which]
+        if armor:
+            args.append('--armor')
+        if minimal:
+            args.extend(['--export-options','export-minimal'])
         args.extend(keyids)
         p = self._open_subprocess(args)
         # gpg --export produces no status-fd output; stdout will be
