@@ -230,9 +230,8 @@ To export keys, use the :meth:`export_keys` method::
 
 For the ``keyids`` parameter, you can use a sequence of anything which GnuPG itself accepts to identify a key - for example, the keyid or the fingerprint could be used. If you want to pass a single keyid, then you can just pass in a string which identifies the key.
 
-The ``export_keys`` method has two additional keyword arguments: ``armor`` (defaulting to ``True``) and ``minimal`` (defaulting to ``False``). When ``True``, these pass ``--armor`` and ``--export-options export-minimal``, respectively, to ``gpg``.
-
-.. versionadded:: 0.3.6
+.. The ``export_keys`` method has two additional keyword arguments: ``armor`` (defaulting to ``True``) and ``minimal`` (defaulting to ``False``). When ``True``, these pass ``--armor`` and ``--export-options export-minimal``, respectively, to ``gpg``.
+   versionadded:: 0.3.6
    The ``armor`` and ``minimal`` keyword arguments were added.
 
 

@@ -72,6 +72,9 @@ Released: Not yet.
 * Refactored ``ListKeys`` / ``SearchKeys`` classes to maximise use of common
   functions.
 
+* Fixed GC94: Added ``export-minimal`` and ``armor`` options when exporting
+  keys. This addition was inadvertently left out of 0.3.6.
+
 0.3.6
 -----
 
@@ -80,8 +83,6 @@ Released: 2014-02-05
 * Fixed GC82: Enabled fast random tests on gpg as well as gpg2.
 * Fixed GC85: Avoided deleting temporary file to preserve its permissions.
 * Fixed GC87: Avoided writing passphrase to log.
-* Fixed GC94: Added ``export-minimal`` and ``armor`` options when exporting
-  keys.
 * Fixed GC95: Added ``verify_data()`` method to allow verification of
   signatures in memory.
 * Fixed GC96: Regularised end-of-line characters.
