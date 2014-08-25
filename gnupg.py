@@ -502,7 +502,7 @@ class Crypt(Verify, TextHandler):
             pass
         elif key in ("NEED_PASSPHRASE", "BAD_PASSPHRASE", "GOOD_PASSPHRASE",
                      "MISSING_PASSPHRASE", "DECRYPTION_FAILED",
-                     "KEY_NOT_CREATED"):
+                     "KEY_NOT_CREATED", "NEED_PASSPHRASE_PIN"):
             self.status = key.replace("_", " ").lower()
         elif key == "NEED_PASSPHRASE_SYM":
             self.status = 'need symmetric passphrase'
@@ -595,7 +595,7 @@ class Sign(TextHandler):
     def handle_status(self, key, value):
         if key in ("USERID_HINT", "NEED_PASSPHRASE", "BAD_PASSPHRASE",
                    "GOOD_PASSPHRASE", "BEGIN_SIGNING", "CARDCTRL", "INV_SGNR",
-                   "NO_SGNR", "MISSING_PASSPHRASE",
+                   "NO_SGNR", "MISSING_PASSPHRASE", "NEED_PASSPHRASE_PIN",
                    "SC_OP_FAILURE", "SC_OP_SUCCESS"):
             pass
         elif key in ("KEYEXPIRED", "SIGEXPIRED"):
