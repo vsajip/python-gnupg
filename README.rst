@@ -75,6 +75,9 @@ Released: Not yet.
 * Fixed GC94: Added ``export-minimal`` and ``armor`` options when exporting
   keys. This addition was inadvertently left out of 0.3.6.
 
+* Fixed #16: Output file names are not quoted.
+
+
 0.3.6
 -----
 
