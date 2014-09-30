@@ -824,6 +824,13 @@ class GPG(object):
         f.close()
         return result
 
+    def set_output_without_confirmation(self, args, output):
+        "If writing to a file which exists, avoid a confirmation message."
+        if os.path.exists(output):
+            # We need to avoid an overwrite confirmation message
+            args.extend(['--batch', '--yes'])
+        args.extend(['--output', output])
+
     def sign_file(self, file, keyid=None, passphrase=None, clearsign=True,
                   detach=False, binary=False, output=None):
         """sign file"""
@@ -841,10 +848,7 @@ class GPG(object):
         if keyid:
             args.extend(['--default-key', shell_quote(keyid)])
         if output:  # write the output to a file with the specified name
-            if os.path.exists(output):
-                # We need to avoid an overwrite confirmation message
-                args.extend(['--batch', '--yes'])
-            args.extend(['--output', shell_quote(output)])
+            self.set_output_without_confirmation(args, output)
 
         result = self.result_map['sign'](self)
         #We could use _handle_io here except for the fact that if the
@@ -1243,11 +1247,7 @@ class GPG(object):
         if armor:   # create ascii-armored output - False for binary output
             args.append('--armor')
         if output:  # write the output to a file with the specified name
-            if os.path.exists(output):
-                # We need to avoid an overwrite confirmation message
-                #os.remove(output)
-                args.extend(['--batch', '--yes'])
-            args.extend(['--output', shell_quote(output)])
+            self.set_output_without_confirmation(args, output)
         if sign is True:
             args.append('--sign')
         elif sign:
@@ -1315,11 +1315,7 @@ class GPG(object):
                      output=None):
         args = ["--decrypt"]
         if output:  # write the output to a file with the specified name
-            if os.path.exists(output):
-                # We need to avoid an overwrite confirmation message
-                #os.remove(output)
-                args.extend(['--batch', '--yes'])
-            args.extend(['--output', shell_quote(output)])
+            self.set_output_without_confirmation(args, output)
         if always_trust:
             args.append("--always-trust")
         result = self.result_map['crypt'](self)

@@ -485,20 +485,16 @@ class GPGTestCase(unittest.TestCase):
         self.assertTrue(len(args) > 4)
         self.assertEqual(args[-4:], ['--foo', '--bar', 'a', 'b'])
 
-    def test_file_encryption_and_decryption(self):
-        "Test that encryption/decryption to/from file works"
-        logger.debug("test_file_encryption_and_decryption begins")
-        encfno, encfname = tempfile.mkstemp()
-        decfno, decfname = tempfile.mkstemp()
+    def do_file_encryption_and_decryption(self, encfname, decfname):
+        "Do the actual encryption.decryptin test using given filenames"
+        mode = None
         if os.name == 'posix':
             # pick a mode that won't be already in effect via umask
-            mode = os.stat(encfname).st_mode | stat.S_IXUSR
-            os.chmod(encfname, mode)
-            # assume same for decfname
-            os.chmod(decfname, mode)
-        # On Windows, if the handles aren't closed, the files can't be deleted
-        os.close(encfno)
-        os.close(decfno)
+            if os.path.exists(encfname) and os.path.exists(decfname):
+                mode = os.stat(encfname).st_mode | stat.S_IXUSR
+                os.chmod(encfname, mode)
+                # assume same for decfname
+                os.chmod(decfname, mode)
         logger.debug('Encrypting to: %r', encfname)
         logger.debug('Decrypting to: %r', decfname)
         try:
@@ -528,13 +524,35 @@ class GPGTestCase(unittest.TestCase):
             self.assertEqual(data, ddata, "Round-trip must work")
         finally:
             for fn in (encfname, decfname):
-                if os.name == 'posix':
+                if os.name == 'posix' and mode is not None:
                     # Check that the file wasn't deleted, and that the
                     # mode bits we set are still in effect
                     self.assertEqual(os.stat(fn).st_mode, mode)
                 if os.path.exists(fn):
                     os.remove(fn)
+
+    def test_file_encryption_and_decryption(self):
+        "Test that encryption/decryption to/from file works"
+        logger.debug("test_file_encryption_and_decryption begins")
+        encfno, encfname = tempfile.mkstemp()
+        decfno, decfname = tempfile.mkstemp()
+        # On Windows, if the handles aren't closed, the files can't be deleted
+        os.close(encfno)
+        os.close(decfno)
+        self.do_file_encryption_and_decryption(encfname, decfname)
         logger.debug("test_file_encryption_and_decryption ends")
+
+    def test_filenames_with_spaces(self):       # See Issue #16
+        "Test that filenames with spaces are correctly handled"
+        logger.debug("test_filename_with_spaces begins")
+        d = tempfile.mkdtemp()
+        try:
+            encfname = os.path.join(d, 'encrypted file')
+            decfname = os.path.join(d, 'decrypted file')
+            self.do_file_encryption_and_decryption(encfname, decfname)
+        finally:
+            shutil.rmtree(d)
+        logger.debug("test_filename_with_spaces ends")
 
     def test_search_keys(self):
         "Test that searching for keys works"
@@ -588,7 +606,8 @@ class GPGTestCase(unittest.TestCase):
 TEST_GROUPS = {
     'sign' : set(['test_signature_verification']),
     'crypt' : set(['test_encryption_and_decryption',
-                   'test_file_encryption_and_decryption']),
+                   'test_file_encryption_and_decryption',
+                   'test_filenames_with_spaces']),
     'key' : set(['test_deletion', 'test_import_and_export',
                  'test_list_keys_after_generation',
                  'test_key_generation_with_invalid_key_type',

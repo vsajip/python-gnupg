@@ -1,4 +1,4 @@
 (build|dist|keys)/
-(MANIFEST|random_binary_data)$
+(DETAILS|MANIFEST|random_binary_data)$
 \.(pyc|log|dict-validwords)$
 
