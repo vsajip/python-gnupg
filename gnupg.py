@@ -110,6 +110,11 @@ else:
 
     # end of sarge code
 
+# Now that we use shell=False, we shouldn't need to quote arguments.
+# Use no_quote instead of shell_quote to remind us of where quoting
+# was needed.
+def no_quote(s):
+    return s
 
 def _copy_data(instream, outstream):
     # Copy one stream to another
@@ -693,14 +698,14 @@ class GPG(object):
         """
         cmd = [self.gpgbinary, '--status-fd', '2', '--no-tty']
         if self.gnupghome:
-            cmd.extend(['--homedir',  shell_quote(self.gnupghome)])
+            cmd.extend(['--homedir',  no_quote(self.gnupghome)])
         if self.keyring:
             cmd.append('--no-default-keyring')
             for fn in self.keyring:
-                cmd.extend(['--keyring', shell_quote(fn)])
+                cmd.extend(['--keyring', no_quote(fn)])
         if self.secret_keyring:
             for fn in self.secret_keyring:
-                cmd.extend(['--secret-keyring', shell_quote(fn)])
+                cmd.extend(['--secret-keyring', no_quote(fn)])
         if passphrase:
             cmd.extend(['--batch', '--passphrase-fd', '0'])
         if self.use_agent:
@@ -846,7 +851,7 @@ class GPG(object):
         elif clearsign:
             args.append("--clearsign")
         if keyid:
-            args.extend(['--default-key', shell_quote(keyid)])
+            args.extend(['--default-key', no_quote(keyid)])
         if output:  # write the output to a file with the specified name
             self.set_output_without_confirmation(args, output)
 
@@ -901,8 +906,8 @@ class GPG(object):
             logger.debug('Wrote to temp file: %r', s)
             os.write(fd, s)
             os.close(fd)
-            args.append(shell_quote(fn))
-            args.append(shell_quote(data_filename))
+            args.append(no_quote(fn))
+            args.append(no_quote(data_filename))
             try:
                 p = self._open_subprocess(args)
                 self._collect_output(p, result, stdin=p.stdin)
@@ -914,7 +919,7 @@ class GPG(object):
         "Verify the signature in sig_filename against data in memory"
         logger.debug('verify_data: %r, %r ...', sig_filename, data[:16])
         result = self.result_map['verify'](self)
-        args = ['--verify', shell_quote(sig_filename), '-']
+        args = ['--verify', no_quote(sig_filename), '-']
         stream = _make_memory_stream(data)
         self._handle_io(args, stream, result, binary=True)
         return result
@@ -991,8 +996,8 @@ class GPG(object):
         logger.debug('recv_keys: %r', keyids)
         data = _make_binary_stream("", self.encoding)
         #data = ""
-        args = ['--keyserver', shell_quote(keyserver), '--recv-keys']
-        args.extend([shell_quote(k) for k in keyids])
+        args = ['--keyserver', no_quote(keyserver), '--recv-keys']
+        args.extend([no_quote(k) for k in keyids])
         self._handle_io(args, data, result, binary=True)
         logger.debug('recv_keys result: %r', result.__dict__)
         data.close()
@@ -1008,8 +1013,8 @@ class GPG(object):
         logger.debug('send_keys: %r', keyids)
         data = _make_binary_stream('', self.encoding)
         #data = ""
-        args = ['--keyserver', shell_quote(keyserver), '--send-keys']
-        args.extend([shell_quote(k) for k in keyids])
+        args = ['--keyserver', no_quote(keyserver), '--send-keys']
+        args.extend([no_quote(k) for k in keyids])
         self._handle_io(args, data, result, binary=True)
         logger.debug('send_keys result: %r', result.__dict__)
         data.close()
@@ -1020,9 +1025,9 @@ class GPG(object):
         if secret:
             which='secret-key'
         if _is_sequence(fingerprints):
-            fingerprints = [shell_quote(s) for s in fingerprints]
+            fingerprints = [no_quote(s) for s in fingerprints]
         else:
-            fingerprints = [shell_quote(fingerprints)]
+            fingerprints = [no_quote(fingerprints)]
         args = ['--batch', '--delete-%s' % which]
         args.extend(fingerprints)
         result = self.result_map['delete'](self)
@@ -1036,9 +1041,9 @@ class GPG(object):
         if secret:
             which='-secret-key'
         if _is_sequence(keyids):
-            keyids = [shell_quote(k) for k in keyids]
+            keyids = [no_quote(k) for k in keyids]
         else:
-            keyids = [shell_quote(keyids)]
+            keyids = [no_quote(keyids)]
         args = ['--export%s' % which]
         if armor:
             args.append('--armor')
@@ -1109,7 +1114,7 @@ class GPG(object):
         $ gpg --with-fingerprint --with-colons filename
         """
         args = ['--with-fingerprint', '--with-colons']
-        args.append(shell_quote(filename))
+        args.append(no_quote(filename))
         p = self._open_subprocess(args)
         return self._get_list_output(p, 'scan')
 
@@ -1131,8 +1136,8 @@ class GPG(object):
         if HEX_DIGITS_RE.match(query):
             query = '0x' + query
         args = ['--fixed-list-mode', '--fingerprint', '--with-colons',
-                '--keyserver', shell_quote(keyserver), '--search-keys',
-                shell_quote(query)]
+                '--keyserver', no_quote(keyserver), '--search-keys',
+                no_quote(query)]
         p = self._open_subprocess(args)
 
         # Get the response information
@@ -1234,7 +1239,7 @@ class GPG(object):
             # such as AES256
             args = ['--symmetric']
             if symmetric is not True:
-                args.extend(['--cipher-algo', shell_quote(symmetric)])
+                args.extend(['--cipher-algo', no_quote(symmetric)])
             # else use the default, currently CAST5
         else:
             if not recipients:
@@ -1243,7 +1248,7 @@ class GPG(object):
             if not _is_sequence(recipients):
                 recipients = (recipients,)
             for recipient in recipients:
-                args.extend(['--recipient', shell_quote(recipient)])
+                args.extend(['--recipient', no_quote(recipient)])
         if armor:   # create ascii-armored output - False for binary output
             args.append('--armor')
         if output:  # write the output to a file with the specified name
@@ -1251,7 +1256,7 @@ class GPG(object):
         if sign is True:
             args.append('--sign')
         elif sign:
-            args.extend(['--sign', '--default-key', shell_quote(sign)])
+            args.extend(['--sign', '--default-key', no_quote(sign)])
         if always_trust:
             args.append('--always-trust')
         result = self.result_map['crypt'](self)
