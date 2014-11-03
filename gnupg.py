@@ -1123,10 +1123,10 @@ class GPG(object):
         >>> gpg = GPG(gnupghome='keys')
         >>> os.chmod('keys', 0x1C0)
         >>> result = gpg.search_keys('<vinay_sajip@hotmail.com>')
-        >>> assert result
+        >>> assert result, 'Failed using default keyserver'
         >>> keyserver = 'keyserver.ubuntu.com'
         >>> result = gpg.search_keys('<vinay_sajip@hotmail.com>', keyserver)
-        >>> assert result
+        >>> assert result, 'Failed using keyserver.ubuntu.com'
 
         """
         query = query.strip()
