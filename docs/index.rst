@@ -467,6 +467,8 @@ output (defaults to ``None``)
 
 Note: If the data being signed is binary, calling ``str(signed_data)`` may raise exceptions. In that case, use the fact that ``signed_data.data`` holds the binary signed data. Usually the signature itself is ASCII; it's the message itself which may cause the exceptions to be raised. (Unless a detached signature is requested, the result of signing is the message with the signature appended.)
 
+The hash algorihm used when creating the signature can be found in the ``signed_data.hash_algo`` attribute.
+
 .. versionadded 0.2.5
 
 The ``detach`` keyword argument was added in version 0.2.5.
