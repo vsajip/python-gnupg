@@ -77,6 +77,7 @@ Released: Not yet.
 
 * Fixed #16: Output file names are not quoted.
 
+* Used a uniform approach with subprocess on Windows and POSIX.
 
 0.3.6
 -----
