@@ -50,6 +50,7 @@ N.B: GCnn refers to an issue nn on Google Code.
 0.3.8 (future)
 --------------
 
+Released: Not yet
 
 0.3.7
 -----
