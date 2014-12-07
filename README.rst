@@ -58,6 +58,7 @@ Released: Not yet
 Released: 2014-12-07
 
 Signed with PGP key: Vinay Sajip (CODE SIGNING KEY) <vinay_sajip@yahoo.co.uk>
+
 Key Fingerprint    : CA74 9061 914E AC13 8E66 EADB 9147 B477 339A 9B86
 
 * Added an ``output`` keyword parameter to the ``sign`` and
