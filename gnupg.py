@@ -32,9 +32,9 @@ Modifications Copyright (C) 2008-2014 Vinay Sajip. All rights reserved.
 A unittest harness (test_gnupg.py) has also been added.
 """
 
-__version__ = "0.3.7.dev0"
+__version__ = "0.3.7"
 __author__ = "Vinay Sajip"
-__date__  = "$27-Jul-2014 12:07:55$"
+__date__  = "$07-Dec-2014 14:06:02$"
 
 try:
     from io import StringIO
@@ -723,7 +723,6 @@ class GPG(object):
             pcmd = ' '.join(cmd)
             print(pcmd)
         logger.debug("%s", cmd)
-        # For some reason not yet established, shell=False fails on Windows.
         return Popen(cmd, shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
     def _read_response(self, stream, result):

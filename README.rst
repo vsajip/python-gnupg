@@ -47,16 +47,14 @@ Change log
 
 N.B: GCnn refers to an issue nn on Google Code.
 
-0.3.7 (future)
+0.3.8 (future)
 --------------
 
-Released: Not yet.
 
-* Handled 'UNEXPECTED' message during verification. Thanks to
-  David Andersen for the patch.
+0.3.7
+-----
 
-* Fixed #2: Raised ValueError if no recipients were specified
-  for an asymmetric encryption request.
+Released: 2014-12-07
 
 * Added an ``output`` keyword parameter to the ``sign`` and
   ``sign_file`` methods, to allow writing the signature to a file.
@@ -67,6 +65,35 @@ Released: Not yet.
   specify a key id when it's desired to use the default. Thanks to
   Fabian Beutel for the patch.
 
+* Used a uniform approach with subprocess on Windows and POSIX: shell=True
+  is not used on either.
+
+* When signing/verifying, the status is updated to reflect any expired or
+  revoked keys or signatures.
+
+* Handled 'NOTATION_NAME' and 'NOTATION_DATA' during verification.
+
+* Fixed #1, #16, #18, #20: Quoting approach changed, since now shell=False.
+
+* Fixed #14: Handled 'NEED_PASSPHRASE_PIN' message.
+
+* Fixed #8: Added a scan_keys method to allow scanning of keys without the
+  need to import into a keyring. Thanks to Venzen Khaosan for the suggestion.
+
+* Fixed #5: Added '0x' prefix when searching for keys. Thanks to Aaron Toponce
+  for the report.
+
+* Fixed #4: Handled 'PROGRESS' message during encryption. Thanks to Daniel
+  Mills for the report.
+
+* Fixed #3: Changed default encoding to Latin-1.
+
+* Fixed #2: Raised ValueError if no recipients were specified
+  for an asymmetric encryption request.
+
+* Handled 'UNEXPECTED' message during verification. Thanks to
+  David Andersen for the patch.
+
 * Replaced old range(len(X)) idiom with enumerate().
 
 * Refactored ``ListKeys`` / ``SearchKeys`` classes to maximise use of common
@@ -74,10 +101,6 @@ Released: Not yet.
 
 * Fixed GC94: Added ``export-minimal`` and ``armor`` options when exporting
   keys. This addition was inadvertently left out of 0.3.6.
-
-* Fixed #16: Output file names are not quoted.
-
-* Used a uniform approach with subprocess on Windows and POSIX.
 
 0.3.6
 -----
