@@ -34,7 +34,7 @@ A unittest harness (test_gnupg.py) has also been added.
 
 __version__ = "0.3.7"
 __author__ = "Vinay Sajip"
-__date__  = "$07-Dec-2014 14:06:02$"
+__date__  = "$07-Dec-2014 18:46:17$"
 
 try:
     from io import StringIO
