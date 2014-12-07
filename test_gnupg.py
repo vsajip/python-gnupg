@@ -618,9 +618,9 @@ TEST_GROUPS = {
 def suite(args=None):
     if args is None:
         args = sys.argv[1:]
-    if not args:
+    if not args or args == ['--no-doctests']:
         result = unittest.TestLoader().loadTestsFromTestCase(GPGTestCase)
-        want_doctests = True
+        want_doctests = not args
     else:
         tests = set()
         want_doctests = False

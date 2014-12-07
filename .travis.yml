@@ -6,4 +6,4 @@ python:
     - "3.3"
     - "3.4"
     - "pypy"
-script: "python test_gnupg.py"
+script: "python test_gnupg.py --no-doctests"
