@@ -52,6 +52,8 @@ N.B: GCnn refers to an issue nn on Google Code.
 
 Released: Not yet
 
+* Handled ``PROGRESS`` messages during verification and signing.
+
 0.3.7
 -----
 

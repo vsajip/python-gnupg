@@ -587,10 +587,9 @@ basic
 Download
 ========
 
-Here is the current version, 0.3.7, in tarball_ and Windows_ formats.
+The latest version is available from the PyPI_ page.
 
-.. _tarball: https://pypi.python.org/packages/source/p/python-gnupg/python-gnupg-0.3.7.tar.gz
-.. _Windows: https://pypi.python.org/packages/any/p/python-gnupg/python-gnupg-0.3.7.win32.exe
+.. _PyPI: https://pypi.python.org/pypi/python-gnupg
 
 Status and Further Work
 =======================

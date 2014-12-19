@@ -221,7 +221,8 @@ class Verify(object):
                      "PLAINTEXT_LENGTH", "POLICY_URL", "DECRYPTION_INFO",
                      "DECRYPTION_OKAY", "INV_SGNR", "FILE_START", "FILE_ERROR",
                      "FILE_DONE", "PKA_TRUST_GOOD", "PKA_TRUST_BAD", "BADMDC",
-                     "GOODMDC", "NO_SGNR", "NOTATION_NAME", "NOTATION_DATA"):
+                     "GOODMDC", "NO_SGNR", "NOTATION_NAME", "NOTATION_DATA",
+                     "PROGRESS"):
             pass
         elif key == "BADSIG":
             self.valid = False
@@ -601,7 +602,7 @@ class Sign(TextHandler):
         if key in ("USERID_HINT", "NEED_PASSPHRASE", "BAD_PASSPHRASE",
                    "GOOD_PASSPHRASE", "BEGIN_SIGNING", "CARDCTRL", "INV_SGNR",
                    "NO_SGNR", "MISSING_PASSPHRASE", "NEED_PASSPHRASE_PIN",
-                   "SC_OP_FAILURE", "SC_OP_SUCCESS"):
+                   "SC_OP_FAILURE", "SC_OP_SUCCESS", "PROGRESS"):
             pass
         elif key in ("KEYEXPIRED", "SIGEXPIRED"):
             self.status = 'key expired'
