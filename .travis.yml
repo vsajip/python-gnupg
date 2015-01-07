@@ -6,4 +6,9 @@ python:
     - "3.3"
     - "3.4"
     - "pypy"
-script: "python test_gnupg.py --no-doctests"
+install:
+    - pip install coveralls
+script:
+    - "python test_gnupg.py --no-doctests"
+    - "coverage run test_gnupg.py --no-doctests"
+after_success: coveralls
