@@ -54,6 +54,9 @@ Released: Not yet
 
 * Handled ``PROGRESS`` messages during verification and signing.
 
+* Hide the console window which appears on Windows when gpg is spawned.
+  Thanks to Kévin Bernard-Allies for the patch.
+
 0.3.7
 -----
 

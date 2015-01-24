@@ -52,6 +52,13 @@ from subprocess import PIPE
 import sys
 import threading
 
+STARTUPINFO = None
+if os.name == 'nt':
+    try:
+        from subprocess import STARTUPINFO, STARTF_USESHOWWINDOW, SW_HIDE
+    except ImportError:
+        STARTUPINFO = None
+
 try:
     import logging.NullHandler as NullHandler
 except ImportError:
@@ -724,7 +731,14 @@ class GPG(object):
             pcmd = ' '.join(cmd)
             print(pcmd)
         logger.debug("%s", cmd)
-        return Popen(cmd, shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        if not STARTUPINFO:
+            si = None
+        else:
+            si = STARTUPINFO()
+            si.dwFlags = STARTF_USESHOWWINDOW
+            si.wShowWindow = SW_HIDE
+        return Popen(cmd, shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE,
+                     startupinfo=si)
 
     def _read_response(self, stream, result):
         # Internal method: reads all the stderr output from GPG, taking notice
