@@ -229,7 +229,7 @@ class Verify(object):
                      "DECRYPTION_OKAY", "INV_SGNR", "FILE_START", "FILE_ERROR",
                      "FILE_DONE", "PKA_TRUST_GOOD", "PKA_TRUST_BAD", "BADMDC",
                      "GOODMDC", "NO_SGNR", "NOTATION_NAME", "NOTATION_DATA",
-                     "PROGRESS"):
+                     "PROGRESS", "PINENTRY_LAUNCHED"):
             pass
         elif key == "BADSIG":
             self.valid = False
@@ -509,7 +509,8 @@ class Crypt(Verify, TextHandler):
     def handle_status(self, key, value):
         if key in ("ENC_TO", "USERID_HINT", "GOODMDC", "END_DECRYPTION",
                    "BEGIN_SIGNING", "NO_SECKEY", "ERROR", "NODATA", "PROGRESS",
-                   "CARDCTRL", "BADMDC", "SC_OP_FAILURE", "SC_OP_SUCCESS"):
+                   "CARDCTRL", "BADMDC", "SC_OP_FAILURE", "SC_OP_SUCCESS",
+                   "PINENTRY_LAUNCHED"):
             # in the case of ERROR, this is because a more specific error
             # message will have come first
             pass
