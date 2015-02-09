@@ -558,7 +558,8 @@ class GenKey(object):
         return self.fingerprint or ''
 
     def handle_status(self, key, value):
-        if key in ("PROGRESS", "GOOD_PASSPHRASE", "NODATA", "KEY_NOT_CREATED"):
+        if key in ("PROGRESS", "GOOD_PASSPHRASE", "NODATA", "KEY_NOT_CREATED",
+                   "PINENTRY_LAUNCHED"):
             pass
         elif key == "KEY_CREATED":
             (self.type,self.fingerprint) = value.split()
