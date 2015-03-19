@@ -54,8 +54,8 @@ Released: Not yet
 
 * Fuxed #22: handled ``PROGRESS`` messages during verification and signing.
 
-* Fixed #26: handled ``PINENTRY_LAUNCHED`` messages during verification and
-  decryption.
+* Fixed #26: handled ``PINENTRY_LAUNCHED`` messages during verification,
+  decryption and key generation.
 
 * Fixed #28: Allowed a default Name-Email to be computed even when neither of
   ``LOGNAME`` and ``USERNAME`` are in the environment.
