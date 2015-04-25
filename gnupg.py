@@ -229,7 +229,7 @@ class Verify(object):
                      "DECRYPTION_OKAY", "INV_SGNR", "FILE_START", "FILE_ERROR",
                      "FILE_DONE", "PKA_TRUST_GOOD", "PKA_TRUST_BAD", "BADMDC",
                      "GOODMDC", "NO_SGNR", "NOTATION_NAME", "NOTATION_DATA",
-                     "PROGRESS", "PINENTRY_LAUNCHED"):
+                     "PROGRESS", "PINENTRY_LAUNCHED", "NEWSIG"):
             pass
         elif key == "BADSIG":
             self.valid = False
