@@ -451,6 +451,11 @@ class ListKeys(SearchKeys):
     UID_INDEX = 9
     FIELDS = 'type trust length algo keyid date expires dummy ownertrust uid'.split()
 
+    def __init__(self, gpg):
+        super(ListKeys, self).__init__(gpg)
+        self.in_subkey = False
+        self.key_map = {}
+
     def key(self, args):
         self.curkey = curkey = self.get_fields(args)
         if curkey['uid']:
@@ -458,16 +463,26 @@ class ListKeys(SearchKeys):
         del curkey['uid']
         curkey['subkeys'] = []
         self.append(curkey)
+        self.in_subkey = False
 
     pub = sec = key
 
     def fpr(self, args):
-        self.curkey['fingerprint'] = args[9]
-        self.fingerprints.append(args[9])
+        fp = args[9]
+        if fp in self.key_map:
+            raise ValueError('Unexpected fingerprint collision: %s' % fp)
+        if not self.in_subkey:
+            self.curkey['fingerprint'] = fp
+            self.fingerprints.append(fp)
+            self.key_map[fp] = self.curkey
+        else:
+            self.curkey['subkeys'][-1].append(fp)
+            self.key_map[fp] = self.curkey
 
     def sub(self, args):
-        subkey = [args[4], args[11]]
+        subkey = [args[4], args[11]]    # keyid, type
         self.curkey['subkeys'].append(subkey)
+        self.in_subkey = True
 
 
 class ScanKeys(ListKeys):
@@ -478,6 +493,7 @@ class ScanKeys(ListKeys):
         # use the last value args[-1] instead of args[11]
         subkey = [args[4], args[-1]]
         self.curkey['subkeys'].append(subkey)
+        self.in_subkey = True
 
 class TextHandler(object):
     def _as_text(self):
@@ -1113,8 +1129,9 @@ class GPG(object):
         which='keys'
         if secret:
             which='secret-keys'
-        args = ["--list-%s" % which, "--fixed-list-mode", "--fingerprint",
-                "--with-colons"]
+        args = ['--list-%s' % which, '--fixed-list-mode',
+                '--fingerprint', '--fingerprint',   # get subkey FPs, too
+                '--with-colons']
         p = self._open_subprocess(args)
         return self._get_list_output(p, 'list')
 

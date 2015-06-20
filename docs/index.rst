@@ -270,6 +270,9 @@ Now that we've seen how to generate, import and export keys, let's move on to fi
 
 The returned value from :meth:`list_keys` is a subclass of Python's ``list`` class. Each entry represents one key and is a Python dictionary which contains useful information about the corresponding key.
 
+.. versionadded:: 0.3.8
+   The returned value from :meth:`list_keys` now has a new attribute, ``key_map``, which is a dictionary mapping key and subkey fingerprints to the corresponding key's dictionary. With this change, you don't need to iterate over the (potentially large) returned list to search for a key with a given fingerprint - the ``key_map`` dict will take you straight to the key info, whether the fingerprint you have is for a key or a subkey.
+
 .. index:: Key; scanning
 
 Scanning keys

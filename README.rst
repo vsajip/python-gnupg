@@ -65,6 +65,16 @@ Released: Not yet
 * Hide the console window which appears on Windows when gpg is spawned.
   Thanks to Kévin Bernard-Allies for the patch.
 
+* Subkey fingerprints are now captured.
+
+* The returned value from :meth:`list_keys` now has a new attribute,
+  ``key_map``, which is a dictionary mapping key and subkey fingerprints to
+  the corresponding key's dictionary. With this change, you don't need to
+  iterate over the (potentially large) returned list to search for a key with
+  a given fingerprint - the ``key_map`` dict will take you straight to the key
+  info, whether the fingerprint you have is for a key or a subkey. Thanks to
+  Nick Daly for the initial suggestion.
+
 0.3.7
 -----
 

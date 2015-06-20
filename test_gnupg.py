@@ -230,6 +230,13 @@ class GPGTestCase(unittest.TestCase):
         public_keys = self.gpg.list_keys()
         self.assertTrue(is_list_with_len(public_keys, 1),
                         "1-element list expected")
+        key_info = public_keys[0]
+        fp = key_info['fingerprint']
+        self.assertTrue(fp in public_keys.key_map)
+        self.assertTrue(public_keys.key_map[fp] is key_info)
+        for _, _, sfp in key_info['subkeys']:
+            self.assertTrue(sfp in public_keys.key_map)
+            self.assertTrue(public_keys.key_map[sfp] is key_info)
         private_keys = self.gpg.list_keys(secret=True)
         self.assertTrue(is_list_with_len(private_keys, 1),
                         "1-element list expected")
