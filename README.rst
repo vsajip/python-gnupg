@@ -1,3 +1,8 @@
+.. image:: https://img.shields.io/travis/vsajip/python-gnupg.svg
+
+.. image:: https://img.shields.io/coveralls/vsajip/python-gnupg.svg
+
+
 What is it?
 ===========
 
