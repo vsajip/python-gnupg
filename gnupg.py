@@ -627,7 +627,8 @@ class Sign(TextHandler):
         if key in ("USERID_HINT", "NEED_PASSPHRASE", "BAD_PASSPHRASE",
                    "GOOD_PASSPHRASE", "BEGIN_SIGNING", "CARDCTRL", "INV_SGNR",
                    "NO_SGNR", "MISSING_PASSPHRASE", "NEED_PASSPHRASE_PIN",
-                   "SC_OP_FAILURE", "SC_OP_SUCCESS", "PROGRESS"):
+                   "SC_OP_FAILURE", "SC_OP_SUCCESS", "PROGRESS",
+                   "PINENTRY_LAUNCHED"):
             pass
         elif key in ("KEYEXPIRED", "SIGEXPIRED"):
             self.status = 'key expired'
