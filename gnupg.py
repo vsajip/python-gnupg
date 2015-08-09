@@ -1110,7 +1110,7 @@ class GPG(object):
                 getattr(result, keyword)(L)
         return result
 
-    def list_keys(self, secret=False):
+    def list_keys(self, secret=False, keys=None):
         """ list the keys currently in the keyring
 
         >>> import shutil
@@ -1133,6 +1133,10 @@ class GPG(object):
         args = ['--list-%s' % which, '--fixed-list-mode',
                 '--fingerprint', '--fingerprint',   # get subkey FPs, too
                 '--with-colons']
+        if keys:
+            if isinstance(keys, string_types):
+                keys = [keys]
+            args.extend(keys)
         p = self._open_subprocess(args)
         return self._get_list_output(p, 'list')
 

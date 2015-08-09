@@ -250,6 +250,39 @@ class GPGTestCase(unittest.TestCase):
         private_keys_2 = gpg.list_keys(secret=True)
         self.assertEqual(private_keys_2, private_keys)
 
+        # generate additional keys so that we can test listing a subset of
+        # keys
+        def get_names(key_map):
+            result = set()
+            for info in key_map.values():
+                for uid in info['uids']:
+                    uid = uid.replace(' (A test user (insecure!))', '')
+                    result.add(uid)
+            return result
+
+        result = self.generate_key("Charlie", "Clark", "gamma.com")
+        self.assertNotEqual(None, result, "Non-null result")
+        result = self.generate_key("Donna", "Davis", "delta.com")
+        self.assertNotEqual(None, result, "Non-null result")
+        public_keys = gpg.list_keys()
+        self.assertEqual(len(public_keys), 3)
+        actual = get_names(public_keys.key_map)
+        expected = set(['Barbara Brown <barbara.brown@beta.com>',
+                        'Charlie Clark <charlie.clark@gamma.com>',
+                        'Donna Davis <donna.davis@delta.com>'])
+        self.assertEqual(actual, expected)
+        # specify a single key as a string
+        public_keys = gpg.list_keys(keys='Donna Davis')
+        actual = get_names(public_keys.key_map)
+        expected = set(['Donna Davis <donna.davis@delta.com>'])
+        self.assertEqual(actual, expected)
+        # specify multiple keys
+        public_keys = gpg.list_keys(keys=['Donna', 'Barbara'])
+        actual = get_names(public_keys.key_map)
+        expected = set(['Barbara Brown <barbara.brown@beta.com>',
+                        'Donna Davis <donna.davis@delta.com>'])
+        self.assertEqual(actual, expected)
+
     def test_scan_keys(self):
         "Test that external key files can be scanned"
         expected = set([
