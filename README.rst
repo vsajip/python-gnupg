@@ -57,7 +57,7 @@ N.B: GCnn refers to an issue nn on Google Code.
 
 Released: Not yet
 
-* Fuxed #22: handled ``PROGRESS`` messages during verification and signing.
+* Fixed #22: handled ``PROGRESS`` messages during verification and signing.
 
 * Fixed #26: handled ``PINENTRY_LAUNCHED`` messages during verification,
   decryption and key generation.
@@ -66,6 +66,8 @@ Released: Not yet
   ``LOGNAME`` and ``USERNAME`` are in the environment.
 
 * Fixed #29: Included test files missing from the tarball in previous versions.
+
+* Fixed #43: handled ``PINENTRY_LAUNCHED`` messages during key export.
 
 * Hide the console window which appears on Windows when gpg is spawned.
   Thanks to Kévin Bernard-Allies for the patch.

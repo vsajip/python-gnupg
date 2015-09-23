@@ -582,6 +582,14 @@ class GenKey(object):
         else:
             raise ValueError("Unknown status message: %r" % key)
 
+class ExportResult(GenKey):
+    """Handle status messages for --export[-secret-key].
+
+    For now, just use an existing class to base it on - if needed, we
+    can override handle_status for more specific message handling.
+    """
+    pass
+
 class DeleteResult(object):
     "Handle status messages for --delete-key and --delete-secret-key"
     def __init__(self, gpg):
@@ -660,6 +668,7 @@ class GPG(object):
         'search': SearchKeys,
         'sign': Sign,
         'verify': Verify,
+        'export': ExportResult,
     }
 
     "Encapsulate access to the gpg executable"
@@ -1084,7 +1093,7 @@ class GPG(object):
         # gpg --export produces no status-fd output; stdout will be
         # empty in case of failure
         #stdout, stderr = p.communicate()
-        result = self.result_map['delete'](self) # any result will do
+        result = self.result_map['export'](self)
         self._collect_output(p, result, stdin=p.stdin)
         logger.debug('export_keys result: %r', result.data)
         return result.data.decode(self.encoding, self.decode_errors)
