@@ -1,6 +1,6 @@
-.. image:: https://img.shields.io/travis/vsajip/python-gnupg.svg
+.. image:: https://travis-ci.org/vsajip/python-gnupg.svg
 
-.. image:: https://img.shields.io/coveralls/vsajip/python-gnupg.svg
+.. image:: https://coveralls.io/repos/vsajip/python-gnupg/badge.svg
 
 
 What is it?
