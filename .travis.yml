@@ -12,5 +12,4 @@ install:
 script:
     - "python test_gnupg.py --no-doctests"
     - "coverage run test_gnupg.py --no-doctests"
-    - "if [ -x \"$(command -v gpg2)\" ];then GPGBINARY=gpg2 python test_gnupg.py --no-doctests fi"
 after_success: coveralls
