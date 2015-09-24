@@ -1,6 +1,8 @@
 .. image:: https://travis-ci.org/vsajip/python-gnupg.svg
+   :target: https://travis-ci.org/vsajip/python-gnupg
 
 .. image:: https://coveralls.io/repos/vsajip/python-gnupg/badge.svg
+   :target: https://coveralls.io/github/vsajip/python-gnupg
 
 
 What is it?
@@ -82,7 +84,7 @@ Released: Not yet
 
 * Subkey fingerprints are now captured.
 
-* The returned value from :meth:`list_keys` now has a new attribute,
+* The returned value from the ``list_keys`` method now has a new attribute,
   ``key_map``, which is a dictionary mapping key and subkey fingerprints to
   the corresponding key's dictionary. With this change, you don't need to
   iterate over the (potentially large) returned list to search for a key with
