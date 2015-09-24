@@ -564,6 +564,7 @@ class GPGTestCase(unittest.TestCase):
                                               output=decfname)
                 self.assertFalse(ddata)
                 self.assertEqual(ddata.status, "no data was provided")
+                efile.close()
         finally:
             for fn in (encfname, decfname):
                 if os.name == 'posix' and mode is not None:
