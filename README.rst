@@ -71,6 +71,9 @@ Released: Not yet
   file decryption to hang due to a ``UnicodeDecodeError``. This has now been
   correctly handled: The decryption fails with a "no data" status.
 
+* Fixed #41: Handled Unicode filenames correctly by encoding them on 2.x using
+  the file system encoding.
+
 * Fixed #43: handled ``PINENTRY_LAUNCHED`` messages during key export. Thanks
   to Ian Denhardt for looking into this.
 

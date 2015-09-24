@@ -119,8 +119,18 @@ else:
 
 # Now that we use shell=False, we shouldn't need to quote arguments.
 # Use no_quote instead of shell_quote to remind us of where quoting
-# was needed.
+# was needed. However, note that we still need, on 2.x, to encode any
+# Unicode argument with the file system encoding - see Issue #41 and
+# Python issue #1759845 ("subprocess.call fails with unicode strings in
+# command line").
+
+# Allows the encoding used to be overridden in special cases by setting
+# this module attribute appropriately.
+fsencoding = sys.getfilesystemencoding()
+
 def no_quote(s):
+    if not _py3k and isinstance(s, text_type):
+        s = s.encode(fsencoding)
     return s
 
 def _copy_data(instream, outstream):
