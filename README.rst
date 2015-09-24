@@ -54,10 +54,15 @@ Change log
 
 N.B: GCnn refers to an issue nn on Google Code.
 
-0.3.8 (future)
+0.3.9 (future)
 --------------
 
 Released: Not yet
+
+0.3.8
+-----
+
+Released: 2015-09-24
 
 * Fixed #22: handled ``PROGRESS`` messages during verification and signing.
 

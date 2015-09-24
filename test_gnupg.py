@@ -17,7 +17,7 @@ import unittest
 import gnupg
 
 __author__ = "Vinay Sajip"
-__date__  = "$07-Dec-2014 18:46:40$"
+__date__  = "$24-Sep-2015 18:05:15$"
 
 ALL_TESTS = True
 
