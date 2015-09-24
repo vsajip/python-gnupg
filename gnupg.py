@@ -131,7 +131,13 @@ def _copy_data(instream, outstream):
     else:
         enc = 'ascii'
     while True:
-        data = instream.read(1024)
+        # See issue #39: read can fail when e.g. a text stream is provided
+        # for what is actually a binary file
+        try:
+            data = instream.read(1024)
+        except UnicodeError:
+            logger.warning('Exception occurred while reading', exc_info=1)
+            break
         if not data:
             break
         sent += len(data)
@@ -529,7 +535,8 @@ class Crypt(Verify, TextHandler):
                    "PINENTRY_LAUNCHED"):
             # in the case of ERROR, this is because a more specific error
             # message will have come first
-            pass
+            if key == "NODATA":
+                self.status = "no data was provided"
         elif key in ("NEED_PASSPHRASE", "BAD_PASSPHRASE", "GOOD_PASSPHRASE",
                      "MISSING_PASSPHRASE", "DECRYPTION_FAILED",
                      "KEY_NOT_CREATED", "NEED_PASSPHRASE_PIN"):

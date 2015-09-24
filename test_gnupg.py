@@ -555,6 +555,15 @@ class GPGTestCase(unittest.TestCase):
                 logger.debug("was: %r", data)
                 logger.debug("new: %r", ddata)
             self.assertEqual(data, ddata, "Round-trip must work")
+
+            # Try opening the encrypted file in text mode (Issue #39)
+            # this doesn't fail in 2.x
+            if gnupg._py3k:
+                efile = open(encfname, 'r')
+                ddata = self.gpg.decrypt_file(efile, passphrase="bbrown",
+                                              output=decfname)
+                self.assertFalse(ddata)
+                self.assertEqual(ddata.status, "no data was provided")
         finally:
             for fn in (encfname, decfname):
                 if os.name == 'posix' and mode is not None:

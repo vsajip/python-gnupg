@@ -67,7 +67,12 @@ Released: Not yet
 
 * Fixed #29: Included test files missing from the tarball in previous versions.
 
-* Fixed #43: handled ``PINENTRY_LAUNCHED`` messages during key export.
+* Fixed #39: On Python 3.x, passing a text instead of a binary stream caused
+  file decryption to hang due to a ``UnicodeDecodeError``. This has now been
+  correctly handled: The decryption fails with a "no data" status.
+
+* Fixed #43: handled ``PINENTRY_LAUNCHED`` messages during key export. Thanks
+  to Ian Denhardt for looking into this.
 
 * Hide the console window which appears on Windows when gpg is spawned.
   Thanks to Kévin Bernard-Allies for the patch.
