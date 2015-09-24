@@ -27,12 +27,12 @@ Vinay Sajip to make use of the subprocess module (Steve's version uses os.fork()
 and so does not work on Windows). Renamed to gnupg.py to avoid confusion with
 the previous versions.
 
-Modifications Copyright (C) 2008-2014 Vinay Sajip. All rights reserved.
+Modifications Copyright (C) 2008-2015 Vinay Sajip. All rights reserved.
 
 A unittest harness (test_gnupg.py) has also been added.
 """
 
-__version__ = "0.3.8"
+__version__ = "0.3.9.dev0"
 __author__ = "Vinay Sajip"
 __date__  = "$24-Sep-2015 18:03:55$"
 
