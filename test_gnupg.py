@@ -102,12 +102,12 @@ class GPGTestCase(unittest.TestCase):
         self.gpg = gpg = gnupg.GPG(gnupghome=hd, gpgbinary=GPGBINARY)
         v = gpg.version
         if v:
-            if v >= (2,):
+            if v >= (2,):  # pragma: no cover
                 gpg.options = ['--debug-quick-random']
             else:
                 gpg.options = ['--quick-random']
         self.test_fn = test_fn = 'random_binary_data'
-        if not os.path.exists(test_fn):
+        if not os.path.exists(test_fn):  # pragma: no cover
             data_file = open(test_fn, 'wb')
             data_file.write(os.urandom(5120 * 1024))
             data_file.close()
@@ -315,7 +315,7 @@ class GPGTestCase(unittest.TestCase):
         edata = str(gpg.encrypt(data, barbara))
         self.assertNotEqual(data, edata, "Data must have changed")
         ddata = gpg.decrypt(edata, passphrase="bbrown")
-        if data != ddata.data:
+        if data != ddata.data:  # pragma: no cover
             logger.debug("was: %r", data)
             logger.debug("new: %r", ddata.data)
         self.assertEqual(data, ddata.data, "Round-trip must work")
@@ -357,7 +357,7 @@ class GPGTestCase(unittest.TestCase):
                         "Exported key should be public")
         ascii = ascii.replace("\r", "").strip()
         match = compare_keys(ascii, KEYS_TO_IMPORT)
-        if match:
+        if match:  # pragma: no cover
             logger.debug("was: %r", KEYS_TO_IMPORT)
             logger.debug("now: %r", ascii)
         self.assertEqual(0, match, "Keys must match")
@@ -384,7 +384,7 @@ class GPGTestCase(unittest.TestCase):
                         "Exported key should be public")
         ascii = ascii.replace("\r", "").strip()
         match = compare_keys(ascii, KEYS_TO_IMPORT)
-        if match:
+        if match:  # pragma: no cover
             logger.debug("was: %r", KEYS_TO_IMPORT)
             logger.debug("now: %r", ascii)
         self.assertEqual(0, match, "Keys must match")
@@ -406,7 +406,7 @@ class GPGTestCase(unittest.TestCase):
         self.assertTrue(sig, "Good passphrase should succeed")
         self.assertTrue(sig.hash_algo)
         verified = self.gpg.verify(sig.data)
-        if key.fingerprint != verified.fingerprint:
+        if key.fingerprint != verified.fingerprint:  # pragma: no cover
             logger.debug("key: %r", key.fingerprint)
             logger.debug("ver: %r", verified.fingerprint)
         self.assertEqual(key.fingerprint, verified.fingerprint,
@@ -422,10 +422,11 @@ class GPGTestCase(unittest.TestCase):
         try:
             file = gnupg._make_binary_stream(sig.data, self.gpg.encoding)
             verified = self.gpg.verify_file(file)
-        except UnicodeDecodeError: #happens in Python 2.6
+        except UnicodeDecodeError:  # pragma: no cover
+            # sometimes happens in Python 2.6
             from io import BytesIO
             verified = self.gpg.verify_file(BytesIO(sig.data))
-        if key.fingerprint != verified.fingerprint:
+        if key.fingerprint != verified.fingerprint:  # pragma: no cover
             logger.debug("key: %r", key.fingerprint)
             logger.debug("ver: %r", verified.fingerprint)
         self.assertEqual(key.fingerprint, verified.fingerprint,
@@ -439,10 +440,11 @@ class GPGTestCase(unittest.TestCase):
         try:
             file = gnupg._make_binary_stream(sig.data, self.gpg.encoding)
             verified = self.gpg.verify_file(file, self.test_fn)
-        except UnicodeDecodeError: #happens in Python 2.6
+        except UnicodeDecodeError:  # pragma: no cover
+            # sometimes happens in Python 2.6
             from io import BytesIO
             verified = self.gpg.verify_file(BytesIO(sig.data))
-        if key.fingerprint != verified.fingerprint:
+        if key.fingerprint != verified.fingerprint:  # pragma: no cover
             logger.debug("key: %r", key.fingerprint)
             logger.debug("ver: %r", verified.fingerprint)
         self.assertEqual(key.fingerprint, verified.fingerprint,
@@ -458,7 +460,7 @@ class GPGTestCase(unittest.TestCase):
             verified = self.gpg.verify_data(fn, data)
         finally:
             os.unlink(fn)
-        if key.fingerprint != verified.fingerprint:
+        if key.fingerprint != verified.fingerprint:  # pragma: no cover
             logger.debug("key: %r", key.fingerprint)
             logger.debug("ver: %r", verified.fingerprint)
         self.assertEqual(key.fingerprint, verified.fingerprint,
@@ -551,7 +553,7 @@ class GPGTestCase(unittest.TestCase):
             ddata = dfile.read()
             dfile.close()
             data = data.encode(self.gpg.encoding)
-            if ddata != data:
+            if ddata != data:  # pragma: no cover
                 logger.debug("was: %r", data)
                 logger.debug("new: %r", ddata)
             self.assertEqual(data, ddata, "Round-trip must work")
@@ -631,7 +633,7 @@ class GPGTestCase(unittest.TestCase):
         finally:
             shutil.rmtree(workdir)
 
-    def disabled_test_signing_with_uid(self):
+    def disabled_test_signing_with_uid(self):  # pragma: no cover
         "Test that signing with uids works. On hold for now."
         logger.debug("test_signing_with_uid begins")
         key = self.generate_key("Andrew", "Able", "alpha.com")
@@ -671,7 +673,7 @@ def suite(args=None):
     if not args or args == ['--no-doctests']:
         result = unittest.TestLoader().loadTestsFromTestCase(GPGTestCase)
         want_doctests = not args
-    else:
+    else:  # pragma: no cover
         tests = set()
         want_doctests = False
         for arg in args:
