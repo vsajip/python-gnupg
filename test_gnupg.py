@@ -240,6 +240,7 @@ class GPGTestCase(unittest.TestCase):
         private_keys = self.gpg.list_keys(secret=True)
         self.assertTrue(is_list_with_len(private_keys, 1),
                         "1-element list expected")
+        self.assertEqual(len(private_keys.fingerprints), 1)
         # Now do the same test, but using keyring and secret_keyring arguments
         hd = os.path.join(os.getcwd(), 'keys')
         gpg = gnupg.GPG(gnupghome=hd, gpgbinary=GPGBINARY,
@@ -690,7 +691,7 @@ def suite(args=None):
 
 def init_logging():
     logging.basicConfig(level=logging.DEBUG, filename="test_gnupg.log",
-                        filemode="w", format="%(asctime)s %(levelname)-5s %(name)-10s %(threadName)-10s %(message)s")
+                        filemode="w", format="%(asctime)s %(levelname)-5s %(name)-10s %(threadName)-10s %(lineno)4d %(message)s")
 
 def main():
     init_logging()

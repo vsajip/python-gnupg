@@ -455,7 +455,6 @@ class ListKeys(SearchKeys):
 
         crt = X.509 certificate
         crs = X.509 certificate and private key available
-        ssb = secret subkey (secondary key)
         uat = user attribute (same as user id except for field 10).
         sig = signature
         rev = revocation signature
@@ -500,6 +499,10 @@ class ListKeys(SearchKeys):
         self.curkey['subkeys'].append(subkey)
         self.in_subkey = True
 
+    def ssb(self, args):
+        subkey = [args[4], None]    # keyid, type
+        self.curkey['subkeys'].append(subkey)
+        self.in_subkey = True
 
 class ScanKeys(ListKeys):
     ''' Handle status messages for --with-fingerprint.'''
@@ -1121,7 +1124,7 @@ class GPG(object):
         self._collect_output(p, result, stdin=p.stdin)
         lines = result.data.decode(self.encoding,
                                    self.decode_errors).splitlines()
-        valid_keywords = 'pub uid sec fpr sub'.split()
+        valid_keywords = 'pub uid sec fpr sub ssb'.split()
         for line in lines:
             if self.verbose:  # pragma: no cover
                 print(line)
