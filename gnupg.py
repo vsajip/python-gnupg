@@ -429,6 +429,7 @@ class SearchKeys(list):
         for i, var in enumerate(self.FIELDS):
             result[var] = args[i]
         result['uids'] = []
+        result['sigs'] = []
         return result
 
     def pub(self, args):
@@ -447,7 +448,7 @@ class SearchKeys(list):
         pass
 
 class ListKeys(SearchKeys):
-    ''' Handle status messages for --list-keys.
+    ''' Handle status messages for --list-keys, --list-sigs.
 
         Handle pub and uid (relating the latter to the former).
 
@@ -464,7 +465,7 @@ class ListKeys(SearchKeys):
     '''
 
     UID_INDEX = 9
-    FIELDS = 'type trust length algo keyid date expires dummy ownertrust uid'.split()
+    FIELDS = 'type trust length algo keyid date expires dummy ownertrust uid sig'.split()
 
     def __init__(self, gpg):
         super(ListKeys, self).__init__(gpg)
@@ -503,6 +504,10 @@ class ListKeys(SearchKeys):
         subkey = [args[4], None]    # keyid, type
         self.curkey['subkeys'].append(subkey)
         self.in_subkey = True
+
+    def sig(self, args):
+        # keyid, uid, sigclass
+        self.curkey['sigs'].append((args[4], args[9], args[10]))
 
 class ScanKeys(ListKeys):
     ''' Handle status messages for --with-fingerprint.'''
@@ -1124,7 +1129,7 @@ class GPG(object):
         self._collect_output(p, result, stdin=p.stdin)
         lines = result.data.decode(self.encoding,
                                    self.decode_errors).splitlines()
-        valid_keywords = 'pub uid sec fpr sub ssb'.split()
+        valid_keywords = 'pub uid sec fpr sub ssb sig'.split()
         for line in lines:
             if self.verbose:  # pragma: no cover
                 print(line)
@@ -1139,7 +1144,7 @@ class GPG(object):
                 getattr(result, keyword)(L)
         return result
 
-    def list_keys(self, secret=False, keys=None):
+    def list_keys(self, secret=False, keys=None, sigs=False):
         """ list the keys currently in the keyring
 
         >>> import shutil
@@ -1156,7 +1161,10 @@ class GPG(object):
 
         """
 
-        which='keys'
+        if sigs:
+            which = 'sigs'
+        else:
+            which='keys'
         if secret:
             which='secret-keys'
         args = ['--list-%s' % which, '--fixed-list-mode',

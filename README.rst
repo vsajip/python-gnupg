@@ -59,6 +59,10 @@ N.B: GCnn refers to an issue nn on Google Code.
 
 Released: Not yet
 
+* Fixed #38: You can now request information about signatures against
+  keys. Thanks to SunDwarf for the suggestion and patch, which was used
+  as a basis for this change.
+
 0.3.8
 -----
 

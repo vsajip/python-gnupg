@@ -276,6 +276,9 @@ The returned value from :meth:`list_keys` is a subclass of Python's ``list`` cla
 .. versionadded:: 0.3.8
    You can also list a subset of keys by specifying a ``keys=`` keyword argument to :meth:`list_keys` whose value is either a single string matching a key, or a list of strings matching multiple keys. In this case, the return value only includes matching keys.
 
+.. versionadded:: 0.3.9
+   A new ``sigs=`` keyword argument has been added to :meth:`list_keys`, defaulting to ``False``. If you specify true, the ``sigs`` entry in the key information returned will contain a list of signatures which apply to the key. Each entry in the list is a 3-tuple of (``keyid``, ``user-id``, ``signature-class``). It doesn't make sense to supply both ``secret=True`` *and* ``sigs=True`` (people can't sign your secret keys), so in case ``secret=True`` is specified, the ``sigs=`` value has no effect.
+
 .. index:: Key; scanning
 
 Scanning keys
