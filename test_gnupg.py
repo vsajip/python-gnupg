@@ -80,6 +80,52 @@ WdPQjKEfKnr+bW4yubwMUYKyAJ4uiE8Rv/oEED1oM3xeJqa+MJ9V1w==
 =sqld
 -----END PGP PUBLIC KEY BLOCK-----"""
 
+SIGNED_KEYS="""-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v2
+
+mI0EVcnKUQEEAKWazmfM0kbvDdw7Kos2NARaX67c8iJ3GOBimUvYLj4VR3Mqrm34
+ZdLlS8jCmid+qoisefvGW5uw5Q3gIs0mdEdUpFKlXNiIja/Dg/FHjjJPPCjfzDTh
+Q03EYA7QvOnXZXhYPBqK7NitsNXW4lPnIJdanLx7yMuL+2Xb+tF39mwnABEBAAG0
+LUpvc2h1YSBDYWx2ZXJ0IChBIHRlc3QgdXNlcikgPGpjQGV4YW1wbGUuY29tPoi3
+BBMBCAAhBQJVycpRAhsDBQsJCAcCBhUICQoLAgQWAgMBAh4BAheAAAoJELxvNQ+z
+0EB2jcED/0lHKaEkyd6cj0Zckf9luIkZ4Hno/vRCquTI7c3aPjS3qmE8mOvKSBCV
++SamPdRM7DdjkdBrrKy2HtiDqbM+1/CdXuQka2SlJWyLCJe48+KWfBpqlY3N4t53
+JjHRitDB+hC8njWTV5prli6EgsBPAF+ZkO0iZhlsMmWdDWgqDpGRiJwEEAEIAAYF
+AlXJym8ACgkQBXzPZYwHT9oiiQQAvPF8ubwRopnXIMDQgSxKyFDM1MI1w/wb4Okd
+/MkMeZSmdcHJ6pEymp5bYciCBuLW+jw0vZWza3YloO/HtuppnF6A9a1UvYcp/diI
+O5qkQqYPlui1PJl7hQ014ioniMfOcC4X/r6PDbC78Pczje0Yh9AOqNGeCyNyNdlc
+pjaHb0m4jQRVycpRAQQAo9JjW75F5wTVVO552cGCZWqZvDyBt9+IkoK9Bc+ggdn5
+6R8QVCihYuaSzcSEN84zHaR3MmGKHraCmCSlfe7w0d41Dlns0P03KMdIZOGrm045
+F8TXdSSPQOv5tA4bz3k2lGD0zB8l4NUWFaZ5fzw2i73FF4O/FwCU8xd/JCKVPkkA
+EQEAAYifBBgBCAAJBQJVycpRAhsMAAoJELxvNQ+z0EB2xLYD/i3tKirQlVB+32WP
+wggstqDp1BlUBmDb+4Gndpg4l7omJTTyOsF26SbYgXZqAdEd5T/UfpEla0DKiBYh
+2/CFYXadkgX/ME+GTetTmD4hHoBNmdXau92buXsIXkwh+JR+RC3cl2U6tWb/MIRd
+zvJiok8W8/FT/QrEjIa2etN2d+KR
+=nNBX
+-----END PGP PUBLIC KEY BLOCK-----
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v2
+
+mI0EVcnKNgEEANIVlIUyRXWHP/ljdMEA8B5NxecRCKusUIPxeapk2do5UCZgR1q8
+5wOP4K/+W3Uj85ylOOCNTFYKRozAHsPMAmQ38W93DZYqFbG6d7rwMvz4pVe0wUtj
+SBINoKnoEDZwx3erxFKOkp/5fF3NoYSIx9a0Ds21ESk0TAuH5Tg934YhABEBAAG0
+MVdpbnN0b24gU21pdGggKEEgdGVzdCB1c2VyKSA8d2luc3RvbkBleGFtcGxlLmNv
+bT6ItwQTAQgAIQUCVcnKNgIbAwULCQgHAgYVCAkKCwIEFgIDAQIeAQIXgAAKCRAF
+fM9ljAdP2h05A/4vmnxV1MwcOhJTHZys5g2/j5UoZG7V7lPGpJaojSAIVzYXZtwT
+5A7OY8Nl21kIY6gnZlgbTRpHN8Qq2wRKAyW5o6wQvuN16CW4bmGjoHYRGPqkeM0w
+G40W/v88JXrYDNNe/68g4pnPsZ3J0oMLbRvCaDQQHXBuZNJrT1sOxl9Of7iNBFXJ
+yjYBBACmHbs0PdOF8NEGc+fEtmdKOSKOkrcvg1wTu1KFFTBFEbseHOCNpx+R6lfO
+ZiZmHGdKeJhTherfjHaY5jmvyDWq5TLZXK61quNsWxmY2zJ0SRwrIG/CWi4bMi5t
+JNc23vMumkz4X5g7x0Ea7xEWkcYBn0H6sZDAtb8d8mrlWkMekQARAQABiJ8EGAEI
+AAkFAlXJyjYCGwwACgkQBXzPZYwHT9pQIwP8D9/VroykSE2J3gy0S6HC287jXqXF
+0zWejUAQtWUSSRx4esqfLE8lfae6+LDHO8D0Bf6YUJmu7ATOZP2/TIas7JrNvXWc
+NKWl2MHEAGUYq8utCjZ3dKKhaV7UvcY4PyLIpFteNkOz4wFe6C0Mm+1NYwokIFyh
+zPBq9eFk7Xx9Wrc=
+=HT6N
+-----END PGP PUBLIC KEY BLOCK-----
+"""
+
+
 def is_list_with_len(o, n):
     return isinstance(o, list) and len(o) == n
 
@@ -246,7 +292,7 @@ class GPGTestCase(unittest.TestCase):
         fp = key_info['fingerprint']
         self.assertTrue(fp in public_keys_sigs.key_map)
         self.assertTrue(public_keys_sigs.key_map[fp] is key_info)
-        self.assertTrue(len(key_info['sigs']) > 0)
+        self.assertTrue(is_list_with_len(key_info['sigs'], 2))
         for siginfo in key_info['sigs']:
             self.assertTrue(len(siginfo), 3)
         for _, _, sfp in key_info['subkeys']:
@@ -299,6 +345,20 @@ class GPGTestCase(unittest.TestCase):
         expected = set(['Barbara Brown <barbara.brown@beta.com>',
                         'Donna Davis <donna.davis@delta.com>'])
         self.assertEqual(actual, expected)
+
+    def test_list_signatures(self):
+        logger.debug("test_list_signatures begins")
+        imported = self.gpg.import_keys(SIGNED_KEYS)
+        keys = self.gpg.list_keys(keys=["18897CA2"])
+        self.assertTrue(is_list_with_len(keys, 1), "importing test signed key")
+        sigs = self.gpg.list_keys(keys=["18897CA2"], sigs=True)[0]['sigs']
+        logger.debug("testing self-signature")
+        self.assertTrue(('BC6F350FB3D04076', 'Joshua Calvert (A test user) <jc@example.com>', '13x') in sigs)
+        logger.debug("testing subkey self-signature")
+        self.assertTrue(('BC6F350FB3D04076', 'Joshua Calvert (A test user) <jc@example.com>', '18x') in sigs)
+        logger.debug("testing other signature")
+        self.assertTrue(('057CCF658C074FDA', 'Winston Smith (A test user) <winston@example.com>', '10x') in sigs)
+        logger.debug("test_list_signatures ends")
 
     def test_scan_keys(self):
         "Test that external key files can be scanned"
@@ -672,6 +732,7 @@ TEST_GROUPS = {
                    'test_filenames_with_spaces']),
     'key' : set(['test_deletion', 'test_import_and_export',
                  'test_list_keys_after_generation',
+                 'test_list_signatures',
                  'test_key_generation_with_invalid_key_type',
                  'test_key_generation_with_escapes',
                  'test_key_generation_with_empty_value',
