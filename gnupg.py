@@ -1121,7 +1121,11 @@ class GPG(object):
         result = self.result_map['export'](self)
         self._collect_output(p, result, stdin=p.stdin)
         logger.debug('export_keys result: %r', result.data)
-        return result.data.decode(self.encoding, self.decode_errors)
+        # Issue #49: Return bytes if armor not specified, else text
+        result = result.data
+        if armor:
+            result = result.decode(self.encoding, self.decode_errors)
+        return result
 
     def _get_list_output(self, p, kind):
         # Get the response information

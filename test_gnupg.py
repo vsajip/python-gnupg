@@ -2,7 +2,7 @@
 """
 A test harness for gnupg.py.
 
-Copyright (C) 2008-2015 Vinay Sajip. All rights reserved.
+Copyright (C) 2008-2016 Vinay Sajip. All rights reserved.
 """
 import doctest
 import logging
@@ -441,8 +441,11 @@ class GPGTestCase(unittest.TestCase):
         #Generate a key so we can test exporting private keys
         key = self.do_key_generation()
         ascii = gpg.export_keys(key.fingerprint, True)
+        self.assertTrue(isinstance(ascii, gnupg.text_type))
         self.assertTrue(ascii.find("PGP PRIVATE KEY BLOCK") >= 0,
                         "Exported key should be private")
+        binary = gpg.export_keys(key.fingerprint, True, armor=False)
+        self.assertFalse(isinstance(binary, gnupg.text_type))
         logger.debug("test_import_and_export ends")
 
     def test_import_only(self):
