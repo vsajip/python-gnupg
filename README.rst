@@ -63,6 +63,13 @@ Released: Not yet
   keys. Thanks to SunDwarf for the suggestion and patch, which was used
   as a basis for this change.
 
+* Fixed #49: When exporting keys, no attempt is made to decode the output when
+  armor=False is specified.
+
+* Fixed #53: A ``FAILURE`` message caused by passing an incorrect passphrase
+  is handled.
+
+
 0.3.8
 -----
 

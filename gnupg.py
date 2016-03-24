@@ -300,10 +300,14 @@ class Verify(object):
             else:
                 self.key_status = 'signing key was revoked'
             self.status = self.key_status
-        elif key == "UNEXPECTED":  # pragma: no cover
+        elif key in ("UNEXPECTED", "FAILURE"):  # pragma: no cover
             self.valid = False
             self.key_id = value
-            self.status = 'unexpected data'
+            if key == "UNEXPECTED":
+                self.status = 'unexpected data'
+            else:
+                # N.B. there might be other reasons
+                self.status = 'incorrect passphrase'
         else:
             raise ValueError("Unknown status message: %r" % key)
 
