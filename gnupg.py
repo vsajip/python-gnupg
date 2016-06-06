@@ -751,7 +751,7 @@ class GPG(object):
         except OSError:
             msg = 'Unable to run gpg - it may not be available.'
             logger.exception(msg)
-            raise ValueError(msg)
+            raise OSError(msg)
         result = self.result_map['verify'](self) # any result will do for this
         self._collect_output(p, result, stdin=p.stdin)
         if p.returncode != 0:  # pragma: no cover
