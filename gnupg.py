@@ -617,7 +617,11 @@ class ExportResult(GenKey):
     For now, just use an existing class to base it on - if needed, we
     can override handle_status for more specific message handling.
     """
-    pass
+    def handle_status(self, key, value):
+        if key in ("EXPORTED", "EXPORT_RES"):
+            pass
+        else:
+            super(ExportResult, self).handle_status(key, value)
 
 class DeleteResult(object):
     "Handle status messages for --delete-key and --delete-secret-key"

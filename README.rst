@@ -69,6 +69,9 @@ Released: Not yet
 * Fixed #53: A ``FAILURE`` message caused by passing an incorrect passphrase
   is handled.
 
+* Handled ``EXPORTED`` and ``EXPORT_RES`` messages while exporting keys. Thanks
+  to Marcel Pörner for the patch.
+
 
 0.3.8
 -----
