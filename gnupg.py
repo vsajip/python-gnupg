@@ -746,7 +746,12 @@ class GPG(object):
         self.encoding = 'latin-1'
         if gnupghome and not os.path.isdir(self.gnupghome):
             os.makedirs(self.gnupghome,0x1C0)
-        p = self._open_subprocess(["--version"])
+        try:
+            p = self._open_subprocess(["--version"])
+        except OSError:
+            msg = 'Unable to run gpg - it may not be available.'
+            logger.exception(msg)
+            raise ValueError(msg)
         result = self.result_map['verify'](self) # any result will do for this
         self._collect_output(p, result, stdin=p.stdin)
         if p.returncode != 0:  # pragma: no cover

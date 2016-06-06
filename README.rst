@@ -72,6 +72,8 @@ Released: Not yet
 * Handled ``EXPORTED`` and ``EXPORT_RES`` messages while exporting keys. Thanks
   to Marcel Pörner for the patch.
 
+* Fixed #54: Improved error message shown when gpg is not available.
+
 
 0.3.8
 -----
