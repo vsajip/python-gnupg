@@ -151,7 +151,7 @@ def _copy_data(instream, outstream):
         if not data:
             break
         sent += len(data)
-        logger.debug("sending chunk (%d): %r", sent, data[:256])
+        # logger.debug("sending chunk (%d): %r", sent, data[:256])
         try:
             outstream.write(data)
         except UnicodeError:  # pragma: no cover
