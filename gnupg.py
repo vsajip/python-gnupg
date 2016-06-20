@@ -245,7 +245,8 @@ class Verify(object):
                      "DECRYPTION_OKAY", "INV_SGNR", "FILE_START", "FILE_ERROR",
                      "FILE_DONE", "PKA_TRUST_GOOD", "PKA_TRUST_BAD", "BADMDC",
                      "GOODMDC", "NO_SGNR", "NOTATION_NAME", "NOTATION_DATA",
-                     "PROGRESS", "PINENTRY_LAUNCHED", "NEWSIG"):
+                     "PROGRESS", "PINENTRY_LAUNCHED", "NEWSIG",
+                     "KEY_CONSIDERED"):
             pass
         elif key == "BADSIG":  # pragma: no cover
             self.valid = False

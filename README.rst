@@ -74,6 +74,8 @@ Released: Not yet
 
 * Fixed #54: Improved error message shown when gpg is not available.
 
+* Fixed #55: Added support for ``KEY_CONSIDERED`` while verifying.
+
 
 0.3.8
 -----
