@@ -890,7 +890,7 @@ class GPG(object):
         if os.path.exists(output):
             # We need to avoid an overwrite confirmation message
             args.extend(['--batch', '--yes'])
-        args.extend(['--output', output])
+        args.extend(['--output', no_quote(output)])
 
     def sign_file(self, file, keyid=None, passphrase=None, clearsign=True,
                   detach=False, binary=False, output=None):
