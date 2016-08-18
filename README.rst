@@ -76,6 +76,11 @@ Released: Not yet
 
 * Fixed #55: Added support for ``KEY_CONSIDERED`` while verifying.
 
+* Avoided encoding problems with filenames under Windows. Thanks to Kévin
+  Bernard-Allies for the patch.
+
+* Fixed #57: Used a better mechanism for comparing keys.
+
 
 0.3.8
 -----

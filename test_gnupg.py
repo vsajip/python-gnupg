@@ -8,6 +8,7 @@ import doctest
 import logging
 import os.path
 import os
+import re
 import shutil
 import stat
 import sys
@@ -129,13 +130,22 @@ zPBq9eFk7Xx9Wrc=
 def is_list_with_len(o, n):
     return isinstance(o, list) and len(o) == n
 
+BASE64_PATTERN = re.compile(r'^(?:[A-Z0-9+/]{4})*(?:[A-Z0-9+/]{2}==|[A-Z0-9+/]{3}=)?$', re.I)
+
+def get_key_data(s):
+    lines = s.split('\n')
+    result = ''
+    for line in lines:
+        m = BASE64_PATTERN.match(line)
+        if m:
+            result += line
+    return result
+
 def compare_keys(k1, k2):
     "Compare ASCII keys"
-    k1 = k1.split('\n')
-    k2 = k2.split('\n')
-    del k1[1] # remove version lines
-    del k2[1]
-    return k1 != k2
+    # See issue #57: we need to compare only the actual key data,
+    # ignoring things like spurious blank lines
+    return get_key_data(k1) != get_key_data(k2)
 
 class GPGTestCase(unittest.TestCase):
     def setUp(self):
