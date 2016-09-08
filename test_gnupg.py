@@ -314,10 +314,15 @@ class GPGTestCase(unittest.TestCase):
                         "1-element list expected")
         self.assertEqual(len(private_keys.fingerprints), 1)
         # Now do the same test, but using keyring and secret_keyring arguments
+        pkn = 'pubring.gpg'
+        skn = 'secring.gpg'
         hd = os.path.join(os.getcwd(), 'keys')
+        if os.name == 'posix':
+            pkn = os.path.join(hd, pkn)
+            skn = os.path.join(hd, skn)
         gpg = gnupg.GPG(gnupghome=hd, gpgbinary=GPGBINARY,
-                        keyring=os.path.join(hd, 'pubring.gpg'),
-                        secret_keyring=os.path.join(hd, 'secring.gpg'))
+                        keyring=pkn, secret_keyring=skn)
+        logger.debug('Using keyring and secret_keyring arguments')
         public_keys_2 = gpg.list_keys()
         self.assertEqual(public_keys_2, public_keys)
         private_keys_2 = gpg.list_keys(secret=True)
