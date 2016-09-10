@@ -54,10 +54,15 @@ Change log
 
 N.B: GCnn refers to an issue nn on Google Code.
 
-0.3.9 (future)
+0.4.0 (future)
 --------------
 
 Released: Not yet
+
+0.3.9
+-----
+
+Released: 2016-09-10
 
 * Fixed #38: You can now request information about signatures against
   keys. Thanks to SunDwarf for the suggestion and patch, which was used

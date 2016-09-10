@@ -7,7 +7,7 @@ setup(name = "python-gnupg",
     long_description = "This module allows easy access to GnuPG's key \
 management, encryption and signature functionality from Python programs. \
 It is intended for use with Python 2.4 or greater.",
-    license="""Copyright (C) 2008-2015 by Vinay Sajip. All Rights Reserved. See LICENSE.txt for license.""",
+    license="""Copyright (C) 2008-2016 by Vinay Sajip. All Rights Reserved. See LICENSE.txt for license.""",
     version=version,
     author="Vinay Sajip",
     author_email="vinay_sajip@red-dove.com",

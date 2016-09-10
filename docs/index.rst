@@ -8,7 +8,7 @@
 ###########################################
 
 :Release: |release|
-:Date: September 24, 2015
+:Date: September 10, 2016
 
 .. module:: gnupg
    :synopsis: A Python wrapper for the GNU Privacy Guard (GnuPG)
@@ -69,14 +69,17 @@ I've gratefully incorporated improvements contributed or suggested by:
 * David Andersen (handle UNEXPECTED during verification)
 * Jannis Leidel (output signature to a file)
 * Venzen Khaosan (scan_keys functionality)
+* Marcel Pörner (handle EXPORTED, EXPORT_RES)
+* Kévin Bernard-Allies (handle filename encoding under Windows)
 
-and Google Code users
+and Google Code / BitBucket users
 
 * dprovins (ListKeys handle_status)
 * ernest0x (improved support for non-ASCII input)
 * eyepulp (additional options for encryption/decryption)
 * hysterix.is.slackin (symmetric encryption support)
 * natureshadow (improved status handling when smart cards in use)
+* SunDwarf (storing signatures against keys)
 
 (If I've missed anyone from this list, please let me know.)
 
