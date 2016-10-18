@@ -377,12 +377,15 @@ class GPGTestCase(unittest.TestCase):
 
     def test_scan_keys(self):
         "Test that external key files can be scanned"
+        if self.gpg.version > (2, 1):
+            raise unittest.SkipTest('Test not suitable for GnuPG >= 2.1')
         expected = set([
             'Andrew Able (A test user) <andrew.able@alpha.com>',
             'Barbara Brown (A test user) <barbara.brown@beta.com>',
             'Charlie Clark (A test user) <charlie.clark@gamma.com>',
         ])
         for fn in ('test_pubring.gpg', 'test_secring.gpg'):
+            logger.debug('scanning keys in %s', fn)
             data = self.gpg.scan_keys(fn)
             uids = set()
             for d in data:
@@ -644,6 +647,7 @@ class GPGTestCase(unittest.TestCase):
             efile.seek(0, 0) # can't use os.SEEK_SET in 2.4
             edata = efile.read()
             efile.close()
+            self.assertTrue(os.path.exists(decfname))
             dfile = open(decfname, 'rb')
             ddata = dfile.read()
             dfile.close()
@@ -792,7 +796,7 @@ def init_logging():
 def main():
     init_logging()
     tests = suite()
-    results = unittest.TextTestRunner(verbosity=2).run(tests)
+    results = unittest.TextTestRunner(verbosity=1).run(tests)
     return not results.wasSuccessful()
 
 

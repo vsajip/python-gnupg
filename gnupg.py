@@ -432,7 +432,12 @@ class SearchKeys(list):
     def get_fields(self, args):
         result = {}
         for i, var in enumerate(self.FIELDS):
-            result[var] = args[i]
+            # GPG 2.1 sends one less element, for some reason. The
+            # last element for 'pub' keys is omitted
+            if i < len(args):
+                result[var] = args[i]
+            else:
+                result[var] = 'unavailable (GPG 2.1?)'
         result['uids'] = []
         result['sigs'] = []
         return result
@@ -605,7 +610,7 @@ class GenKey(object):
 
     def handle_status(self, key, value):
         if key in ("PROGRESS", "GOOD_PASSPHRASE", "NODATA", "KEY_NOT_CREATED",
-                   "PINENTRY_LAUNCHED"):
+                   "PINENTRY_LAUNCHED", "ERROR"):
             pass
         elif key == "KEY_CREATED":
             (self.type,self.fingerprint) = value.split()
@@ -670,7 +675,7 @@ class Sign(TextHandler):
                    "GOOD_PASSPHRASE", "BEGIN_SIGNING", "CARDCTRL", "INV_SGNR",
                    "NO_SGNR", "MISSING_PASSPHRASE", "NEED_PASSPHRASE_PIN",
                    "SC_OP_FAILURE", "SC_OP_SUCCESS", "PROGRESS",
-                   "PINENTRY_LAUNCHED"):
+                   "PINENTRY_LAUNCHED", "FAILURE"):
             pass
         elif key in ("KEYEXPIRED", "SIGEXPIRED"):  # pragma: no cover
             self.status = 'key expired'
