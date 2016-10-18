@@ -432,12 +432,10 @@ class SearchKeys(list):
     def get_fields(self, args):
         result = {}
         for i, var in enumerate(self.FIELDS):
-            # GPG 2.1 sends one less element, for some reason. The
-            # last element for 'pub' keys is omitted
             if i < len(args):
                 result[var] = args[i]
             else:
-                result[var] = 'unavailable (GPG 2.1?)'
+                result[var] = 'unavailable'
         result['uids'] = []
         result['sigs'] = []
         return result
@@ -1208,7 +1206,7 @@ class GPG(object):
         The function achieves this by running:
         $ gpg --with-fingerprint --with-colons filename
         """
-        args = ['--with-fingerprint', '--with-colons']
+        args = ['--with-fingerprint', '--with-colons', '--fixed-list-mode']
         args.append(no_quote(filename))
         p = self._open_subprocess(args)
         return self._get_list_output(p, 'scan')
