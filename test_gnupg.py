@@ -15,6 +15,16 @@ import sys
 import tempfile
 import unittest
 
+try:
+    from unittest import skipIf
+except ImportError:
+    # For now, for Python < 2.7
+    def skipIf(condition, message):
+        if not condition:
+            return lambda x: x
+        else:
+            return lambda x: None
+
 import gnupg
 
 __author__ = "Vinay Sajip"
@@ -377,20 +387,20 @@ class GPGTestCase(unittest.TestCase):
 
     def test_scan_keys(self):
         "Test that external key files can be scanned"
-        if self.gpg.version > (2, 1):
-            raise unittest.SkipTest('Test not suitable for GnuPG >= 2.1')
-        expected = set([
-            'Andrew Able (A test user) <andrew.able@alpha.com>',
-            'Barbara Brown (A test user) <barbara.brown@beta.com>',
-            'Charlie Clark (A test user) <charlie.clark@gamma.com>',
-        ])
-        for fn in ('test_pubring.gpg', 'test_secring.gpg'):
-            logger.debug('scanning keys in %s', fn)
-            data = self.gpg.scan_keys(fn)
-            uids = set()
-            for d in data:
-                uids.add(d['uids'][0])
-            self.assertEqual(uids, expected)
+        # Don't use SkipTest for now, as not available for Python < 2.7
+        if self.gpg.version < (2, 1):
+            expected = set([
+                'Andrew Able (A test user) <andrew.able@alpha.com>',
+                'Barbara Brown (A test user) <barbara.brown@beta.com>',
+                'Charlie Clark (A test user) <charlie.clark@gamma.com>',
+            ])
+            for fn in ('test_pubring.gpg', 'test_secring.gpg'):
+                logger.debug('scanning keys in %s', fn)
+                data = self.gpg.scan_keys(fn)
+                uids = set()
+                for d in data:
+                    uids.add(d['uids'][0])
+                self.assertEqual(uids, expected)
 
     def test_encryption_and_decryption(self):
         "Test that encryption and decryption works"
@@ -698,7 +708,7 @@ class GPGTestCase(unittest.TestCase):
             shutil.rmtree(d)
         logger.debug("test_filename_with_spaces ends")
 
-    @unittest.skipIf(os.name == 'nt', 'Test not suitable for Windows')
+    @skipIf(os.name == 'nt', 'Test not suitable for Windows')
     def test_search_keys(self):
         "Test that searching for keys works"
         r = self.gpg.search_keys('<vinay_sajip@hotmail.com>')
