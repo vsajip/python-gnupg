@@ -708,7 +708,7 @@ class GPGTestCase(unittest.TestCase):
             shutil.rmtree(d)
         logger.debug("test_filename_with_spaces ends")
 
-    @skipIf(os.name == 'nt', 'Test not suitable for Windows')
+    #@skipIf(os.name == 'nt', 'Test not suitable for Windows')
     def test_search_keys(self):
         "Test that searching for keys works"
         r = self.gpg.search_keys('<vinay_sajip@hotmail.com>')
