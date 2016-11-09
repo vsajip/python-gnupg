@@ -351,7 +351,7 @@ class ImportResult(object):
     }
 
     def handle_status(self, key, value):
-        if key == "IMPORTED":
+        if key in ("IMPORTED", "KEY_CONSIDERED"):
             # this duplicates info we already see in import_ok & import_problem
             pass
         elif key == "NODATA":  # pragma: no cover
@@ -558,7 +558,7 @@ class Crypt(Verify, TextHandler):
         if key in ("ENC_TO", "USERID_HINT", "GOODMDC", "END_DECRYPTION",
                    "BEGIN_SIGNING", "NO_SECKEY", "ERROR", "NODATA", "PROGRESS",
                    "CARDCTRL", "BADMDC", "SC_OP_FAILURE", "SC_OP_SUCCESS",
-                   "PINENTRY_LAUNCHED"):
+                   "PINENTRY_LAUNCHED", "KEY_CONSIDERED"):
             # in the case of ERROR, this is because a more specific error
             # message will have come first
             if key == "NODATA":
@@ -608,7 +608,7 @@ class GenKey(object):
 
     def handle_status(self, key, value):
         if key in ("PROGRESS", "GOOD_PASSPHRASE", "NODATA", "KEY_NOT_CREATED",
-                   "PINENTRY_LAUNCHED", "ERROR"):
+                   "PINENTRY_LAUNCHED", "ERROR", "KEY_CONSIDERED"):
             pass
         elif key == "KEY_CREATED":
             (self.type,self.fingerprint) = value.split()
@@ -673,7 +673,7 @@ class Sign(TextHandler):
                    "GOOD_PASSPHRASE", "BEGIN_SIGNING", "CARDCTRL", "INV_SGNR",
                    "NO_SGNR", "MISSING_PASSPHRASE", "NEED_PASSPHRASE_PIN",
                    "SC_OP_FAILURE", "SC_OP_SUCCESS", "PROGRESS",
-                   "PINENTRY_LAUNCHED", "FAILURE"):
+                   "PINENTRY_LAUNCHED", "FAILURE", "KEY_CONSIDERED"):
             pass
         elif key in ("KEYEXPIRED", "SIGEXPIRED"):  # pragma: no cover
             self.status = 'key expired'
