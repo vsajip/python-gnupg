@@ -800,23 +800,24 @@ class GPG(object):
     def _open_subprocess(self, args, passphrase=False):
         # Internal method: open a pipe to a GPG subprocess and return
         # the file objects for communicating with it.
-        def debug_print(cmd):
-            result = []
-            for c in cmd:
-                if ' ' not in c:
-                    result.append(c)
-                else:
-                    if '"' not in c:
-                        result.append('"%s"' % c)
-                    elif "'" not in c:
-                        result.append("'%s'" % c)
-                    else:
-                        result.append(c)  # give up
-            return ' '.join(cmd)
+
+        # def debug_print(cmd):
+            # result = []
+            # for c in cmd:
+                # if ' ' not in c:
+                    # result.append(c)
+                # else:
+                    # if '"' not in c:
+                        # result.append('"%s"' % c)
+                    # elif "'" not in c:
+                        # result.append("'%s'" % c)
+                    # else:
+                        # result.append(c)  # give up
+            # return ' '.join(cmd)
+        from subprocess import list2cmdline as debug_print
 
         cmd = self.make_args(args, passphrase)
         if self.verbose:  # pragma: no cover
-            pcmd = ' '.join(cmd)
             print(debug_print(cmd))
         logger.debug("%s", debug_print(cmd))
         if not STARTUPINFO:
