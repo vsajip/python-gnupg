@@ -8,7 +8,7 @@
 ###########################################
 
 :Release: |release|
-:Date: |date|
+:Date: |today|
 
 .. module:: gnupg
    :synopsis: A Python wrapper for the GNU Privacy Guard (GnuPG)
