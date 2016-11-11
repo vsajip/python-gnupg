@@ -647,7 +647,7 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(args[-4:], ['--foo', '--bar', 'a', 'b'])
 
     def do_file_encryption_and_decryption(self, encfname, decfname):
-        "Do the actual encryption.decryptin test using given filenames"
+        "Do the actual encryption/decryption test using given filenames"
         mode = None
         if os.name == 'posix':
             # pick a mode that won't be already in effect via umask
@@ -793,7 +793,7 @@ TEST_GROUPS = {
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-    'test': set(['test_list_keys_after_generation']),
+    'test': set(['test_filenames_with_spaces']),
 }
 
 def suite(args=None):
