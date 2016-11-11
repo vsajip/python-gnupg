@@ -127,7 +127,7 @@ options (defaults to ``None``)
     If specified, the value should be a list of additional command-line options to pass to GPG.
 secret_keyring (defaults to ``None``)
     If specified, the value is used as the name of the secret keyring file. A list of paths to secret keyring files can also be
-    specified.
+    specified. *Note that these files are not used by GnuPG >= 2.1.*
 
 .. versionchanged:: 0.3.4
    The ``keyring`` argument can now also be a list of keyring filenames.
