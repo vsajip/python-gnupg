@@ -1,4 +1,4 @@
 (build|dist|keys)/
 (DETAILS|MANIFEST|random_binary_data)$
 \.(pyc|log|dict-validwords)$
-
+local.*\.sh
