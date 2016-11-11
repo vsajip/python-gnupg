@@ -308,7 +308,8 @@ class Verify(object):
                 self.status = 'unexpected data'
             else:
                 # N.B. there might be other reasons
-                self.status = 'incorrect passphrase'
+                if not self.status:
+                    self.status = 'incorrect passphrase'
         else:
             raise ValueError("Unknown status message: %r" % key)
 
