@@ -20,9 +20,14 @@
 .. toctree::
    :maxdepth: 2
 
-The ``gnupg`` module allows Python programs to make use of the functionality provided by the `GNU Privacy Guard`__ (abbreviated GPG or GnuPG). Using this module, Python programs can encrypt and decrypt data, digitally sign documents and verify digital signatures, manage (generate, list and delete) encryption keys, using proven Public Key Infrastructure (PKI) encryption technology based on OpenPGP.
+The ``gnupg`` module allows Python programs to make use of the functionality provided by the `GNU Privacy Guard`__ (abbreviated GPG or GnuPG). Using
+this module, Python programs can encrypt and decrypt data, digitally sign documents and verify digital signatures, manage (generate, list and delete)
+encryption keys, using proven Public Key Infrastructure (PKI) encryption technology based on OpenPGP.
 
-This module is expected to be used with Python versions >= 2.4, as it makes use of the ``subprocess`` module which appeared in that version of Python. Development and testing has been carried out on Windows (Python 2.4, 2.5, 2.6, 3.1, Jython 2.5.1), Mac OS X (Python 2.5) and Ubuntu (Python 2.4, 2.5, 2.6, 2.7, 3.0, 3.1, Jython 2.5.1). It should work with more recent versions of Python, too. Install this module using ``pip install python-gnupg``.
+This module is expected to be used with Python versions >= 2.4, as it makes use of the ``subprocess`` module which appeared in that version of Python.
+Development and testing has been carried out on Windows (Python 2.4, 2.5, 2.6, 3.1, Jython 2.5.1), Mac OS X (Python 2.5) and Ubuntu (Python 2.4, 2.5,
+2.6, 2.7, 3.0, 3.1, Jython 2.5.1). It should work with more recent versions of Python, too. Install this module using ``pip install python-gnupg``.
+You can then use this module in your own code by doing ``import gnupg`` or similar.
 
 
 __ gnupg_
