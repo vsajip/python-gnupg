@@ -45,6 +45,15 @@ for the simplest deployment options.
    there are more dependent files which you have to ship. For this reason, our recommendation is to stick with GnuPG 1.4.x on Windows, unless you
    specifically need 2.0 features - in which case, you may have to do a full installation rather than just relying on a couple of files).*
 
+   The latest version of GnuPG (2.1.x) introduces a number of changes:
+
+   * By default, passphrases cannot be passed via streams to ``gpg`` unless the line ``allow-loopback-pinentry`` is added to ``gpg-agent.conf`` in the home
+     directory used by ``gpg`` (this is also where the keyring files are kept). If that file does not exist, you will need to create it with that single line.
+     Note that even with this configuration, some versions of GnuPG 2.1.x won't work as expected. In our testing, we found, for example, that the 2.1.11
+     executable shipped with Ubuntu 16.04 did't behave helpfully, whereas a GnuPG 2.1.15 executable compiled from source on the same machine worked as
+     expected.
+   * To export secret keys, a passphrase must be provided.
+
 __ gnupg-win-bin_
 
 .. _gnupg-win-bin: ftp://ftp.gnupg.org/gcrypt/binary/
