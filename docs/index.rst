@@ -133,7 +133,7 @@ secret_keyring (defaults to ``None``)
    The ``keyring`` argument can now also be a list of keyring filenames.
 
 .. versionadded:: 0.3.4
-   The ``secret_keyring`` argument was added.
+   The ``secret_keyring`` argument was added. *Note that this argument is not used when working with GnuPG >= 2.1.*
 
 .. note:: If you specify values in ``options``, make sure you don't specify values which will conflict with other values added by python-gnupg. You
    should be familiar with GPG command-line arguments and how they affect GPG's operation.
