@@ -673,7 +673,7 @@ class Sign(TextHandler):
                    "GOOD_PASSPHRASE", "BEGIN_SIGNING", "CARDCTRL", "INV_SGNR",
                    "NO_SGNR", "MISSING_PASSPHRASE", "NEED_PASSPHRASE_PIN",
                    "SC_OP_FAILURE", "SC_OP_SUCCESS", "PROGRESS",
-                   "PINENTRY_LAUNCHED", "FAILURE", "KEY_CONSIDERED"):
+                   "PINENTRY_LAUNCHED", "FAILURE", "ERROR", "KEY_CONSIDERED"):
             pass
         elif key in ("KEYEXPIRED", "SIGEXPIRED"):  # pragma: no cover
             self.status = 'key expired'
@@ -775,6 +775,10 @@ class GPG(object):
         a passphrase will be sent to GPG, else False.
         """
         cmd = [self.gpgbinary, '--status-fd', '2', '--no-tty']
+        # cmd.extend(['--debug', 'ipc'])
+        if passphrase and hasattr(self, 'version'):
+            if self.version >= (2, 1):
+                cmd[1:1] = ['--pinentry-mode', 'loopback']
         if self.gnupghome:
             cmd.extend(['--homedir',  no_quote(self.gnupghome)])
         if self.keyring:
@@ -796,11 +800,25 @@ class GPG(object):
     def _open_subprocess(self, args, passphrase=False):
         # Internal method: open a pipe to a GPG subprocess and return
         # the file objects for communicating with it.
+        def debug_print(cmd):
+            result = []
+            for c in cmd:
+                if ' ' not in c:
+                    result.append(c)
+                else:
+                    if '"' not in c:
+                        result.append('"%s"' % c)
+                    elif "'" not in c:
+                        result.append("'%s'" % c)
+                    else:
+                        result.append(c)  # give up
+            return ' '.join(cmd)
+
         cmd = self.make_args(args, passphrase)
         if self.verbose:  # pragma: no cover
             pcmd = ' '.join(cmd)
-            print(pcmd)
-        logger.debug("%s", cmd)
+            print(debug_print(cmd))
+        logger.debug("%s", debug_print(cmd))
         if not STARTUPINFO:
             si = None
         else:  # pragma: no cover
@@ -1116,11 +1134,21 @@ class GPG(object):
         self._collect_output(p, result, stdin=p.stdin)
         return result
 
-    def export_keys(self, keyids, secret=False, armor=True, minimal=False):
-        "export the indicated keys. 'keyid' is anything gpg accepts"
+    def export_keys(self, keyids, secret=False, armor=True, minimal=False,
+                    passphrase=None):
+        """
+        Export the indicated keys. A 'keyid' is anything gpg accepts.
+
+        Since GnuPG 2.1, you can't export secret keys without providing a
+        passphrase.
+        """
+
         which=''
         if secret:
             which='-secret-key'
+            if self.version >= (2, 1) and passphrase is None:
+                raise ValueError('For GnuPG >= 2.1, exporting secret keys '
+                                 'needs a passphrase to be provided')
         if _is_sequence(keyids):
             keyids = [no_quote(k) for k in keyids]
         else:
@@ -1131,12 +1159,21 @@ class GPG(object):
         if minimal:  # pragma: no cover
             args.extend(['--export-options','export-minimal'])
         args.extend(keyids)
-        p = self._open_subprocess(args)
         # gpg --export produces no status-fd output; stdout will be
         # empty in case of failure
         #stdout, stderr = p.communicate()
         result = self.result_map['export'](self)
-        self._collect_output(p, result, stdin=p.stdin)
+        if not secret or self.version < (2, 1):
+            p = self._open_subprocess(args)
+            self._collect_output(p, result, stdin=p.stdin)
+        else:
+            # Need to send in a passphrase.
+            f = _make_binary_stream('', self.encoding)
+            try:
+                self._handle_io(args, f, result, passphrase=passphrase,
+                                binary=True)
+            finally:
+                f.close()
         logger.debug('export_keys result: %r', result.data)
         # Issue #49: Return bytes if armor not specified, else text
         result = result.data

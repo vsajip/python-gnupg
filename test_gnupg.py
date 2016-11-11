@@ -250,6 +250,8 @@ class GPGTestCase(unittest.TestCase):
             'name_comment': 'dummy comment',
             'name_email': 'test.name@example.com',
         }
+        if self.gpg.version >= (2, 1):
+            params['passphrase'] = 'foo'
         cmd = self.gpg.gen_key_input(**params)
         result = self.gpg.gen_key(cmd)
         keys = self.gpg.list_keys()
@@ -263,10 +265,14 @@ class GPGTestCase(unittest.TestCase):
 
     def test_key_generation_with_escapes(self):
         "Test that key generation handles escape characters"
-        cmd = self.gpg.gen_key_input(name_comment='Funny chars: '
-                                                  '\\r\\n\\f\\v\\0\\b',
-                                     name_real='Test Name',
-                                     name_email='test.name@example.com')
+        params = {
+            'name_real': 'Test Name',
+            'name_comment': 'Funny chars: \\r\\n\\f\\v\\0\\b',
+            'name_email': 'test.name@example.com',
+        }
+        if self.gpg.version >= (2, 1):
+            params['passphrase'] = 'foo'
+        cmd = self.gpg.gen_key_input(**params)
         result = self.gpg.gen_key(cmd)
         keys = self.gpg.list_keys()
         self.assertEqual(len(keys), 1)
@@ -324,12 +330,19 @@ class GPGTestCase(unittest.TestCase):
                         "1-element list expected")
         self.assertEqual(len(private_keys.fingerprints), 1)
         # Now do the same test, but using keyring and secret_keyring arguments
-        pkn = 'pubring.gpg'
-        skn = 'secring.gpg'
+        if self.gpg.version < (2, 1):
+            pkn = 'pubring.gpg'
+            skn = 'secring.gpg'
+        else:
+            # On GnuPG >= 2.1, --secret-keyring is obsolete and ignored,
+            # and the keyring file name has changed.
+            pkn = 'pubring.kbx'
+            skn = None
         hd = os.path.join(os.getcwd(), 'keys')
         if os.name == 'posix':
             pkn = os.path.join(hd, pkn)
-            skn = os.path.join(hd, skn)
+            if skn:
+                skn = os.path.join(hd, skn)
         gpg = gnupg.GPG(gnupghome=hd, gpgbinary=GPGBINARY,
                         keyring=pkn, secret_keyring=skn)
         logger.debug('Using keyring and secret_keyring arguments')
@@ -468,11 +481,16 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(0, match, "Keys must match")
         #Generate a key so we can test exporting private keys
         key = self.do_key_generation()
-        ascii = gpg.export_keys(key.fingerprint, True)
+        if self.gpg.version < (2, 1):
+            passphrase = None
+        else:
+            passphrase = 'bbrown'
+        ascii = gpg.export_keys(key.fingerprint, True, passphrase=passphrase)
         self.assertTrue(isinstance(ascii, gnupg.text_type))
         self.assertTrue(ascii.find("PGP PRIVATE KEY BLOCK") >= 0,
                         "Exported key should be private")
-        binary = gpg.export_keys(key.fingerprint, True, armor=False)
+        binary = gpg.export_keys(key.fingerprint, True, armor=False,
+                                 passphrase=passphrase)
         self.assertFalse(isinstance(binary, gnupg.text_type))
         logger.debug("test_import_and_export ends")
 
@@ -775,7 +793,7 @@ TEST_GROUPS = {
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-    'test': set(['test_search_keys']),
+    'test': set(['test_list_keys_after_generation']),
 }
 
 def suite(args=None):
