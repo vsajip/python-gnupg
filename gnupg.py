@@ -1089,7 +1089,7 @@ class GPG(object):
         >>> shutil.rmtree("keys")
         >>> gpg = GPG(gnupghome="keys")
         >>> os.chmod('keys', 0x1C0)
-        >>> result = gpg.recv_keys('keyserver.ubuntu.com', '92905378')
+        >>> result = gpg.recv_keys('pgp.mit.edu', '92905378')
         >>> assert result
 
         """
