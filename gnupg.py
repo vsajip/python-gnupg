@@ -647,6 +647,8 @@ class DeleteResult(object):
         if key == "DELETE_PROBLEM":  # pragma: no cover
             self.status = self.problem_reason.get(value,
                                                   "Unknown error: %r" % value)
+        elif key == "KEY_CONSIDERED":
+            pass
         else:  # pragma: no cover
             raise ValueError("Unknown status message: %r" % key)
 
@@ -976,7 +978,7 @@ class GPG(object):
 
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
         >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
-        >>> input = gpg.gen_key_input(Passphrase='foo')
+        >>> input = gpg.gen_key_input(passphrase='foo')
         >>> key = gpg.gen_key(input)
         >>> assert key
         >>> sig = gpg.sign('hello',keyid=key.fingerprint,passphrase='bar')
@@ -1037,7 +1039,7 @@ class GPG(object):
         >>> shutil.rmtree("keys")
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
         >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
-        >>> input = gpg.gen_key_input()
+        >>> input = gpg.gen_key_input(passphrase='foo')
         >>> result = gpg.gen_key(input)
         >>> print1 = result.fingerprint
         >>> result = gpg.gen_key(input)
@@ -1214,7 +1216,7 @@ class GPG(object):
         >>> shutil.rmtree("keys")
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
         >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
-        >>> input = gpg.gen_key_input()
+        >>> input = gpg.gen_key_input(passphrase='foo')
         >>> result = gpg.gen_key(input)
         >>> print1 = result.fingerprint
         >>> result = gpg.gen_key(input)
@@ -1303,7 +1305,7 @@ class GPG(object):
 
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
         >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
-        >>> input = gpg.gen_key_input()
+        >>> input = gpg.gen_key_input(passphrase='foo')
         >>> result = gpg.gen_key(input)
         >>> assert result
         >>> result = gpg.gen_key('foo')
@@ -1411,23 +1413,23 @@ class GPG(object):
         >>> input = gpg.gen_key_input(passphrase='foo')
         >>> result = gpg.gen_key(input)
         >>> print1 = result.fingerprint
-        >>> input = gpg.gen_key_input()
+        >>> input = gpg.gen_key_input(passphrase='foo')
         >>> result = gpg.gen_key(input)
         >>> print2 = result.fingerprint
         >>> result = gpg.encrypt("hello",print2)
         >>> message = str(result)
         >>> assert message != 'hello'
-        >>> result = gpg.decrypt(message)
+        >>> result = gpg.decrypt(message, passphrase='foo')
         >>> assert result
         >>> str(result)
         'hello'
-        >>> result = gpg.encrypt("hello again",print1)
+        >>> result = gpg.encrypt("hello again", print1)
         >>> message = str(result)
-        >>> result = gpg.decrypt(message,passphrase='bar')
+        >>> result = gpg.decrypt(message, passphrase='bar')
         >>> result.status in ('decryption failed', 'bad passphrase')
         True
         >>> assert not result
-        >>> result = gpg.decrypt(message,passphrase='foo')
+        >>> result = gpg.decrypt(message, passphrase='foo')
         >>> result.status == 'decryption ok'
         True
         >>> str(result)
@@ -1436,7 +1438,7 @@ class GPG(object):
         >>> result.status == 'encryption ok'
         True
         >>> message = str(result)
-        >>> result = gpg.decrypt(message)
+        >>> result = gpg.decrypt(message, passphrase='foo')
         >>> result.status == 'decryption ok'
         True
         >>> assert result.fingerprint == print1
