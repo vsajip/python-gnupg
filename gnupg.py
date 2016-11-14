@@ -974,7 +974,8 @@ class GPG(object):
     def verify(self, data):
         """Verify the signature on the contents of the string 'data'
 
-        >>> gpg = GPG(gnupghome="keys")
+        >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
+        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
         >>> input = gpg.gen_key_input(Passphrase='foo')
         >>> key = gpg.gen_key(input)
         >>> assert key
@@ -1034,7 +1035,8 @@ class GPG(object):
 
         >>> import shutil
         >>> shutil.rmtree("keys")
-        >>> gpg = GPG(gnupghome="keys")
+        >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
+        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
         >>> input = gpg.gen_key_input()
         >>> result = gpg.gen_key(input)
         >>> print1 = result.fingerprint
@@ -1087,7 +1089,8 @@ class GPG(object):
 
         >>> import shutil
         >>> shutil.rmtree("keys")
-        >>> gpg = GPG(gnupghome="keys")
+        >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
+        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
         >>> os.chmod('keys', 0x1C0)
         >>> result = gpg.recv_keys('pgp.mit.edu', '92905378')
         >>> assert result
@@ -1209,7 +1212,8 @@ class GPG(object):
 
         >>> import shutil
         >>> shutil.rmtree("keys")
-        >>> gpg = GPG(gnupghome="keys")
+        >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
+        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
         >>> input = gpg.gen_key_input()
         >>> result = gpg.gen_key(input)
         >>> print1 = result.fingerprint
@@ -1255,7 +1259,8 @@ class GPG(object):
 
         >>> import shutil
         >>> shutil.rmtree('keys')
-        >>> gpg = GPG(gnupghome='keys')
+        >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
+        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome='keys')
         >>> os.chmod('keys', 0x1C0)
         >>> result = gpg.search_keys('<vinay_sajip@hotmail.com>')
         >>> assert result, 'Failed using default keyserver'
@@ -1296,7 +1301,8 @@ class GPG(object):
         """Generate a key; you might use gen_key_input() to create the
         control input.
 
-        >>> gpg = GPG(gnupghome="keys")
+        >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
+        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
         >>> input = gpg.gen_key_input()
         >>> result = gpg.gen_key(input)
         >>> assert result
@@ -1400,7 +1406,8 @@ class GPG(object):
         >>> import shutil
         >>> if os.path.exists("keys"):
         ...     shutil.rmtree("keys")
-        >>> gpg = GPG(gnupghome="keys")
+        >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
+        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
         >>> input = gpg.gen_key_input(passphrase='foo')
         >>> result = gpg.gen_key(input)
         >>> print1 = result.fingerprint
