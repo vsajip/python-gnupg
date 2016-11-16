@@ -157,6 +157,20 @@ def compare_keys(k1, k2):
     # ignoring things like spurious blank lines
     return get_key_data(k1) != get_key_data(k2)
 
+AGENT_CONFIG = b'''allow-loopback-pinentry
+log-file socket:///tmp/S.my-gnupg-log
+verbose
+debug ipc
+'''
+
+def prepare_homedir(hd):
+    if not os.path.isdir(hd):
+        os.makedirs(hd)
+    os.chmod(hd, 0x1C0)
+    fn = os.path.join(hd, 'gpg-agent.conf')
+    with open(fn, 'wb') as f:
+        f.write(AGENT_CONFIG)
+
 class GPGTestCase(unittest.TestCase):
     def setUp(self):
         hd = os.path.join(os.getcwd(), 'keys')
@@ -164,6 +178,7 @@ class GPGTestCase(unittest.TestCase):
             self.assertTrue(os.path.isdir(hd),
                             "Not a directory: %s" % hd)
             shutil.rmtree(hd)
+        prepare_homedir(hd)
         self.homedir = hd
         self.gpg = gpg = gnupg.GPG(gnupghome=hd, gpgbinary=GPGBINARY)
         v = gpg.version
@@ -776,6 +791,94 @@ class GPGTestCase(unittest.TestCase):
         self.assertTrue(signed.data)
         logger.debug("test_signing_with_uid ends")
 
+    def test_doctest_import_keys(self):
+        """
+        Because GnuPG 2.1 requires passphrases for exporting and deleting
+        secret keys, and because console-mode passphrase entry requires
+        configuration changes, doctests can't always be used. This test
+        replicates the original doctest for import_keys as a regular test.
+
+        >>> import shutil
+        >>> shutil.rmtree("keys")
+        >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
+        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
+        >>> input = gpg.gen_key_input(name_email='user1@test', passphrase='pp1')
+        >>> result = gpg.gen_key(input)
+        >>> fp1 = result.fingerprint
+        >>> result = gpg.gen_key(input)
+        >>> fp2 = result.fingerprint
+        >>> pubkey1 = gpg.export_keys(fp1)
+        >>> seckey1 = gpg.export_keys(fp1, secret=True, passphrase='pp1')
+        >>> seckeys = gpg.list_keys(secret=True)
+        >>> pubkeys = gpg.list_keys()
+        >>> assert fp1 in seckeys.fingerprints
+        >>> assert fp1 in pubkeys.fingerprints
+        >>> str(gpg.delete_keys(fp1))
+        'Must delete secret key first'
+        >>> str(gpg.delete_keys(fp1, secret=True, passphrase='pp1'))
+        'ok'
+        >>> str(gpg.delete_keys(fp1))
+        'ok'
+        >>> str(gpg.delete_keys("nosuchkey"))
+        'No such key'
+        >>> seckeys = gpg.list_keys(secret=True)
+        >>> pubkeys = gpg.list_keys()
+        >>> assert not fp1 in seckeys.fingerprints
+        >>> assert not fp1 in pubkeys.fingerprints
+        >>> result = gpg.import_keys('foo')
+        >>> assert not result
+        >>> result = gpg.import_keys(pubkey1)
+        >>> pubkeys = gpg.list_keys()
+        >>> seckeys = gpg.list_keys(secret=True)
+        >>> assert not fp1 in seckeys.fingerprints
+        >>> assert fp1 in pubkeys.fingerprints
+        >>> result = gpg.import_keys(seckey1)
+        >>> assert result
+        >>> seckeys = gpg.list_keys(secret=True)
+        >>> pubkeys = gpg.list_keys()
+        >>> assert fp1 in seckeys.fingerprints
+        >>> assert fp1 in pubkeys.fingerprints
+        >>> assert fp2 in pubkeys.fingerprints
+        """
+        logger.debug("test_doctest_import_keys begins")
+        gpg = self.gpg
+        inp = gpg.gen_key_input(name_email='user1@test', passphrase='pp1')
+        result = gpg.gen_key(inp)
+        fp1 = result.fingerprint
+        inp = gpg.gen_key_input(name_email='user2@test', passphrase='pp2')
+        result = gpg.gen_key(inp)
+        fp2 = result.fingerprint
+        pubkey1 = gpg.export_keys(fp1)
+        if gpg.version >= (2, 1):
+            passphrase = 'pp1'
+        else:
+            passphrase = None
+        seckey1 = gpg.export_keys(fp1, secret=True, passphrase=passphrase)
+        seckeys = gpg.list_keys(secret=True)
+        pubkeys = gpg.list_keys()
+        # avoid assertIn, etc. as absent in older Python versions
+        self.assertTrue(fp1 in seckeys.fingerprints)
+        self.assertTrue(fp1 in pubkeys.fingerprints)
+        result = gpg.delete_keys(fp1)
+        self.assertEqual(str(result), 'Must delete secret key first')
+        if gpg.version < (2, 1):
+            # Doesn't work on 2.1, and can't use SkipTest due to having
+            # to support older Pythons
+            result = gpg.delete_keys(fp1, secret=True, passphrase=passphrase)
+            self.assertEqual(str(result), 'ok')
+            result = gpg.delete_keys(fp1)
+            self.assertEqual(str(result), 'ok')
+            result = gpg.delete_keys('nosuchkey')
+            self.assertEqual(str(result), 'No such key')
+            seckeys = gpg.list_keys(secret=True)
+            pubkeys = gpg.list_keys()
+            self.assertFalse(fp1 in seckeys.fingerprints)
+            self.assertFalse(fp1 in pubkeys.fingerprints)
+            result = gpg.import_keys('foo')
+            self.assertFalse(result)
+        logger.debug("test_doctest_import_keys ends")
+
+
 TEST_GROUPS = {
     'sign' : set(['test_signature_verification']),
     'crypt' : set(['test_encryption_and_decryption',
@@ -789,11 +892,11 @@ TEST_GROUPS = {
                  'test_key_generation_with_empty_value',
                  'test_key_generation_with_colons',
                  'test_search_keys', 'test_scan_keys']),
-    'import' : set(['test_import_only']),
+    'import' : set(['test_import_only', 'test_doctest_import_keys']),
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-    'test': set(['test_filenames_with_spaces']),
+    'test': set(['test_doctest_import_keys']),
 }
 
 def suite(args=None):

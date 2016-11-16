@@ -778,7 +778,7 @@ class GPG(object):
         a passphrase will be sent to GPG, else False.
         """
         cmd = [self.gpgbinary, '--status-fd', '2', '--no-tty']
-        # cmd.extend(['--debug', 'ipc'])
+        cmd.extend(['--debug', 'ipc'])
         if passphrase and hasattr(self, 'version'):
             if self.version >= (2, 1):
                 cmd[1:1] = ['--pinentry-mode', 'loopback']
@@ -822,15 +822,16 @@ class GPG(object):
         cmd = self.make_args(args, passphrase)
         if self.verbose:  # pragma: no cover
             print(debug_print(cmd))
-        logger.debug("%s", debug_print(cmd))
         if not STARTUPINFO:
             si = None
         else:  # pragma: no cover
             si = STARTUPINFO()
             si.dwFlags = STARTF_USESHOWWINDOW
             si.wShowWindow = SW_HIDE
-        return Popen(cmd, shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE,
-                     startupinfo=si)
+        result = Popen(cmd, shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE,
+                       startupinfo=si)
+        logger.debug("%s: %s", result.pid, debug_print(cmd))
+        return result
 
     def _read_response(self, stream, result):
         # Internal method: reads all the stderr output from GPG, taking notice
@@ -1033,50 +1034,8 @@ class GPG(object):
     #
 
     def import_keys(self, key_data):
-        """ import the key_data into our keyring
-
-        >>> import shutil
-        >>> shutil.rmtree("keys")
-        >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
-        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
-        >>> input = gpg.gen_key_input(passphrase='foo')
-        >>> result = gpg.gen_key(input)
-        >>> print1 = result.fingerprint
-        >>> result = gpg.gen_key(input)
-        >>> print2 = result.fingerprint
-        >>> pubkey1 = gpg.export_keys(print1)
-        >>> seckey1 = gpg.export_keys(print1,secret=True)
-        >>> seckeys = gpg.list_keys(secret=True)
-        >>> pubkeys = gpg.list_keys()
-        >>> assert print1 in seckeys.fingerprints
-        >>> assert print1 in pubkeys.fingerprints
-        >>> str(gpg.delete_keys(print1))
-        'Must delete secret key first'
-        >>> str(gpg.delete_keys(print1,secret=True))
-        'ok'
-        >>> str(gpg.delete_keys(print1))
-        'ok'
-        >>> str(gpg.delete_keys("nosuchkey"))
-        'No such key'
-        >>> seckeys = gpg.list_keys(secret=True)
-        >>> pubkeys = gpg.list_keys()
-        >>> assert not print1 in seckeys.fingerprints
-        >>> assert not print1 in pubkeys.fingerprints
-        >>> result = gpg.import_keys('foo')
-        >>> assert not result
-        >>> result = gpg.import_keys(pubkey1)
-        >>> pubkeys = gpg.list_keys()
-        >>> seckeys = gpg.list_keys(secret=True)
-        >>> assert not print1 in seckeys.fingerprints
-        >>> assert print1 in pubkeys.fingerprints
-        >>> result = gpg.import_keys(seckey1)
-        >>> assert result
-        >>> seckeys = gpg.list_keys(secret=True)
-        >>> pubkeys = gpg.list_keys()
-        >>> assert print1 in seckeys.fingerprints
-        >>> assert print1 in pubkeys.fingerprints
-        >>> assert print2 in pubkeys.fingerprints
-
+        """
+        Import the key_data into our keyring.
         """
         result = self.result_map['import'](self)
         logger.debug('import_keys: %r', key_data[:256])
@@ -1126,9 +1085,12 @@ class GPG(object):
         data.close()
         return result
 
-    def delete_keys(self, fingerprints, secret=False):
+    def delete_keys(self, fingerprints, secret=False, passphrase=None):
         which='key'
         if secret:  # pragma: no cover
+            if self.version >= (2, 1) and passphrase is None:
+                raise ValueError('For GnuPG >= 2.1, deleting secret keys '
+                                 'needs a passphrase to be provided')
             which='secret-key'
         if _is_sequence(fingerprints):  # pragma: no cover
             fingerprints = [no_quote(s) for s in fingerprints]
@@ -1137,8 +1099,17 @@ class GPG(object):
         args = ['--batch', '--delete-%s' % which]
         args.extend(fingerprints)
         result = self.result_map['delete'](self)
-        p = self._open_subprocess(args)
-        self._collect_output(p, result, stdin=p.stdin)
+        if not secret or self.version < (2, 1):
+            p = self._open_subprocess(args)
+            self._collect_output(p, result, stdin=p.stdin)
+        else:
+            # Need to send in a passphrase.
+            f = _make_binary_stream('', self.encoding)
+            try:
+                self._handle_io(args, f, result, passphrase=passphrase,
+                                binary=True)
+            finally:
+                f.close()
         return result
 
     def export_keys(self, keyids, secret=False, armor=True, minimal=False,
@@ -1218,19 +1189,18 @@ class GPG(object):
         >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
         >>> input = gpg.gen_key_input(passphrase='foo')
         >>> result = gpg.gen_key(input)
-        >>> print1 = result.fingerprint
+        >>> fp1 = result.fingerprint
         >>> result = gpg.gen_key(input)
-        >>> print2 = result.fingerprint
+        >>> fp2 = result.fingerprint
         >>> pubkeys = gpg.list_keys()
-        >>> assert print1 in pubkeys.fingerprints
-        >>> assert print2 in pubkeys.fingerprints
+        >>> assert fp1 in pubkeys.fingerprints
+        >>> assert fp2 in pubkeys.fingerprints
 
         """
 
         if sigs:
             which = 'sigs'
-        else:
-            which='keys'
+        else:            which='keys'
         if secret:
             which='secret-keys'
         args = ['--list-%s' % which, '--fixed-list-mode',
@@ -1410,38 +1380,38 @@ class GPG(object):
         ...     shutil.rmtree("keys")
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
         >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
-        >>> input = gpg.gen_key_input(passphrase='foo')
+        >>> input = gpg.gen_key_input(name_email='user1@test', passphrase='pp1')
         >>> result = gpg.gen_key(input)
-        >>> print1 = result.fingerprint
-        >>> input = gpg.gen_key_input(passphrase='foo')
+        >>> fp1 = result.fingerprint
+        >>> input = gpg.gen_key_input(name_email='user2@test', passphrase='pp2')
         >>> result = gpg.gen_key(input)
-        >>> print2 = result.fingerprint
-        >>> result = gpg.encrypt("hello",print2)
+        >>> fp2 = result.fingerprint
+        >>> result = gpg.encrypt("hello",fp2)
         >>> message = str(result)
         >>> assert message != 'hello'
-        >>> result = gpg.decrypt(message, passphrase='foo')
+        >>> result = gpg.decrypt(message, passphrase='pp2')
         >>> assert result
         >>> str(result)
         'hello'
-        >>> result = gpg.encrypt("hello again", print1)
+        >>> result = gpg.encrypt("hello again", fp1)
         >>> message = str(result)
         >>> result = gpg.decrypt(message, passphrase='bar')
         >>> result.status in ('decryption failed', 'bad passphrase')
         True
         >>> assert not result
-        >>> result = gpg.decrypt(message, passphrase='foo')
+        >>> result = gpg.decrypt(message, passphrase='pp1')
         >>> result.status == 'decryption ok'
         True
         >>> str(result)
         'hello again'
-        >>> result = gpg.encrypt("signed hello",print2,sign=print1,passphrase='foo')
+        >>> result = gpg.encrypt("signed hello", fp2, sign=fp1, passphrase='pp1')
         >>> result.status == 'encryption ok'
         True
         >>> message = str(result)
-        >>> result = gpg.decrypt(message, passphrase='foo')
+        >>> result = gpg.decrypt(message, passphrase='pp2')
         >>> result.status == 'decryption ok'
         True
-        >>> assert result.fingerprint == print1
+        >>> assert result.fingerprint == fp1
 
         """
         data = _make_binary_stream(data, self.encoding)
