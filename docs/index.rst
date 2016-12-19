@@ -387,7 +387,10 @@ If you want to encrypt data in a file (or file-like object), use::
 
     >>> encrypted_ascii_data = gpg.encrypt_file(stream, recipients) # e.g. after stream = open(filename, "rb")
 
-These methods both return an object such that ``str(encrypted_ascii_data)`` gives the encrypted data in a non-binary format.
+These methods both return an object such that:
+
+* If encryption succeeded, the returned object's ``ok`` attribute is set to ``True``. Otherwise, the returned object's ``ok`` attribute is set to ``False`` and its ``status`` attribute (a message string) provides more information as to the reason for failure (for example, ``'invalid recipient'`` or ``'key expired'``).
+* ``str(encrypted_ascii_data)`` gives the encrypted data in a non-binary format.
 
 In both cases, ``recipients`` is a list of key fingerprints for those recipients. For your convenience, if there is a single recipient, you can pass the fingerprint rather than a 1-element array containing the fingerprint. Both methods accept the following optional keyword arguments:
 
