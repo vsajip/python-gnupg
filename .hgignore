@@ -2,3 +2,4 @@
 (DETAILS|MANIFEST|random_binary_data)$
 \.(pyc|log|dict-validwords)$
 local.*\.(sh|cmd)
+docs/themes/
