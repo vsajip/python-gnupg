@@ -227,7 +227,7 @@ man_pages = [
 epub_title = u'python-gnupg'
 epub_author = u'Vinay Sajip'
 epub_publisher = u'Vinay Sajip'
-epub_copyright = u'2014, Vinay Sajip'
+epub_copyright = u'2016, Vinay Sajip'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.

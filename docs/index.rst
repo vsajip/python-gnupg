@@ -632,7 +632,11 @@ The latest version is available from the PyPI_ page.
 
 Status and Further Work
 =======================
-The ``gnupg`` module, being based on proven earlier versions, is quite usable. However, there are many features of GnuPG which this module does not take advantage of, or provide access to. How this module evolves will be determined by feedback from the user community.
+The ``gnupg`` module, being based on proven earlier versions, is quite usable, and comes packaged with Linux distributions such as Debian, Ubuntu and Fedora. However, there may be some features of GnuPG which this module does not take advantage of, or provide access to. How this module evolves will be determined by feedback from its user community.
+
+Support for GnuPG 2.1 is limited, because that version of GnuPG does not provide the ability to prevent pinentry popups in all cases. This package sends passphrases to the ``gpg`` executable via pipes, which is only possible under GnuPG 2.1 under limited conditions and requiring end-users to edit GnuPG configuration files.
+
+At present, functionality that requires interacting with the ``gpg`` executable (e.g. for key editing) is not available. This is because it requires essentially a state machine which manages the interaction - moreover, a state machine which varies according to the specific version of the ``gpg`` executable being used.
 
 If you find bugs and want to raise issues, please do so via the `BitBucket project`__.
 
