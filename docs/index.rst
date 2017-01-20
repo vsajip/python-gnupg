@@ -432,7 +432,7 @@ If you want to decrypt data in a file (or file-like object), use::
 
     >>> decrypted_data = gpg.decrypt_file(stream) # e.g. after stream = open(filename, "rb")
 
-These methods both return an object such that ``str(decrypted_data)`` gives the decrypted data in a non-binary format.
+These methods both return an object such that ``str(decrypted_data)`` gives the decrypted data in a non-binary format. If decryption succeeded, the returned object's ``ok`` attribute is set to ``True``. Otherwise, the returned object's ``ok`` attribute is set to ``False`` and its ``status`` attribute (a message string) provides more information as to the reason for failure (for example, ``'bad passphrase'`` or ``'decryption failed'``).
 
 Both methods accept the following optional keyword arguments:
 
