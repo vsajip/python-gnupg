@@ -40,7 +40,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Python Wrapper for GnuPG'
-copyright = u'2008-2016, Vinay Sajip'
+copyright = u'2008-2017, Vinay Sajip'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -227,7 +227,7 @@ man_pages = [
 epub_title = u'python-gnupg'
 epub_author = u'Vinay Sajip'
 epub_publisher = u'Vinay Sajip'
-epub_copyright = u'2016, Vinay Sajip'
+epub_copyright = u'2017, Vinay Sajip'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.

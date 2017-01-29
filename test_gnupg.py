@@ -2,7 +2,7 @@
 """
 A test harness for gnupg.py.
 
-Copyright (C) 2008-2016 Vinay Sajip. All rights reserved.
+Copyright (C) 2008-2017 Vinay Sajip. All rights reserved.
 """
 import doctest
 import logging
@@ -28,7 +28,7 @@ except ImportError:
 import gnupg
 
 __author__ = "Vinay Sajip"
-__date__  = "$10-Sep-2016 08:38:57$"
+__date__  = "$29-Jan-2017 17:09:59$"
 
 ALL_TESTS = True
 

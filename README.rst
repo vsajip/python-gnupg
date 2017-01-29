@@ -54,10 +54,32 @@ Change log
 
 N.B: GCnn refers to an issue nn on Google Code.
 
-0.4.0 (future)
+0.4.1 (future)
 --------------
 
-Released: Not yet
+Released: Not yet.
+
+
+0.4.0
+-----
+
+Released: 2017-01-29
+
+* Added support for ``KEY_CONSIDERED`` in more places - encryption /
+  decryption, signing, key generation and key import.
+
+* Partial fix for #32 (GPG 2.1 compatibility). Unfortunately, better
+  support cannot be provided at this point, unless there are certain
+  changes (relating to pinentry popups) in how GPG 2.1 works.
+
+* Fixed #60: An IndexError was being thrown by ``scan_keys()``.
+
+* Ensured that utf-8 encoding is used when the ``--with-column`` mode is
+  used. Thanks to Yann Leboulanger for the patch.
+
+* ``list_keys()`` now uses ``--fixed-list-mode``. Thanks to Werner Koch
+  for the pointer.
+
 
 0.3.9
 -----
