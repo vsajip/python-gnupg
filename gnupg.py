@@ -240,6 +240,8 @@ class Verify(object):
         if key in self.TRUST_LEVELS:
             self.trust_text = key
             self.trust_level = self.TRUST_LEVELS[key]
+        elif key in ("WARNING", "ERROR"):
+            logger.warning('potential problem: %s: %s', key, value)
         elif key in ("RSA_OR_IDEA", "NODATA", "IMPORT_RES", "PLAINTEXT",
                      "PLAINTEXT_LENGTH", "POLICY_URL", "DECRYPTION_INFO",
                      "DECRYPTION_OKAY", "INV_SGNR", "FILE_START", "FILE_ERROR",
@@ -352,7 +354,9 @@ class ImportResult(object):
     }
 
     def handle_status(self, key, value):
-        if key in ("IMPORTED", "KEY_CONSIDERED"):
+        if key in ("WARNING", "ERROR"):
+            logger.warning('potential problem: %s: %s', key, value)
+        elif key in ("IMPORTED", "KEY_CONSIDERED"):
             # this duplicates info we already see in import_ok & import_problem
             pass
         elif key == "NODATA":  # pragma: no cover
@@ -556,12 +560,12 @@ class Crypt(Verify, TextHandler):
     __bool__ = __nonzero__
 
     def handle_status(self, key, value):
-        if key in ("ENC_TO", "USERID_HINT", "GOODMDC", "END_DECRYPTION",
-                   "BEGIN_SIGNING", "NO_SECKEY", "ERROR", "NODATA", "PROGRESS",
+        if key in ("WARNING", "ERROR"):
+            logger.warning('potential problem: %s: %s', key, value)
+        elif key in ("ENC_TO", "USERID_HINT", "GOODMDC", "END_DECRYPTION",
+                   "BEGIN_SIGNING", "NO_SECKEY", "NODATA", "PROGRESS",
                    "CARDCTRL", "BADMDC", "SC_OP_FAILURE", "SC_OP_SUCCESS",
                    "PINENTRY_LAUNCHED", "KEY_CONSIDERED"):
-            # in the case of ERROR, this is because a more specific error
-            # message will have come first
             if key == "NODATA":
                 self.status = "no data was provided"
         elif key in ("NEED_PASSPHRASE", "BAD_PASSPHRASE", "GOOD_PASSPHRASE",
@@ -608,8 +612,10 @@ class GenKey(object):
         return self.fingerprint or ''
 
     def handle_status(self, key, value):
-        if key in ("PROGRESS", "GOOD_PASSPHRASE", "NODATA", "KEY_NOT_CREATED",
-                   "PINENTRY_LAUNCHED", "ERROR", "KEY_CONSIDERED"):
+        if key in ("WARNING", "ERROR"):
+            logger.warning('potential problem: %s: %s', key, value)
+        elif key in ("PROGRESS", "GOOD_PASSPHRASE", "NODATA", "KEY_NOT_CREATED",
+                   "PINENTRY_LAUNCHED", "KEY_CONSIDERED"):
             pass
         elif key == "KEY_CREATED":
             (self.type,self.fingerprint) = value.split()
@@ -672,11 +678,13 @@ class Sign(TextHandler):
     __bool__ = __nonzero__
 
     def handle_status(self, key, value):
-        if key in ("USERID_HINT", "NEED_PASSPHRASE", "BAD_PASSPHRASE",
+        if key in ("WARNING", "ERROR", "FAILURE"):
+            logger.warning('potential problem: %s: %s', key, value)
+        elif key in ("USERID_HINT", "NEED_PASSPHRASE", "BAD_PASSPHRASE",
                    "GOOD_PASSPHRASE", "BEGIN_SIGNING", "CARDCTRL", "INV_SGNR",
                    "NO_SGNR", "MISSING_PASSPHRASE", "NEED_PASSPHRASE_PIN",
                    "SC_OP_FAILURE", "SC_OP_SUCCESS", "PROGRESS",
-                   "PINENTRY_LAUNCHED", "FAILURE", "ERROR", "KEY_CONSIDERED"):
+                   "PINENTRY_LAUNCHED", "KEY_CONSIDERED"):
             pass
         elif key in ("KEYEXPIRED", "SIGEXPIRED"):  # pragma: no cover
             self.status = 'key expired'
