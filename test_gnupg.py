@@ -177,7 +177,7 @@ class GPGTestCase(unittest.TestCase):
         if os.path.exists(hd):
             self.assertTrue(os.path.isdir(hd),
                             "Not a directory: %s" % hd)
-            shutil.rmtree(hd)
+            shutil.rmtree(hd, ignore_errors=True)
         prepare_homedir(hd)
         self.homedir = hd
         self.gpg = gpg = gnupg.GPG(gnupghome=hd, gpgbinary=GPGBINARY)
@@ -738,7 +738,7 @@ class GPGTestCase(unittest.TestCase):
             decfname = os.path.join(d, 'decrypted file')
             self.do_file_encryption_and_decryption(encfname, decfname)
         finally:
-            shutil.rmtree(d)
+            shutil.rmtree(d, ignore_errors=True)
         logger.debug("test_filename_with_spaces ends")
 
     #@skipIf(os.name == 'nt', 'Test not suitable for Windows')
@@ -774,7 +774,7 @@ class GPGTestCase(unittest.TestCase):
             files = os.listdir(workdir)
             self.assertEqual(files, ["'ab?'"])
         finally:
-            shutil.rmtree(workdir)
+            shutil.rmtree(workdir, ignore_errors=True)
 
     def disabled_test_signing_with_uid(self):  # pragma: no cover
         "Test that signing with uids works. On hold for now."
@@ -799,7 +799,7 @@ class GPGTestCase(unittest.TestCase):
         replicates the original doctest for import_keys as a regular test.
 
         >>> import shutil
-        >>> shutil.rmtree("keys")
+        >>> shutil.rmtree("keys", ignore_errors=True)
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
         >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
         >>> input = gpg.gen_key_input(name_email='user1@test', passphrase='pp1')

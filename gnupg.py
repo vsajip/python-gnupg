@@ -1019,7 +1019,7 @@ class GPG(object):
         """Import a key from a keyserver
 
         >>> import shutil
-        >>> shutil.rmtree("keys")
+        >>> shutil.rmtree("keys", ignore_errors=True)
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
         >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
         >>> os.chmod('keys', 0x1C0)
@@ -1154,7 +1154,7 @@ class GPG(object):
         """ list the keys currently in the keyring
 
         >>> import shutil
-        >>> shutil.rmtree("keys")
+        >>> shutil.rmtree("keys", ignore_errors=True)
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
         >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
         >>> input = gpg.gen_key_input(passphrase='foo')
@@ -1208,7 +1208,7 @@ class GPG(object):
         """ search keyserver by query (using --search-keys option)
 
         >>> import shutil
-        >>> shutil.rmtree('keys')
+        >>> shutil.rmtree('keys', ignore_errors=True)
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
         >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome='keys')
         >>> os.chmod('keys', 0x1C0)
@@ -1355,7 +1355,7 @@ class GPG(object):
 
         >>> import shutil
         >>> if os.path.exists("keys"):
-        ...     shutil.rmtree("keys")
+        ...     shutil.rmtree("keys", ignore_errors=True)
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
         >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
         >>> input = gpg.gen_key_input(name_email='user1@test', passphrase='pp1')
