@@ -242,14 +242,6 @@ class Verify(object):
             self.trust_level = self.TRUST_LEVELS[key]
         elif key in ("WARNING", "ERROR"):
             logger.warning('potential problem: %s: %s', key, value)
-        elif key in ("RSA_OR_IDEA", "NODATA", "IMPORT_RES", "PLAINTEXT",
-                     "PLAINTEXT_LENGTH", "POLICY_URL", "DECRYPTION_INFO",
-                     "DECRYPTION_OKAY", "INV_SGNR", "FILE_START", "FILE_ERROR",
-                     "FILE_DONE", "PKA_TRUST_GOOD", "PKA_TRUST_BAD", "BADMDC",
-                     "GOODMDC", "NO_SGNR", "NOTATION_NAME", "NOTATION_DATA",
-                     "PROGRESS", "PINENTRY_LAUNCHED", "NEWSIG",
-                     "KEY_CONSIDERED"):
-            pass
         elif key == "BADSIG":  # pragma: no cover
             self.valid = False
             self.status = 'signature bad'
@@ -288,12 +280,6 @@ class Verify(object):
             self.valid = False
             self.key_id = value
             self.status = 'no public key'
-        elif key in ("KEYEXPIRED", "SIGEXPIRED", "KEYREVOKED"):  # pragma: no cover
-            # these are useless in verify, since they are spit out for any
-            # pub/subkeys on the key, not just the one doing the signing.
-            # if we want to check for signatures with expired key,
-            # the relevant flag is EXPKEYSIG or REVKEYSIG.
-            pass
         elif key in ("EXPKEYSIG", "REVKEYSIG"):  # pragma: no cover
             # signed with expired or revoked key
             self.valid = False
@@ -312,8 +298,6 @@ class Verify(object):
                 # N.B. there might be other reasons
                 if not self.status:
                     self.status = 'incorrect passphrase'
-        else:
-            raise ValueError("Unknown status message: %r" % key)
 
 class ImportResult(object):
     "Handle status messages for --import"
@@ -390,8 +374,6 @@ class ImportResult(object):
         elif key == "SIGEXPIRED":  # pragma: no cover
             self.results.append({'fingerprint': None,
                 'problem': '0', 'text': 'Signature expired'})
-        else:  # pragma: no cover
-            raise ValueError("Unknown status message: %r" % key)
 
     def summary(self):
         l = []
@@ -562,12 +544,8 @@ class Crypt(Verify, TextHandler):
     def handle_status(self, key, value):
         if key in ("WARNING", "ERROR"):
             logger.warning('potential problem: %s: %s', key, value)
-        elif key in ("ENC_TO", "USERID_HINT", "GOODMDC", "END_DECRYPTION",
-                   "BEGIN_SIGNING", "NO_SECKEY", "NODATA", "PROGRESS",
-                   "CARDCTRL", "BADMDC", "SC_OP_FAILURE", "SC_OP_SUCCESS",
-                   "PINENTRY_LAUNCHED", "KEY_CONSIDERED"):
-            if key == "NODATA":
-                self.status = "no data was provided"
+        elif key == "NODATA":
+            self.status = "no data was provided"
         elif key in ("NEED_PASSPHRASE", "BAD_PASSPHRASE", "GOOD_PASSPHRASE",
                      "MISSING_PASSPHRASE", "DECRYPTION_FAILED",
                      "KEY_NOT_CREATED", "NEED_PASSPHRASE_PIN"):
@@ -614,13 +592,8 @@ class GenKey(object):
     def handle_status(self, key, value):
         if key in ("WARNING", "ERROR"):
             logger.warning('potential problem: %s: %s', key, value)
-        elif key in ("PROGRESS", "GOOD_PASSPHRASE", "NODATA", "KEY_NOT_CREATED",
-                   "PINENTRY_LAUNCHED", "KEY_CONSIDERED"):
-            pass
         elif key == "KEY_CREATED":
             (self.type,self.fingerprint) = value.split()
-        else:
-            raise ValueError("Unknown status message: %r" % key)
 
 class ExportResult(GenKey):
     """Handle status messages for --export[-secret-key].
@@ -653,10 +626,6 @@ class DeleteResult(object):
         if key == "DELETE_PROBLEM":  # pragma: no cover
             self.status = self.problem_reason.get(value,
                                                   "Unknown error: %r" % value)
-        elif key == "KEY_CONSIDERED":
-            pass
-        else:  # pragma: no cover
-            raise ValueError("Unknown status message: %r" % key)
 
     def __nonzero__(self):
         return self.status == 'ok'
@@ -680,12 +649,6 @@ class Sign(TextHandler):
     def handle_status(self, key, value):
         if key in ("WARNING", "ERROR", "FAILURE"):
             logger.warning('potential problem: %s: %s', key, value)
-        elif key in ("USERID_HINT", "NEED_PASSPHRASE", "BAD_PASSPHRASE",
-                   "GOOD_PASSPHRASE", "BEGIN_SIGNING", "CARDCTRL", "INV_SGNR",
-                   "NO_SGNR", "MISSING_PASSPHRASE", "NEED_PASSPHRASE_PIN",
-                   "SC_OP_FAILURE", "SC_OP_SUCCESS", "PROGRESS",
-                   "PINENTRY_LAUNCHED", "KEY_CONSIDERED"):
-            pass
         elif key in ("KEYEXPIRED", "SIGEXPIRED"):  # pragma: no cover
             self.status = 'key expired'
         elif key == "KEYREVOKED":  # pragma: no cover
@@ -695,8 +658,6 @@ class Sign(TextHandler):
              algo, self.hash_algo, cls,
              self.timestamp, self.fingerprint
              ) = value.split()
-        else:  # pragma: no cover
-            raise ValueError("Unknown status message: %r" % key)
 
 VERSION_RE = re.compile(r'gpg \(GnuPG\) (\d+(\.\d+)*)'.encode('ascii'), re.I)
 HEX_DIGITS_RE = re.compile(r'[0-9a-f]+$', re.I)
