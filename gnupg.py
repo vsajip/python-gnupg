@@ -1187,10 +1187,19 @@ class GPG(object):
         List details of an ascii armored or binary key file
         without first importing it to the local keyring.
 
-        The function achieves this by running:
+        The function achieves this on modern GnuPG by running:
+
+        $ gpg --dry-run --import-options import-show --import
+
+        On older versions, it does the *much* riskier:
+
         $ gpg --with-fingerprint --with-colons filename
         """
-        args = ['--with-fingerprint', '--with-colons', '--fixed-list-mode']
+        if self.version >= (2, 1):
+            args = ['--dry-run', '--import-options', 'import-show', '--import']
+        else:
+            logger.warning('Warning! trying to list packets, but if the file is not a keyring, might accidentally decrypt')
+            args = ['--with-fingerprint', '--with-colons', '--fixed-list-mode']
         args.append(no_quote(filename))
         p = self._open_subprocess(args)
         return self._get_list_output(p, 'scan')
