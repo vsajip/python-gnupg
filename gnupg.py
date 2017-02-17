@@ -298,6 +298,11 @@ class Verify(object):
                 # N.B. there might be other reasons
                 if not self.status:
                     self.status = 'incorrect passphrase'
+        elif key in ("DECRYPTION_INFO", "PLAINTEXT", "PLAINTEXT_LENGTH",
+                     "NO_SECKEY", "BEGIN_SIGNING"):
+            pass
+        else:  # pragma: no cover
+            logger.debug('message ignored: %s, %s', key, value)
 
 class ImportResult(object):
     "Handle status messages for --import"
@@ -374,6 +379,8 @@ class ImportResult(object):
         elif key == "SIGEXPIRED":  # pragma: no cover
             self.results.append({'fingerprint': None,
                 'problem': '0', 'text': 'Signature expired'})
+        else:  # pragma: no cover
+            logger.debug('message ignored: %s, %s', key, value)
 
     def summary(self):
         l = []
@@ -570,6 +577,11 @@ class Crypt(Verify, TextHandler):
             self.status = 'sig created'
         elif key == "SIGEXPIRED":  # pragma: no cover
             self.status = 'sig expired'
+        elif key in ("ENC_TO", "USERID_HINT", "GOODMDC",
+                     "END_DECRYPTION", "CARDCTRL", "BADMDC",
+                     "SC_OP_FAILURE", "SC_OP_SUCCESS",
+                     "PINENTRY_LAUNCHED", "KEY_CONSIDERED"):
+            pass
         else:
             Verify.handle_status(self, key, value)
 
@@ -590,10 +602,14 @@ class GenKey(object):
         return self.fingerprint or ''
 
     def handle_status(self, key, value):
-        if key in ("WARNING", "ERROR"):
+        if key in ("WARNING", "ERROR"):  # pragma: no cover
             logger.warning('potential problem: %s: %s', key, value)
         elif key == "KEY_CREATED":
             (self.type,self.fingerprint) = value.split()
+        elif key in ("PROGRESS", "GOOD_PASSPHRASE", "KEY_NOT_CREATED"):
+            pass
+        else:  # pragma: no cover
+            logger.debug('message ignored: %s, %s', key, value)
 
 class ExportResult(GenKey):
     """Handle status messages for --export[-secret-key].
@@ -626,6 +642,8 @@ class DeleteResult(object):
         if key == "DELETE_PROBLEM":  # pragma: no cover
             self.status = self.problem_reason.get(value,
                                                   "Unknown error: %r" % value)
+        else:  # pragma: no cover
+            logger.debug('message ignored: %s, %s', key, value)
 
     def __nonzero__(self):
         return self.status == 'ok'
@@ -647,7 +665,7 @@ class Sign(TextHandler):
     __bool__ = __nonzero__
 
     def handle_status(self, key, value):
-        if key in ("WARNING", "ERROR", "FAILURE"):
+        if key in ("WARNING", "ERROR", "FAILURE"):  # pragma: no cover
             logger.warning('potential problem: %s: %s', key, value)
         elif key in ("KEYEXPIRED", "SIGEXPIRED"):  # pragma: no cover
             self.status = 'key expired'
@@ -658,6 +676,11 @@ class Sign(TextHandler):
              algo, self.hash_algo, cls,
              self.timestamp, self.fingerprint
              ) = value.split()
+        elif key in ("USERID_HINT", "NEED_PASSPHRASE", "GOOD_PASSPHRASE",
+                     "BAD_PASSPHRASE", "BEGIN_SIGNING"):
+            pass
+        else:  # pragma: no cover
+            logger.debug('message ignored: %s, %s', key, value)
 
 VERSION_RE = re.compile(r'gpg \(GnuPG\) (\d+(\.\d+)*)'.encode('ascii'), re.I)
 HEX_DIGITS_RE = re.compile(r'[0-9a-f]+$', re.I)
