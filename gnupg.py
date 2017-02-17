@@ -751,6 +751,7 @@ class GPG(object):
         if passphrase and hasattr(self, 'version'):
             if self.version >= (2, 1):
                 cmd[1:1] = ['--pinentry-mode', 'loopback']
+        cmd.extend(['--fixed-list-mode', '--batch', '--with-colons'])
         if self.gnupghome:
             cmd.extend(['--homedir',  no_quote(self.gnupghome)])
         if self.keyring:
@@ -761,7 +762,7 @@ class GPG(object):
             for fn in self.secret_keyring:
                 cmd.extend(['--secret-keyring', no_quote(fn)])
         if passphrase:
-            cmd.extend(['--batch', '--passphrase-fd', '0'])
+            cmd.extend(['--passphrase-fd', '0'])
         if self.use_agent:  # pragma: no cover
             cmd.append('--use-agent')
         if self.options:
@@ -906,7 +907,7 @@ class GPG(object):
         "If writing to a file which exists, avoid a confirmation message."
         if os.path.exists(output):
             # We need to avoid an overwrite confirmation message
-            args.extend(['--batch', '--yes'])
+            args.extend(['--yes'])
         args.extend(['--output', no_quote(output)])
 
     def sign_file(self, file, keyid=None, passphrase=None, clearsign=True,
@@ -1065,7 +1066,7 @@ class GPG(object):
             fingerprints = [no_quote(s) for s in fingerprints]
         else:
             fingerprints = [no_quote(fingerprints)]
-        args = ['--batch', '--delete-%s' % which]
+        args = ['--delete-%s' % which]
         args.extend(fingerprints)
         result = self.result_map['delete'](self)
         if not secret or self.version < (2, 1):
@@ -1172,9 +1173,8 @@ class GPG(object):
         else:            which='keys'
         if secret:
             which='secret-keys'
-        args = ['--list-%s' % which, '--fixed-list-mode',
-                '--fingerprint', '--fingerprint',   # get subkey FPs, too
-                '--with-colons']
+        args = ['--list-%s' % which,
+                '--fingerprint', '--fingerprint'] # get subkey FPs, too
         if keys:
             if isinstance(keys, string_types):
                 keys = [keys]
@@ -1213,7 +1213,7 @@ class GPG(object):
         query = query.strip()
         if HEX_DIGITS_RE.match(query):
             query = '0x' + query
-        args = ['--fixed-list-mode', '--fingerprint', '--with-colons',
+        args = ['--fingerprint',
                 '--keyserver', no_quote(keyserver), '--search-keys',
                 no_quote(query)]
         p = self._open_subprocess(args)
@@ -1251,7 +1251,7 @@ class GPG(object):
         >>> assert not result
 
         """
-        args = ["--gen-key", "--batch"]
+        args = ["--gen-key"]
         result = self.result_map['generate'](self)
         f = _make_binary_stream(input, self.encoding)
         self._handle_io(args, f, result, binary=True)
