@@ -1221,7 +1221,8 @@ class GPG(object):
         if self.version >= (2, 1):
             args = ['--dry-run', '--import-options', 'import-show', '--import']
         else:
-            logger.warning('Warning! trying to list packets, but if the file is not a keyring, might accidentally decrypt')
+            logger.warning('Trying to list packets, but if the file is not a '
+                           'keyring, might accidentally decrypt')
             args = ['--with-fingerprint', '--with-colons', '--fixed-list-mode']
         args.append(no_quote(filename))
         p = self._open_subprocess(args)
