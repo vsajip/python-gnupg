@@ -59,6 +59,18 @@ N.B: GCnn refers to an issue nn on Google Code.
 
 Released: Not yet.
 
+* Updated message handling logic to no longer raise exceptions when a message
+  isn't recognised. Thanks to Daniel Kahn Gillmor for the patch.
+
+* Always use always use --fixed-list-mode, --batch and --with-colons. Thanks to
+  Daniel Kahn Gillmor for the patch.
+
+* Improved scan_keys() handling on GnuPG >= 2.1. Thanks to Daniel Kahn Gillmor
+  for the patch.
+
+* Improved test behaviour with GnuPG >= 2.1. Failures when deleting test
+  directory trees are now ignored. Thanks to Daniel Kahn Gillmor for the patch.
+
 
 0.4.0
 -----
