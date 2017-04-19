@@ -71,6 +71,10 @@ Released: Not yet.
 * Improved test behaviour with GnuPG >= 2.1. Failures when deleting test
   directory trees are now ignored. Thanks to Daniel Kahn Gillmor for the patch.
 
+* Added close_file keyword argument to verify_file to allow the file closing
+  to be made optional. Current behaviour is maintained - close_file=False can
+  be passed to skip closing the file being verified.
+
 
 0.4.0
 -----

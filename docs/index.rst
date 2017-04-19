@@ -1,14 +1,20 @@
 .. GnuPG Wrapper for Python documentation master file, created by
    sphinx-quickstart on Thu Jul 02 16:14:12 2009.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
 
 ###########################################
 `python-gnupg` - A Python wrapper for GnuPG
 ###########################################
 
-:Release: |release|
-:Date: |today|
+.. rst-class:: release-info
+
+   .. list-table::
+      :widths: auto
+      :stub-columns: 1
+
+      * - Release:
+        - |release|
+      * - Date:
+        - Jan 29, 2017
 
 .. module:: gnupg
    :synopsis: A Python wrapper for the GNU Privacy Guard (GnuPG)
@@ -18,7 +24,7 @@
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
 The ``gnupg`` module allows Python programs to make use of the functionality provided by the `GNU Privacy Guard`__ (abbreviated GPG or GnuPG). Using
 this module, Python programs can encrypt and decrypt data, digitally sign documents and verify digital signatures, manage (generate, list and delete)
@@ -551,6 +557,11 @@ The data that was signed should be in a separate file whose path is indicated by
 .. versionadded:: 0.2.5
    The second argument to verify_file (``data_filename``) was added.
 
+.. versionadded:: 0.4.1
+   An optional keyword argument to verify_file (``close_file``) was added. This
+   defaults to ``True``, but if set to ``False``, the signature stream is not
+   closed. It's then left to the caller to close it when appropriate.
+
 When a signature is verified, signer information is held in attributes of ``verified``: ``username``, ``key_id``, ``signature_id``,
 ``fingerprint``, ``trust_level`` and ``trust_text``. If the message wasn't signed, these attributes will all be set to ``None``.
 
@@ -650,8 +661,8 @@ __ discussion_
 
 .. _discussion: http://groups.google.com/group/python-gnupg
 
-Indices and tables
-==================
+Index
+=====
 
 * :ref:`genindex`
 

@@ -988,7 +988,7 @@ class GPG(object):
         f.close()
         return result
 
-    def verify_file(self, file, data_filename=None):
+    def verify_file(self, file, data_filename=None, close_file=True):
         "Verify the signature on the contents of the file-like object 'file'"
         logger.debug('verify_file: %r, %r', file, data_filename)
         result = self.result_map['verify'](self)
@@ -1000,7 +1000,8 @@ class GPG(object):
             import tempfile
             fd, fn = tempfile.mkstemp(prefix='pygpg')
             s = file.read()
-            file.close()
+            if close_file:
+                file.close()
             logger.debug('Wrote to temp file: %r', s)
             os.write(fd, s)
             os.close(fd)
