@@ -471,6 +471,10 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(data, str(ddata))
         # Test that you can't encrypt with no recipients
         self.assertRaises(ValueError, self.gpg.encrypt, data, [])
+        # Test extra_args parameter
+        edata = str(gpg.encrypt(data, barbara, extra_args=['-z', '0']))
+        ddata = gpg.decrypt(edata, passphrase="bbrown")
+        self.assertEqual(data.encode('ascii'), ddata.data, "Round-trip must work")
 
     def test_import_and_export(self):
         "Test that key import and export works"
