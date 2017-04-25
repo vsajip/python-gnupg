@@ -934,7 +934,7 @@ class GPG(object):
         args.extend(['--output', no_quote(output)])
 
     def sign_file(self, file, keyid=None, passphrase=None, clearsign=True,
-                  detach=False, binary=False, output=None):
+                  detach=False, binary=False, output=None, extra_args=None):
         """sign file"""
         logger.debug("sign_file: %s", file)
         if binary:  # pragma: no cover
@@ -952,6 +952,8 @@ class GPG(object):
         if output:  # write the output to a file with the specified name
             self.set_output_without_confirmation(args, output)
 
+        if extra_args:
+            args.extend(extra_args)
         result = self.result_map['sign'](self)
         #We could use _handle_io here except for the fact that if the
         #passphrase is bad, gpg bails and you can't write the message.
@@ -967,7 +969,7 @@ class GPG(object):
         self._collect_output(p, result, writer, stdin)
         return result
 
-    def verify(self, data):
+    def verify(self, data, **kwargs):
         """Verify the signature on the contents of the string 'data'
 
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
@@ -984,15 +986,17 @@ class GPG(object):
 
         """
         f = _make_binary_stream(data, self.encoding)
-        result = self.verify_file(f)
+        result = self.verify_file(f, **kwargs)
         f.close()
         return result
 
-    def verify_file(self, file, data_filename=None, close_file=True):
+    def verify_file(self, file, data_filename=None, close_file=True, extra_args=None):
         "Verify the signature on the contents of the file-like object 'file'"
         logger.debug('verify_file: %r, %r', file, data_filename)
         result = self.result_map['verify'](self)
         args = ['--verify']
+        if extra_args:
+            args.extend(extra_args)
         if data_filename is None:
             self._handle_io(args, file, result, binary=True)
         else:
@@ -1014,11 +1018,14 @@ class GPG(object):
                 os.unlink(fn)
         return result
 
-    def verify_data(self, sig_filename, data):
+    def verify_data(self, sig_filename, data, extra_args=None):
         "Verify the signature in sig_filename against data in memory"
         logger.debug('verify_data: %r, %r ...', sig_filename, data[:16])
         result = self.result_map['verify'](self)
-        args = ['--verify', no_quote(sig_filename), '-']
+        args = ['--verify']
+        if extra_args:
+            args.extend(extra_args)
+        args.extend([no_quote(sig_filename), '-'])
         stream = _make_memory_stream(data)
         self._handle_io(args, stream, result, binary=True)
         return result
@@ -1342,7 +1349,7 @@ class GPG(object):
     #
     def encrypt_file(self, file, recipients, sign=None,
             always_trust=False, passphrase=None,
-            armor=True, output=None, symmetric=False):
+            armor=True, output=None, symmetric=False, extra_args=None):
         "Encrypt the message read from the file-like object 'file'"
         args = ['--encrypt']
         if symmetric:
@@ -1370,6 +1377,8 @@ class GPG(object):
             args.extend(['--sign', '--default-key', no_quote(sign)])
         if always_trust:  # pragma: no cover
             args.append('--always-trust')
+        if extra_args:
+            args.extend(extra_args)
         result = self.result_map['crypt'](self)
         self._handle_io(args, file, result, passphrase=passphrase, binary=True)
         logger.debug('encrypt result: %r', result.data)
@@ -1429,12 +1438,14 @@ class GPG(object):
         return result
 
     def decrypt_file(self, file, always_trust=False, passphrase=None,
-                     output=None):
+                     output=None, extra_args=None):
         args = ["--decrypt"]
         if output:  # write the output to a file with the specified name
             self.set_output_without_confirmation(args, output)
         if always_trust:  # pragma: no cover
             args.append("--always-trust")
+        if extra_args:
+            args.extend(extra_args)
         result = self.result_map['crypt'](self)
         self._handle_io(args, file, result, passphrase, binary=True)
         logger.debug('decrypt result: %r', result.data)

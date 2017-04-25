@@ -76,6 +76,10 @@ Released: Not yet.
   be passed to skip closing the file being verified.
 
 
+* Added the ``extra_args`` keyword parameter to allow custom arguments to be
+  passed to the ``gpg`` executable.
+
+
 0.4.0
 -----
 

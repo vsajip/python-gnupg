@@ -406,6 +406,8 @@ always_trust (defaults to ``False``)
     Skip key validation and assume that used keys are always fully trusted.
 passphrase (defaults to ``None``)
     A passphrase to use when accessing the keyrings.
+extra_args (defaults to ``None``)
+    A list of additional arguments to pass to the ``gpg`` executable.
 
 .. index:: Encryption; symmetric
 
@@ -414,6 +416,9 @@ symmetric (defaults to ``False``)
 
 .. versionchanged:: 0.3.5
    A string can be passed for the ``symmetric`` argument, as well as ``True`` or ``False``. If a string is passed, it should be a symmetric cipher algorithm supported by the ``gpg`` you are using.
+
+.. versionadded:: 0.4.1
+   The ``extra_args`` keyword argument was added.
 
 The ``encrypt_file`` method takes the following additional keyword arguments:
 
@@ -446,6 +451,11 @@ always_trust (defaults to ``False``)
     Skip key validation and assume that used keys are always fully trusted.
 passphrase (defaults to ``None``)
     A passphrase to use when accessing the keyrings.
+extra_args (defaults to ``None``)
+    A list of additional arguments to pass to the ``gpg`` executable.
+
+.. versionadded:: 0.4.1
+   The ``extra_args`` keyword argument was added.
 
 The ``decrypt_file`` method takes the following additional keyword argument:
 
@@ -509,22 +519,25 @@ binary (defaults to ``False``)
     If ``True``, a binary signature (rather than armored ASCII) is created.
 output (defaults to ``None``)
     If specified, this is used as the file path where GPG outputs the signature. Convention dictates a ``.asc`` or ``.sig`` file extension for this.
+extra_args (defaults to ``None``)
+    A list of additional arguments to pass to the ``gpg`` executable.
 
 Note: If the data being signed is binary, calling ``str(signed_data)`` may raise exceptions. In that case, use the fact that ``signed_data.data`` holds the binary signed data. Usually the signature itself is ASCII; it's the message itself which may cause the exceptions to be raised. (Unless a detached signature is requested, the result of signing is the message with the signature appended.)
 
 The hash algorihm used when creating the signature can be found in the ``signed_data.hash_algo`` attribute.
 
-.. versionadded 0.2.5
+.. versionadded:: 0.2.5
+   The ``detach`` keyword argument was added in version 0.2.5.
 
-The ``detach`` keyword argument was added in version 0.2.5.
+.. versionadded:: 0.2.6
+   The ``binary`` keyword argument was added in version 0.2.6.
 
-.. versionadded 0.2.6
+.. versionadded:: 0.3.7
+   The ``output`` keyword argument was added in version 0.3.7.
 
-The ``binary`` keyword argument was added in version 0.2.6.
+.. versionadded:: 0.4.1
+   The ``extra_args`` keyword argument was added.
 
-.. versionadded 0.3.7
-
-The ``output`` keyword argument was added in version 0.3.7.
 
 .. index:: Verification
 
@@ -562,6 +575,10 @@ The data that was signed should be in a separate file whose path is indicated by
    defaults to ``True``, but if set to ``False``, the signature stream is not
    closed. It's then left to the caller to close it when appropriate.
 
+   An optional keyword argument ``extra_args`` was added. This defaults to ``None``,
+   but if a value is specified, it should be a list of extra arguments to pass to
+   the ``gpg`` executable.
+
 When a signature is verified, signer information is held in attributes of ``verified``: ``username``, ``key_id``, ``signature_id``,
 ``fingerprint``, ``trust_level`` and ``trust_text``. If the message wasn't signed, these attributes will all be set to ``None``.
 
@@ -593,8 +610,14 @@ where *data* should be a byte string of the data to be verified against the
 signature in the file named by *path_to_signature_file*. The returned value is
 the same as for the other verification methods.
 
+In addition, an ``extra_args`` keyword parameter can be specified. If provided,
+this is treated as a list of additional arguments to pass to the ``gpg`` executable.
+
 .. versionadded:: 0.3.6
    The ``verify_data`` method was added.
+
+.. versionadded:: 0.4.1
+   The ``extra_args`` keyword argument was added.
 
 Passphrases
 ===========
