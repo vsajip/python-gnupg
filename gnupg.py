@@ -379,6 +379,9 @@ class ImportResult(object):
         elif key == "SIGEXPIRED":  # pragma: no cover
             self.results.append({'fingerprint': None,
                 'problem': '0', 'text': 'Signature expired'})
+        elif key == "FAILURE":  # pragma: no cover
+            self.results.append({'fingerprint': None,
+                'problem': '0', 'text': 'Other failure'})
         else:  # pragma: no cover
             logger.debug('message ignored: %s, %s', key, value)
 
