@@ -52,8 +52,7 @@ however, 100% backwards-compatible with earlier incarnations.
 Change log
 ==========
 
-N.B: GCnn refers to an issue nn on Google Code.
-
+.. note:: GCnn refers to an issue nn on Google Code.
 
 0.4.1 (future)
 --------------
