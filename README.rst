@@ -54,6 +54,7 @@ Change log
 
 N.B: GCnn refers to an issue nn on Google Code.
 
+
 0.4.1 (future)
 --------------
 
@@ -62,18 +63,18 @@ Released: Not yet.
 * Updated message handling logic to no longer raise exceptions when a message
   isn't recognised. Thanks to Daniel Kahn Gillmor for the patch.
 
-* Always use always use --fixed-list-mode, --batch and --with-colons. Thanks to
-  Daniel Kahn Gillmor for the patch.
+* Always use always use ``--fixed-list-mode``, ``--batch`` and
+  ``--with-colons``. Thanks to Daniel Kahn Gillmor for the patch.
 
-* Improved scan_keys() handling on GnuPG >= 2.1. Thanks to Daniel Kahn Gillmor
-  for the patch.
+* Improved ``scan_keys()`` handling on GnuPG >= 2.1. Thanks to Daniel Kahn
+  Gillmor for the patch.
 
 * Improved test behaviour with GnuPG >= 2.1. Failures when deleting test
   directory trees are now ignored. Thanks to Daniel Kahn Gillmor for the patch.
 
-* Added close_file keyword argument to verify_file to allow the file closing
-  to be made optional. Current behaviour is maintained - close_file=False can
-  be passed to skip closing the file being verified.
+* Added ``close_file`` keyword argument to verify_file to allow the file closing
+  to be made optional. Current behaviour is maintained - ``close_file=False``
+  can be passed to skip closing the file being verified.
 
 * Added the ``extra_args`` keyword parameter to allow custom arguments to be
   passed to the ``gpg`` executable.

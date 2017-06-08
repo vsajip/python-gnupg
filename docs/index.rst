@@ -222,7 +222,8 @@ __ parm_details_
 +---------------+------------------+--------------------------------+---------------------------------------------+
 | Passphrase    | passphrase       | "secret"                       | The passphrase to use. If this parameter is |
 |               |                  |                                | not specified, no passphrase is needed to   |
-|               |                  |                                | access the key.                             |
+|               |                  |                                | access the key. *Passphrases using newlines |
+|               |                  |                                | are not supported*.                         |
 +---------------+------------------+--------------------------------+---------------------------------------------+
 
 Whatever keyword arguments you pass to :meth:`gen_key_input` will be converted to the parameters expected by GnuPG by replacing underscores with hyphens and title-casing the result. You can of course construct the parameters in your own dictionary ``params`` and then pass it as follows::
