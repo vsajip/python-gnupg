@@ -661,6 +661,7 @@ class Sign(TextHandler):
         self.type = None
         self.hash_algo = None
         self.fingerprint = None
+        self.status = None
 
     def __nonzero__(self):
         return self.fingerprint is not None
@@ -679,6 +680,7 @@ class Sign(TextHandler):
              algo, self.hash_algo, cls,
              self.timestamp, self.fingerprint
              ) = value.split()
+            self.status = 'signature created'
         elif key in ("USERID_HINT", "NEED_PASSPHRASE", "GOOD_PASSPHRASE",
                      "BAD_PASSPHRASE", "BEGIN_SIGNING"):
             pass
