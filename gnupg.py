@@ -1167,7 +1167,7 @@ class GPG(object):
         # Get the response information
         result = self.result_map[kind](self)
         self._collect_output(p, result, stdin=p.stdin)
-        lines = result.data.decode('utf-8',
+        lines = result.data.decode(self.encoding,
                                    self.decode_errors).splitlines()
         valid_keywords = 'pub uid sec fpr sub ssb sig'.split()
         for line in lines:
@@ -1265,7 +1265,7 @@ class GPG(object):
         # Get the response information
         result = self.result_map['search'](self)
         self._collect_output(p, result, stdin=p.stdin)
-        lines = result.data.decode('utf-8',
+        lines = result.data.decode(self.encoding,
                                    self.decode_errors).splitlines()
         valid_keywords = ['pub', 'uid']
         for line in lines:
