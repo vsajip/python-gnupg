@@ -5,7 +5,6 @@ A test harness for gnupg.py.
 Copyright (C) 2008-2017 Vinay Sajip. All rights reserved.
 """
 import doctest
-import functools
 import logging
 import os.path
 import os
