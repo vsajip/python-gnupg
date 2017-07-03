@@ -439,7 +439,6 @@ class GPGTestCase(unittest.TestCase):
         key = self.generate_key("Barbara", "Brown", "beta.com")
         barbara = key.fingerprint
         gpg = self.gpg
-        gpg.encoding = 'latin-1'
         if gnupg._py3k:
             data = 'Hello, André!'
         else:
@@ -539,7 +538,6 @@ class GPGTestCase(unittest.TestCase):
         "Test that signing and verification works"
         logger.debug("test_signature_verification begins")
         key = self.generate_key("Andrew", "Able", "alpha.com")
-        self.gpg.encoding = 'latin-1'
         if gnupg._py3k:
             data = 'Hello, André!'
         else:
