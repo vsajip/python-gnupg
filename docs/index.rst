@@ -311,6 +311,14 @@ The returned value from :meth:`list_keys` is a subclass of Python's ``list`` cla
 
    It doesn't make sense to supply both ``secret=True`` *and* ``sigs=True`` (people can't sign your secret keys), so in case ``secret=True`` is specified, the ``sigs=`` value has no effect.
 
+.. versionadded:: 0.4.1
+   Instances of the ``GPG`` class now have an additional ``on_data`` attribute,
+   which defaults to ``None``. It can be set to a callable which will be called
+   with a single argument - a binary chunk of data received from the ``gpg``
+   executable. The callable can do whatever it likes with the chunks passed to
+   it - e.g. write them to a separate stream. The callable should not raise any
+   exceptions (unless it wants the current operation to fail).
+
 .. _RFC-4880: https://tools.ietf.org/html/rfc4880#section-5.2.1
 
 .. index:: Key; scanning

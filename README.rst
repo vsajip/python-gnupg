@@ -78,6 +78,13 @@ Released: Not yet.
 * Added the ``extra_args`` keyword parameter to allow custom arguments to be
   passed to the ``gpg`` executable.
 
+* Instances of the ``GPG`` class now have an additional ``on_data`` attribute,
+  which defaults to ``None``. It can be set to a callable which will be called
+  with a single argument - a binary chunk of data received from the ``gpg``
+  executable. The callable can do whatever it likes with the chunks passed to it
+  - e.g. write them to a separate stream. The callable should not raise any
+  exceptions (unless it wants the current operation to fail).
+
 
 0.4.0
 -----
