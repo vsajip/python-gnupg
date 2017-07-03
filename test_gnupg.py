@@ -5,6 +5,7 @@ A test harness for gnupg.py.
 Copyright (C) 2008-2017 Vinay Sajip. All rights reserved.
 """
 import doctest
+import functools
 import logging
 import os.path
 import os
@@ -472,8 +473,25 @@ class GPGTestCase(unittest.TestCase):
         self.assertRaises(ValueError, self.gpg.encrypt, data, [])
         # Test extra_args parameter
         edata = str(gpg.encrypt(data, barbara, extra_args=['-z', '0']))
-        ddata = gpg.decrypt(edata, passphrase="bbrown")
-        self.assertEqual(data.encode('ascii'), ddata.data, "Round-trip must work")
+        ddata = gpg.decrypt(edata, passphrase='bbrown')
+        self.assertEqual(data.encode('ascii'), ddata.data, 'Round-trip must work')
+        # Test on_data functionality
+
+        chunks = []
+
+        def collector(data):
+            chunks.append(data)
+
+        gpg.on_data = collector
+        edata = str(gpg.encrypt(data, barbara))
+        self.assertTrue(chunks)
+        expected = type(chunks[0])().join(chunks)
+        self.assertEqual(expected.decode('ascii'), edata)
+        chunks = []
+        ddata = gpg.decrypt(edata, passphrase='bbrown')
+        self.assertEqual(data.encode('ascii'), ddata.data, 'Round-trip must work')
+        expected = type(chunks[0])().join(chunks)
+        self.assertEqual(expected.decode('ascii'), data)
 
     def test_import_and_export(self):
         "Test that key import and export works"

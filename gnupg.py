@@ -743,6 +743,7 @@ class GPG(object):
         if isinstance(options, str):  # pragma: no cover
             options = [options]
         self.options = options
+        self.on_data = None  # or a callable - will be called with data chunks
         # Changed in 0.3.7 to use Latin-1 encoding rather than
         # locale.getpreferredencoding falling back to sys.stdin.encoding
         # falling back to utf-8, because gpg itself uses latin-1 as the default
@@ -859,7 +860,7 @@ class GPG(object):
                 result.handle_status(keyword, value)
         result.stderr = ''.join(lines)
 
-    def _read_data(self, stream, result):
+    def _read_data(self, stream, result, on_data=None):
         # Read the contents of the file from GPG's stdout
         chunks = []
         while True:
@@ -868,6 +869,8 @@ class GPG(object):
                 break
             logger.debug("chunk: %r" % data[:256])
             chunks.append(data)
+            if on_data:
+                on_data(data)
         if _py3k:
             # Join using b'' or '', as appropriate
             result.data = type(data)().join(chunks)
@@ -888,7 +891,7 @@ class GPG(object):
         rr.start()
 
         stdout = process.stdout
-        dr = threading.Thread(target=self._read_data, args=(stdout, result))
+        dr = threading.Thread(target=self._read_data, args=(stdout, result, self.on_data))
         dr.setDaemon(True)
         logger.debug('stdout reader: %r', dr)
         dr.start()
