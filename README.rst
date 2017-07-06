@@ -54,10 +54,16 @@ Change log
 
 .. note:: GCnn refers to an issue nn on Google Code.
 
-0.4.1 (future)
+0.4.2 (future)
 --------------
 
 Released: Not yet.
+
+
+0.4.1
+-----
+
+Released: 2017-07-06
 
 * Updated message handling logic to no longer raise exceptions when a message
   isn't recognised. Thanks to Daniel Kahn Gillmor for the patch.
