@@ -36,9 +36,9 @@ Development and testing has been carried out on Windows (Python 2.4, 2.5, 2.6, 3
 You can then use this module in your own code by doing ``import gnupg`` or similar.
 
 .. note::
-   There is at least one other fork of this project, which was apparently created because an earlier version of this software used the ``subprocess`` module with ``shell=True``, making it vulnerable to shell injection. **This is no longer the case**.
+   There is at least one fork of this project, which was apparently created because an earlier version of this software used the ``subprocess`` module with ``shell=True``, making it vulnerable to shell injection. **This is no longer the case**.
 
-   Other forks may not be drop-in compatible with this software, so take care to use the correct version, as indicated in the ``pip install`` command above.
+   Forks may not be drop-in compatible with this software, so take care to use the correct version, as indicated in the ``pip install`` command above.
 
 __ gnupg_
 
