@@ -95,6 +95,7 @@ I've gratefully incorporated improvements contributed or suggested by:
 * Venzen Khaosan (scan_keys functionality)
 * Marcel Pörner (handle EXPORTED, EXPORT_RES)
 * Kévin Bernard-Allies (handle filename encoding under Windows)
+* Daniel Kahn Gillmor (various improvements which were released in 0.4.1)
 
 and Google Code / BitBucket users
 
