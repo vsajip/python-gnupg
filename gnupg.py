@@ -544,6 +544,7 @@ class Crypt(Verify, TextHandler):
         self.data = ''
         self.ok = False
         self.status = ''
+        self.key_id = None
 
     def __nonzero__(self):
         if self.ok: return True
@@ -580,7 +581,10 @@ class Crypt(Verify, TextHandler):
             self.status = 'sig created'
         elif key == "SIGEXPIRED":  # pragma: no cover
             self.status = 'sig expired'
-        elif key in ("ENC_TO", "USERID_HINT", "GOODMDC",
+        elif key == "ENC_TO":  # pragma: no cover
+            # ENC_TO <long_keyid> <keytype> <keylength>
+            self.key_id = value.split(' ', 1)[0]
+        elif key in ("USERID_HINT", "GOODMDC",
                      "END_DECRYPTION", "CARDCTRL", "BADMDC",
                      "SC_OP_FAILURE", "SC_OP_SUCCESS",
                      "PINENTRY_LAUNCHED", "KEY_CONSIDERED"):

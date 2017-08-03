@@ -472,6 +472,10 @@ extra_args (defaults to ``None``)
 .. versionadded:: 0.4.1
    The ``extra_args`` keyword argument was added.
 
+.. versionadded:: 0.4.2
+   Upon a successful decryption, the keyid of the decrypting key is stored in the ``key_id`` attribute of the result,
+   if this information is provided by ``gpg``.
+
 The ``decrypt_file`` method takes the following additional keyword argument:
 
 output (defaults to ``None``)
