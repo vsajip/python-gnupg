@@ -685,7 +685,9 @@ class Sign(TextHandler):
              self.timestamp, self.fingerprint
              ) = value.split()
             self.status = 'signature created'
-        elif key in ("USERID_HINT", "NEED_PASSPHRASE", "GOOD_PASSPHRASE",
+        elif key == "USERID_HINT":  # pragma: no cover
+            self.key_id, self.username = value.split(' ', 1)
+        elif key in ("NEED_PASSPHRASE", "GOOD_PASSPHRASE",
                      "BAD_PASSPHRASE", "BEGIN_SIGNING"):
             pass
         else:  # pragma: no cover
