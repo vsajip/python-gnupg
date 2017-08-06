@@ -666,6 +666,8 @@ class Sign(TextHandler):
         self.hash_algo = None
         self.fingerprint = None
         self.status = None
+        self.key_id = None
+        self.username = None
 
     def __nonzero__(self):
         return self.fingerprint is not None
@@ -681,14 +683,14 @@ class Sign(TextHandler):
             self.status = 'key revoked'
         elif key == "SIG_CREATED":
             (self.type,
-             algo, self.hash_algo, cls,
-             self.timestamp, self.fingerprint
-             ) = value.split()
+             algo, self.hash_algo, cls, self.timestamp, self.fingerprint
+            ) = value.split()
             self.status = 'signature created'
         elif key == "USERID_HINT":  # pragma: no cover
             self.key_id, self.username = value.split(' ', 1)
-        elif key in ("NEED_PASSPHRASE", "GOOD_PASSPHRASE",
-                     "BAD_PASSPHRASE", "BEGIN_SIGNING"):
+        elif key == "BAD_PASSPHRASE":
+            self.status = 'bad passphrase'
+        elif key in ("NEED_PASSPHRASE", "GOOD_PASSPHRASE", "BEGIN_SIGNING"):
             pass
         else:  # pragma: no cover
             logger.debug('message ignored: %s, %s', key, value)

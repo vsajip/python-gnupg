@@ -564,6 +564,7 @@ class GPGTestCase(unittest.TestCase):
         self.assertFalse(sig, "Bad passphrase should fail")
         sig = self.gpg.sign(data, keyid=key.fingerprint, passphrase='aable')
         self.assertTrue(sig, "Good passphrase should succeed")
+        self.assertTrue(sig.username.startswith('Andrew Able'))
         self.assertTrue(sig.hash_algo)
         verified = self.gpg.verify(sig.data)
         if key.fingerprint != verified.fingerprint:  # pragma: no cover

@@ -473,8 +473,7 @@ extra_args (defaults to ``None``)
    The ``extra_args`` keyword argument was added.
 
 .. versionadded:: 0.4.2
-   Upon a successful decryption, the keyid of the decrypting key is stored in the ``key_id`` attribute of the result,
-   if this information is provided by ``gpg``.
+   Upon a successful decryption, the keyid of the decrypting key is stored in the ``key_id`` attribute of the result, if this information is provided by ``gpg``.
 
 The ``decrypt_file`` method takes the following additional keyword argument:
 
@@ -556,6 +555,9 @@ The hash algorihm used when creating the signature can be found in the ``signed_
 
 .. versionadded:: 0.4.1
    The ``extra_args`` keyword argument was added.
+
+.. versionadded:: 0.4.2
+   The keyid and username of the signing key are stored in the ``key_id`` and ``username`` attributes of the result, if this information is provided by ``gpg``.
 
 
 .. index:: Verification
