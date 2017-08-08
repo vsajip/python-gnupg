@@ -557,7 +557,7 @@ The hash algorihm used when creating the signature can be found in the ``signed_
    The ``extra_args`` keyword argument was added.
 
 .. versionadded:: 0.4.2
-   The keyid and username of the signing key are stored in the ``key_id`` and ``username`` attributes of the result, if this information is provided by ``gpg``.
+   The keyid and username of the signing key are stored in the ``key_id`` and ``username`` attributes of the result, if this information is provided by ``gpg`` (which should happen if you specify ``extra_args=['--verbose']``).
 
 
 .. index:: Verification
@@ -619,6 +619,10 @@ is no problem detected with the signing key, the ``key_status`` attribute will b
 
 .. versionadded:: 0.3.3
    The ``key_status`` attribute was added.
+
+.. versionadded:: 0.4.2
+   The keyid and username of the signing key are stored in the ``key_id`` and ``username`` attributes of the result, if this information is provided by ``gpg``.
+
 
 Verifying detached signatures in memory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

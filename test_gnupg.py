@@ -648,6 +648,8 @@ class GPGTestCase(unittest.TestCase):
         data_file.close()
         try:
             verified = self.gpg.verify_data(sig_file, data)
+            self.assertTrue(verified.username.startswith('Andrew Able'))
+            self.assertTrue(key.fingerprint.endswith(verified.key_id))
         finally:
             os.unlink(sig_file)
         if key.fingerprint != verified.fingerprint:
@@ -901,7 +903,8 @@ class GPGTestCase(unittest.TestCase):
 
 
 TEST_GROUPS = {
-    'sign' : set(['test_signature_verification']),
+    'sign' : set(['test_signature_verification',
+                  'test_signature_file']),
     'crypt' : set(['test_encryption_and_decryption',
                    'test_file_encryption_and_decryption',
                    'test_filenames_with_spaces']),
