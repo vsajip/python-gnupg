@@ -26,6 +26,15 @@ You can install this package from the Python Package Index (pyPI) by running::
 
     pip install python-gnupg
 
+.. note::
+   There is at least one fork of this project, which was apparently created
+   because an earlier version of this software used the ``subprocess`` module
+   with ``shell=True``, making it vulnerable to shell injection. **This is no
+   longer the case**.
+
+   Forks may not be drop-in compatible with this software, so take care to use
+   the correct version, as indicated in the ``pip install`` command above.
+
 
 Installing from a source distribution archive
 ---------------------------------------------
