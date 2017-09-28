@@ -68,6 +68,9 @@ Change log
 
 Released: Not yet.
 
+* Fixed #81: Subkey information is now collected and returned in a ``subkey_info``
+  dictionary keyed by the subkey's ID.
+
 
 0.4.1
 -----

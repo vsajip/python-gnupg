@@ -321,7 +321,13 @@ class GPGTestCase(unittest.TestCase):
         fp = key_info['fingerprint']
         self.assertTrue(fp in public_keys.key_map)
         self.assertTrue(public_keys.key_map[fp] is key_info)
-        for _, _, sfp in key_info['subkeys']:
+        self.assertTrue('subkey_info' in key_info)
+        skinfo = key_info['subkey_info']
+        for skid, _, sfp in key_info['subkeys']:
+            self.assertTrue(skid in skinfo)
+            info = skinfo[skid]
+            self.assertEqual(info['keyid'], skid)
+            self.assertEqual(info['type'], 'sub')
             self.assertTrue(sfp in public_keys.key_map)
             self.assertTrue(public_keys.key_map[sfp] is key_info)
 
@@ -334,9 +340,15 @@ class GPGTestCase(unittest.TestCase):
         self.assertTrue(fp in public_keys_sigs.key_map)
         self.assertTrue(public_keys_sigs.key_map[fp] is key_info)
         self.assertTrue(is_list_with_len(key_info['sigs'], 2))
+        self.assertTrue('subkey_info' in key_info)
+        skinfo = key_info['subkey_info']
         for siginfo in key_info['sigs']:
             self.assertTrue(len(siginfo), 3)
-        for _, _, sfp in key_info['subkeys']:
+        for skid, _, sfp in key_info['subkeys']:
+            self.assertTrue(skid in skinfo)
+            info = skinfo[skid]
+            self.assertEqual(info['keyid'], skid)
+            self.assertEqual(info['type'], 'sub')
             self.assertTrue(sfp in public_keys_sigs.key_map)
             self.assertTrue(public_keys_sigs.key_map[sfp] is key_info)
 
@@ -344,6 +356,14 @@ class GPGTestCase(unittest.TestCase):
         self.assertTrue(is_list_with_len(private_keys, 1),
                         "1-element list expected")
         self.assertEqual(len(private_keys.fingerprints), 1)
+        key_info = private_keys[0]
+        self.assertTrue('subkey_info' in key_info)
+        skinfo = key_info['subkey_info']
+        self.assertTrue(skid in skinfo)
+        info = skinfo[skid]
+        self.assertEqual(info['keyid'], skid)
+        self.assertEqual(info['type'], 'ssb')
+
         # Now do the same test, but using keyring and secret_keyring arguments
         if self.gpg.version < (2, 1):
             pkn = 'pubring.gpg'
@@ -920,7 +940,7 @@ TEST_GROUPS = {
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-    'test': set(['test_doctest_import_keys']),
+    'test': set(['test_list_keys_after_generation']),
 }
 
 def suite(args=None):

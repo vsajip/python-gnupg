@@ -409,6 +409,13 @@ class SendResult(object):
     def handle_status(self, key, value):
         logger.debug('SendResult: %s: %s', key, value)
 
+def _set_fields(target, fieldnames, args):
+    for i, var in enumerate(fieldnames):
+        if i < len(args):
+            target[var] = args[i]
+        else:
+            target[var] = 'unavailable'
+
 class SearchKeys(list):
     ''' Handle status messages for --search-keys.
 
@@ -428,11 +435,7 @@ class SearchKeys(list):
 
     def get_fields(self, args):
         result = {}
-        for i, var in enumerate(self.FIELDS):
-            if i < len(args):
-                result[var] = args[i]
-            else:
-                result[var] = 'unavailable'
+        _set_fields(result, self.FIELDS, args)
         result['uids'] = []
         result['sigs'] = []
         return result
@@ -500,14 +503,25 @@ class ListKeys(SearchKeys):
             self.curkey['subkeys'][-1].append(fp)
             self.key_map[fp] = self.curkey
 
+    def _collect_subkey_info(self, curkey, args):
+        info_map = curkey.setdefault('subkey_info', {})
+        info = {}
+        _set_fields(info, self.FIELDS, args)
+        info_map[args[4]] = info
+
     def sub(self, args):
+        # See issue #81. We create a dict with more information about
+        # subkeys, but for backward compatibility reason, have to add it in
+        # as a separate entry 'subkey_info'
         subkey = [args[4], args[11]]    # keyid, type
         self.curkey['subkeys'].append(subkey)
+        self._collect_subkey_info(self.curkey, args)
         self.in_subkey = True
 
     def ssb(self, args):
         subkey = [args[4], None]    # keyid, type
         self.curkey['subkeys'].append(subkey)
+        self._collect_subkey_info(self.curkey, args)
         self.in_subkey = True
 
     def sig(self, args):
@@ -522,6 +536,7 @@ class ScanKeys(ListKeys):
         # use the last value args[-1] instead of args[11]
         subkey = [args[4], args[-1]]
         self.curkey['subkeys'].append(subkey)
+        self._collect_subkey_info(self.curkey, args)
         self.in_subkey = True
 
 class TextHandler(object):

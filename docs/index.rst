@@ -324,6 +324,12 @@ The returned value from :meth:`list_keys` is a subclass of Python's ``list`` cla
    it - e.g. write them to a separate stream. The callable should not raise any
    exceptions (unless it wants the current operation to fail).
 
+.. versionadded:: 0.4.2
+   Information on keys returned by :meth:`list_keys` or :meth:`scan_keys` now
+   incudes a ``subkey_info`` dictionary, which contains any returned information
+   on subkeys such as creation and expiry dates. The dictionary is keyed on the
+   subkey ID.
+
 .. _RFC-4880: https://tools.ietf.org/html/rfc4880#section-5.2.1
 
 .. index:: Key; scanning
