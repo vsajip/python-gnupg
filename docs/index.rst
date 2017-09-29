@@ -305,6 +305,65 @@ Now that we've seen how to generate, import and export keys, let's move on to fi
 
 The returned value from :meth:`list_keys` is a subclass of Python's ``list`` class. Each entry represents one key and is a Python dictionary which contains useful information about the corresponding key.
 
+The following entries are in the returned dictionary. Some of the key names are
+not ideal for describing the values, but they have been left as is for backward
+compatibility reasons. As `GnuPG documentation
+<https://git.gnupg.org/cgi-bin/gitweb.cgi?p=gnupg.git;a=blob_plain;f=doc/DETAILS>`_
+has improved, a better understanding is possible of the information returned by
+``gpg``.
+
++--------------+---------------------------------------------------------------+
+| dict key     | dict value (all string values)                                |
++==============+===============================================================+
+| type         | Type of key                                                   |
++--------------+---------------------------------------------------------------+
+| trust        | The validity of the key                                       |
++--------------+---------------------------------------------------------------+
+| length       | The length of the key in bits                                 |
++--------------+---------------------------------------------------------------+
+| algo         | Public key algorithm                                          |
++--------------+---------------------------------------------------------------+
+| keyid        | The key ID                                                    |
++--------------+---------------------------------------------------------------+
+| date         | The creation date of the key in UTC as a Unix timestamp       |
++--------------+---------------------------------------------------------------+
+| expires      | The expiry date of the key in UTC as a timestamp, if specified|
++--------------+---------------------------------------------------------------+
+| dummy        | Certificate serial number, UID hash or trust signature info   |
++--------------+---------------------------------------------------------------+
+| ownertrust   | The level of owner trust for the key                          |
++--------------+---------------------------------------------------------------+
+| uid          | The user ID                                                   |
++--------------+---------------------------------------------------------------+
+| sig          | Signature class                                               |
++--------------+---------------------------------------------------------------+
+| cap          | Key capabilities                                              |
++--------------+---------------------------------------------------------------+
+| issuer       | Issuer information                                            |
++--------------+---------------------------------------------------------------+
+| flag         | A flag field                                                  |
++--------------+---------------------------------------------------------------+
+| token        | Token serial number                                           |
++--------------+---------------------------------------------------------------+
+| hash         | Hash algorithm                                                |
++--------------+---------------------------------------------------------------+
+| curve        | Curve name for elliptic curve cryptography (ECC) keys         |
++--------------+---------------------------------------------------------------+
+| compliance   | Compliance flags                                              |
++--------------+---------------------------------------------------------------+
+| updated      | Last updated timestamp                                        |
++--------------+---------------------------------------------------------------+
+| origin       | Origin of keys                                                |
++--------------+---------------------------------------------------------------+
+| subkeys      | A list containing [keyid, type] elements for each subkey      |
++--------------+---------------------------------------------------------------+
+| subkey_info  | A dictionary of subkey information keyed on subkey id         |
++--------------+---------------------------------------------------------------+
+
+For more information about the values in this dictionary, refer to the GnuPG
+documentation linked above. (Note that that documentation is not terribly
+user-friendly, but nevertheless it should be usable.)
+
 .. versionadded:: 0.3.8
    The returned value from :meth:`list_keys` now has a new attribute, ``key_map``, which is a dictionary mapping key and subkey fingerprints to the corresponding key's dictionary. With this change, you don't need to iterate over the (potentially large) returned list to search for a key with a given fingerprint - the ``key_map`` dict will take you straight to the key info, whether the fingerprint you have is for a key or a subkey.
 
@@ -328,7 +387,9 @@ The returned value from :meth:`list_keys` is a subclass of Python's ``list`` cla
    Information on keys returned by :meth:`list_keys` or :meth:`scan_keys` now
    incudes a ``subkey_info`` dictionary, which contains any returned information
    on subkeys such as creation and expiry dates. The dictionary is keyed on the
-   subkey ID.
+   subkey ID. The following additional keys are present in key information
+   dictionaries: ``cap``, ``issuer``, ``flag``, ``token``, ``hash``, ``curve``,
+   ``compliance``, ``updated`` and ``origin``.
 
 .. _RFC-4880: https://tools.ietf.org/html/rfc4880#section-5.2.1
 
