@@ -473,7 +473,7 @@ class ListKeys(SearchKeys):
     '''
 
     UID_INDEX = 9
-    FIELDS = 'type trust length algo keyid date expires dummy ownertrust uid sig'.split()
+    FIELDS = 'type trust length algo keyid date expires dummy ownertrust uid sig cap issuer flag token hash curve compliance updated origin'.split()
 
     def __init__(self, gpg):
         super(ListKeys, self).__init__(gpg)
