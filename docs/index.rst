@@ -360,6 +360,10 @@ has improved, a better understanding is possible of the information returned by
 | subkey_info  | A dictionary of subkey information keyed on subkey id         |
 +--------------+---------------------------------------------------------------+
 
+Depending on the version of ``gpg`` used, some of these keys may have the value
+``'unavailable'``. The last two keys are provided by ``python-gnupg`` rather than
+``gpg``.
+
 For more information about the values in this dictionary, refer to the GnuPG
 documentation linked above. (Note that that documentation is not terribly
 user-friendly, but nevertheless it should be usable.)
