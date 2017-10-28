@@ -1481,3 +1481,23 @@ class GPG(object):
         self._handle_io(args, file, result, passphrase, binary=True)
         logger.debug('decrypt result: %r', result.data)
         return result
+
+    def trust_key(self, fingerprint, trustlevel):
+        levels = Verify.TRUST_LEVELS
+        if trustlevel not in levels:
+            poss = ', '.join(sorted(levels))
+            raise ValueError('Invalid trust level: %s (must be one of %s)' %
+                             (trustlevel, poss))
+        trustlevel = levels[trustlevel] + 2
+        import tempfile
+        try:
+            fd, fn = tempfile.mkstemp()
+            s = '%s:%s:%s' % (fingerprint, trustlevel, os.linesep)
+            os.write(fd, s.encode(self.encoding))
+            os.close(fd)
+            result = self.result_map['delete'](self)
+            p = self._open_subprocess(['--import-ownertrust', fn])
+            self._collect_output(p, result, stdin=p.stdin)
+        finally:
+            os.remove(fn)
+        return result

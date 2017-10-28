@@ -419,6 +419,26 @@ class GPGTestCase(unittest.TestCase):
                         'Donna Davis <donna.davis@delta.com>'])
         self.assertEqual(actual, expected)
 
+    def test_key_trust(self):
+        "Test that trusting a key works"
+        gpg = self.gpg
+        imported = gpg.import_keys(KEYS_TO_IMPORT)
+        key = gpg.list_keys()[0]
+        fingerprint = key['fingerprint']
+        self.assertEqual(key['ownertrust'], '-')
+        cases = (
+            ('TRUST_NEVER', 'n'),
+            ('TRUST_MARGINAL', 'm'),
+            ('TRUST_FULLY', 'f'),
+            ('TRUST_ULTIMATE', 'u'),
+            ('TRUST_UNDEFINED', 'q'),
+        )
+        for param, expected in cases:
+            gpg.trust_key(fingerprint, param)
+            key = gpg.list_keys(keys=fingerprint)[0]
+            self.assertEqual(key['ownertrust'], expected)
+        self.assertRaises(ValueError, gpg.trust_key, fingerprint, 'TRUST_FOOBAR')
+
     def test_list_signatures(self):
         logger.debug("test_list_signatures begins")
         imported = self.gpg.import_keys(SIGNED_KEYS)
@@ -935,12 +955,12 @@ TEST_GROUPS = {
                  'test_key_generation_with_escapes',
                  'test_key_generation_with_empty_value',
                  'test_key_generation_with_colons',
-                 'test_search_keys', 'test_scan_keys']),
+                 'test_search_keys', 'test_scan_keys', 'test_key_trust']),
     'import' : set(['test_import_only', 'test_doctest_import_keys']),
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-    'test': set(['test_list_keys_after_generation']),
+    'test': set(['test_key_trust']),
 }
 
 def suite(args=None):
