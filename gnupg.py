@@ -1482,17 +1482,24 @@ class GPG(object):
         logger.debug('decrypt result: %r', result.data)
         return result
 
-    def trust_key(self, fingerprint, trustlevel):
+    def trust_keys(self, fingerprints, trustlevel):
         levels = Verify.TRUST_LEVELS
         if trustlevel not in levels:
             poss = ', '.join(sorted(levels))
-            raise ValueError('Invalid trust level: %s (must be one of %s)' %
+            raise ValueError('Invalid trust level: "%s" (must be one of %s)' %
                              (trustlevel, poss))
         trustlevel = levels[trustlevel] + 2
         import tempfile
         try:
             fd, fn = tempfile.mkstemp()
-            s = '%s:%s:%s' % (fingerprint, trustlevel, os.linesep)
+            lines = []
+            if isinstance(fingerprints, string_types):
+                fingerprints = [fingerprints]
+            for f in fingerprints:
+                lines.append('%s:%s:' % (f, trustlevel))
+            # The trailing newline is required!
+            s = os.linesep.join(lines) + os.linesep
+            logger.debug('writing ownertrust info: %s', s);
             os.write(fd, s.encode(self.encoding))
             os.close(fd)
             result = self.result_map['delete'](self)

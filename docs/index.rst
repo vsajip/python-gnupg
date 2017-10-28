@@ -96,6 +96,7 @@ I've gratefully incorporated improvements contributed or suggested by:
 * Marcel Pörner (handle EXPORTED, EXPORT_RES)
 * Kévin Bernard-Allies (handle filename encoding under Windows)
 * Daniel Kahn Gillmor (various improvements which were released in 0.4.1)
+* William Foster (trust_key patch)
 
 and Google Code / BitBucket users
 
@@ -396,6 +397,26 @@ user-friendly, but nevertheless it should be usable.)
    ``compliance``, ``updated`` and ``origin``.
 
 .. _RFC-4880: https://tools.ietf.org/html/rfc4880#section-5.2.1
+
+
+.. index:: Key; trusting
+
+Setting the trust level for imported keys
+-----------------------------------------
+
+You can set the trust level for imported keys as follows::
+
+    >>> gpg.trust_keys(fingerprints, trustlevel)
+
+where the ``fingerprints`` are a list of fingerprints of keys for which the
+trust level is to be set, and ``trustlevel`` is one of the string values
+``'TRUST_UNDEFINED'``, ``'TRUST_NEVER'``, ``'TRUST_MARGINAL'``,
+``'TRUST_FULLY'`` or ``'TRUST_ULTIMATE'``.
+
+You can also specify a single fingerprint for the ``fingerprints`` parameter.
+
+.. versionadded:: 0.4.2
+   The ``trust_keys`` method was added.
 
 .. index:: Key; scanning
 

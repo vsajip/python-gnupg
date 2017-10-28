@@ -71,6 +71,8 @@ Released: Not yet.
 * Fixed #81: Subkey information is now collected and returned in a ``subkey_info``
   dictionary keyed by the subkey's ID.
 
+* Fixed #90: Provided a ``trust_keys`` method to allow setting the trust level
+  for keys. Thanks to William Foster for a suggested implementation.
 
 0.4.1
 -----

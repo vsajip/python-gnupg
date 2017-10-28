@@ -420,12 +420,14 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_key_trust(self):
-        "Test that trusting a key works"
+        "Test that trusting keys works"
         gpg = self.gpg
-        imported = gpg.import_keys(KEYS_TO_IMPORT)
-        key = gpg.list_keys()[0]
-        fingerprint = key['fingerprint']
-        self.assertEqual(key['ownertrust'], '-')
+        gpg.import_keys(KEYS_TO_IMPORT)
+        keys = gpg.list_keys()
+        fingerprints = []
+        for key in keys:
+            self.assertEqual(key['ownertrust'], '-')
+            fingerprints.append(key['fingerprint'])
         cases = (
             ('TRUST_NEVER', 'n'),
             ('TRUST_MARGINAL', 'm'),
@@ -434,10 +436,11 @@ class GPGTestCase(unittest.TestCase):
             ('TRUST_UNDEFINED', 'q'),
         )
         for param, expected in cases:
-            gpg.trust_key(fingerprint, param)
-            key = gpg.list_keys(keys=fingerprint)[0]
-            self.assertEqual(key['ownertrust'], expected)
-        self.assertRaises(ValueError, gpg.trust_key, fingerprint, 'TRUST_FOOBAR')
+            gpg.trust_keys(fingerprints, param)
+            keys = gpg.list_keys(keys=fingerprints)
+            for key in keys:
+                self.assertEqual(key['ownertrust'], expected)
+        self.assertRaises(ValueError, gpg.trust_keys, fingerprints, 'TRUST_FOOBAR')
 
     def test_list_signatures(self):
         logger.debug("test_list_signatures begins")
