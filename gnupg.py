@@ -1117,10 +1117,20 @@ class GPG(object):
         data.close()
         return result
 
-    def delete_keys(self, fingerprints, secret=False, passphrase=None):
+    def delete_keys(self, fingerprints, secret=False, passphrase=None,
+                    expect_passphrase=True):
+        """
+        Delete the indicated keys.
+
+        Since GnuPG 2.1, you can't delete secret keys without providing a
+        passphrase. However, if you're expecting the passphrase to go to gpg
+        via pinentry, you should specify expect_passphrase=False. (It's only
+        checked for GnuPG >= 2.1).
+        """
         which='key'
         if secret:  # pragma: no cover
-            if self.version >= (2, 1) and passphrase is None:
+            if (self.version >= (2, 1) and passphrase is None and
+                expect_passphrase):
                 raise ValueError('For GnuPG >= 2.1, deleting secret keys '
                                  'needs a passphrase to be provided')
             which='secret-key'
@@ -1145,18 +1155,21 @@ class GPG(object):
         return result
 
     def export_keys(self, keyids, secret=False, armor=True, minimal=False,
-                    passphrase=None):
+                    passphrase=None, expect_passphrase=True):
         """
         Export the indicated keys. A 'keyid' is anything gpg accepts.
 
         Since GnuPG 2.1, you can't export secret keys without providing a
-        passphrase.
+        passphrase. However, if you're expecting the passphrase to go to gpg
+        via pinentry, you should specify expect_passphrase=False. (It's only
+        checked for GnuPG >= 2.1).
         """
 
         which=''
         if secret:
             which='-secret-key'
-            if self.version >= (2, 1) and passphrase is None:
+            if (self.version >= (2, 1) and passphrase is None and
+                expect_passphrase):
                 raise ValueError('For GnuPG >= 2.1, exporting secret keys '
                                  'needs a passphrase to be provided')
         if _is_sequence(keyids):

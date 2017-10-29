@@ -265,12 +265,16 @@ The ``export_keys`` method has some additional keyword arguments:
 * ``armor`` (defaulting to ``True``) - when ``True``, passes ``--armor`` to ``gpg``.
 * ``minimal`` (defaulting to ``False``) - when ``True``, passes ``--export-options export-minimal`` to ``gpg``.
 * ``passphrase`` - if specified, sends the specified passphrase to ``gpg``. For GnuPG >= 2.1, exporting secret keys requires a passphrase to be provided.
+* ``expect_passphrase`` - defaults to ``True`` for backward compatibility. If the passphrase is to be passed to ``gpg`` via pinentry, you wouldn't pass it here - so specify ``expect_passphrase=False`` in that case. If you don't do that, and don't pass a passphrase, a ``ValueError`` will be raised.
 
 .. versionadded:: 0.3.7
    The ``armor`` and ``minimal`` keyword arguments were added.
 
 .. versionadded:: 0.4.0
    The ``passphrase`` keyword argument was added.
+
+.. versionadded:: 0.4.2
+   The ``expect_passphrase`` keyword argument was added.
 
 .. index:: Key; importing
 
@@ -451,6 +455,17 @@ To delete keys, their key identifiers must be specified. If a public/private key
     'No such key'
 
 The argument you pass to :meth:`delete_keys` can be either a single key identifier (e.g. keyid or fingerprint) or a sequence of key identifiers.
+
+The ``delete_keys`` method has some additional keyword arguments:
+
+* ``passphrase`` - if specified, sends the specified passphrase to ``gpg``. For GnuPG >= 2.1, exporting secret keys requires a passphrase to be provided.
+* ``expect_passphrase`` - defaults to ``True`` for backward compatibility. If the passphrase is to be passed to ``gpg`` via pinentry, you wouldn't pass it here - so specify ``expect_passphrase=False`` in that case. If you don't do that, and don't pass a passphrase, a ``ValueError`` will be raised.
+
+.. versionadded:: 0.4.0
+   The ``passphrase`` keyword argument was added.
+
+.. versionadded:: 0.4.2
+   The ``expect_passphrase`` keyword argument was added.
 
 
 .. index:: Key; searching
