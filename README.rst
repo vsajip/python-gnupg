@@ -79,6 +79,11 @@ Released: Not yet.
 * Fixed #95: Provided a ``trust_keys`` method to allow setting the trust level
   for keys. Thanks to William Foster for a suggested implementation.
 
+* Made the exception message when the gpg executable is not found contain the
+  path of the executable that was tried. Thanks to Kostis Anagnostopoulos for
+  the suggestion.
+
+
 0.4.1
 -----
 

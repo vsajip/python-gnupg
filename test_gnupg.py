@@ -717,8 +717,9 @@ class GPGTestCase(unittest.TestCase):
 
     def test_nogpg(self):
         "Test that absence of gpg is handled correctly"
-        self.assertRaises(OSError, gnupg.GPG, gnupghome=self.homedir,
-                          gpgbinary='frob')
+        with self.assertRaises(OSError) as ar:
+            gnupg.GPG(gnupghome=self.homedir, gpgbinary='frob')
+        self.assertIn('frob', str(ar.exception))
 
     def test_make_args(self):
         "Test argument line construction"

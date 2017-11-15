@@ -777,7 +777,7 @@ class GPG(object):
         try:
             p = self._open_subprocess(["--version"])
         except OSError:
-            msg = 'Unable to run gpg - it may not be available.'
+            msg = 'Unable to run gpg (%s) - it may not be available.' % self.gpgbinary
             logger.exception(msg)
             raise OSError(msg)
         result = self.result_map['verify'](self) # any result will do for this
