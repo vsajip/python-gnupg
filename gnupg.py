@@ -295,9 +295,14 @@ class Verify(object):
             if key == "UNEXPECTED":
                 self.status = 'unexpected data'
             else:
-                # N.B. there might be other reasons
+                # N.B. there might be other reasons. For example, if an output
+                # file can't  be created - /dev/null/foo will lead to a
+                # "not a directory" error, but which is not sent as a status
+                # message with the [GNUPG:] prefix. Similarly if you try to
+                # write to "/etc/foo" as a non-root user, a "permission denied"
+                # error will be sent as a non-status message.
                 if not self.status:
-                    self.status = 'incorrect passphrase'
+                    self.status = 'unspecified, perhaps an incorrect passphrase'
         elif key in ("DECRYPTION_INFO", "PLAINTEXT", "PLAINTEXT_LENGTH",
                      "NO_SECKEY", "BEGIN_SIGNING"):
             pass

@@ -83,6 +83,9 @@ Released: Not yet.
   path of the executable that was tried. Thanks to Kostis Anagnostopoulos for
   the suggestion.
 
+* Fixed #100: Made the error message less categorical in the case of a failure
+  with an unspecified reason.
+
 
 0.4.1
 -----
