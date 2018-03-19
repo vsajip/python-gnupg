@@ -607,8 +607,10 @@ class GPGTestCase(unittest.TestCase):
         self.assertFalse(sig, "Bad passphrase should fail")
         sig = self.gpg.sign(data, keyid=key.fingerprint, passphrase='aable')
         self.assertTrue(sig, "Good passphrase should succeed")
-        self.assertTrue(sig.username.startswith('Andrew Able'))
-        self.assertTrue(key.fingerprint.endswith(sig.key_id))
+        if sig.username:  # not set in recent versions of GnuPG e.g. 2.2.5
+            self.assertTrue(sig.username.startswith('Andrew Able'))
+        if sig.key_id:
+            self.assertTrue(key.fingerprint.endswith(sig.key_id))
         self.assertTrue(sig.hash_algo)
         verified = self.gpg.verify(sig.data)
         if key.fingerprint != verified.fingerprint:  # pragma: no cover
@@ -796,6 +798,27 @@ class GPGTestCase(unittest.TestCase):
         self.do_file_encryption_and_decryption(encfname, decfname)
         logger.debug("test_file_encryption_and_decryption ends")
 
+    #@skipIf(os.name == 'nt', 'Test not suitable for Windows')
+    def test_invalid_outputs(self):
+        "Test encrypting to invalid output files"
+        encfno, encfname = tempfile.mkstemp()
+        os.close(encfno)
+        cases = (
+            ('/dev/null/foo', 'not a directory'),
+            ('/etc/foo', 'permission denied'),
+        )
+        key = self.generate_key("Barbara", "Brown", "beta.com")
+        barbara = key.fingerprint
+        data = "Hello, world!"
+        for badout, message in cases:
+            stream = gnupg._make_binary_stream(data, self.gpg.encoding)
+            edata = self.gpg.encrypt_file(stream,
+                                          barbara, armor=False, output=badout)
+            # on GnuPG 1.4, you sometimes don't get any FAILURE messages, in
+            # which case status will not be set
+            if edata.status:
+                self.assertEqual(edata.status, message)
+
     def test_filenames_with_spaces(self):       # See Issue #16
         "Test that filenames with spaces are correctly handled"
         logger.debug("test_filename_with_spaces begins")
@@ -951,7 +974,7 @@ TEST_GROUPS = {
                   'test_signature_file']),
     'crypt' : set(['test_encryption_and_decryption',
                    'test_file_encryption_and_decryption',
-                   'test_filenames_with_spaces']),
+                   'test_filenames_with_spaces', 'test_invalid_outputs']),
     'key' : set(['test_deletion', 'test_import_and_export',
                  'test_list_keys_after_generation',
                  'test_list_signatures',
@@ -964,7 +987,7 @@ TEST_GROUPS = {
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-    'test': set(['test_key_trust']),
+    'test': set(['test_invalid_outputs']),
 }
 
 def suite(args=None):

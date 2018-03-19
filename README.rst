@@ -84,7 +84,8 @@ Released: Not yet.
   the suggestion.
 
 * Fixed #100: Made the error message less categorical in the case of a failure
-  with an unspecified reason.
+  with an unspecified reason, adding some information from gpg error codes when
+  available.
 
 
 0.4.1

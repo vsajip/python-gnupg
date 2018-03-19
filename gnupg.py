@@ -217,12 +217,22 @@ class Verify(object):
         "TRUST_ULTIMATE" : TRUST_ULTIMATE,
     }
 
+    # for now, just the most common error codes. This can be expanded as and
+    # when reports come in of other errors.
+    GPG_ERROR_CODES = {
+        1: 'permission denied',
+        35: 'file exists',
+        81: 'file not found',
+        97: 'not a directory',
+    }
+
     def __init__(self, gpg):
         self.gpg = gpg
         self.valid = False
         self.fingerprint = self.creation_date = self.timestamp = None
         self.signature_id = self.key_id = None
         self.username = None
+        self.key_id = None
         self.key_status = None
         self.status = None
         self.pubkey_fingerprint = None
@@ -301,8 +311,16 @@ class Verify(object):
                 # message with the [GNUPG:] prefix. Similarly if you try to
                 # write to "/etc/foo" as a non-root user, a "permission denied"
                 # error will be sent as a non-status message.
+                message = 'unspecified, perhaps an incorrect passphrase'
+                parts = value.split()
+                if parts[-1].isdigit():
+                    code = int(parts[-1])
+                    if code & 0x8000:  # a system error code
+                        code = code & 0x7FFF
+                        if code in self.GPG_ERROR_CODES:
+                            message = self.GPG_ERROR_CODES[code]
                 if not self.status:
-                    self.status = 'unspecified, perhaps an incorrect passphrase'
+                    self.status = message
         elif key in ("DECRYPTION_INFO", "PLAINTEXT", "PLAINTEXT_LENGTH",
                      "NO_SECKEY", "BEGIN_SIGNING"):
             pass
