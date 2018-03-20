@@ -219,11 +219,15 @@ class Verify(object):
 
     # for now, just the most common error codes. This can be expanded as and
     # when reports come in of other errors.
-    GPG_ERROR_CODES = {
+    GPG_SYSTEM_ERROR_CODES = {
         1: 'permission denied',
         35: 'file exists',
         81: 'file not found',
         97: 'not a directory',
+    }
+
+    GPG_ERROR_CODES = {
+        11: 'incorrect passphrase',
     }
 
     def __init__(self, gpg):
@@ -311,14 +315,18 @@ class Verify(object):
                 # message with the [GNUPG:] prefix. Similarly if you try to
                 # write to "/etc/foo" as a non-root user, a "permission denied"
                 # error will be sent as a non-status message.
-                message = 'unspecified, perhaps an incorrect passphrase'
+                message = 'error - %s' % value
                 parts = value.split()
                 if parts[-1].isdigit():
                     code = int(parts[-1])
-                    if code & 0x8000:  # a system error code
-                        code = code & 0x7FFF
-                        if code in self.GPG_ERROR_CODES:
-                            message = self.GPG_ERROR_CODES[code]
+                    system_error = bool(code & 0x8000)
+                    code = code & 0x7FFF
+                    if system_error:
+                        mapping = self.GPG_SYSTEM_ERROR_CODES
+                    else:
+                        mapping = self.GPG_ERROR_CODES
+                    if code in mapping:
+                        message = mapping[code]
                 if not self.status:
                     self.status = message
         elif key in ("DECRYPTION_INFO", "PLAINTEXT", "PLAINTEXT_LENGTH",
