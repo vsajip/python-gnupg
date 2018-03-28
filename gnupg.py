@@ -32,7 +32,7 @@ Modifications Copyright (C) 2008-2018 Vinay Sajip. All rights reserved.
 A unittest harness (test_gnupg.py) has also been added.
 """
 
-__version__ = "0.4.2"
+__version__ = "0.4.3.dev0"
 __author__ = "Vinay Sajip"
 __date__  = "$28-Mar-2018 15:26:51$"
 
