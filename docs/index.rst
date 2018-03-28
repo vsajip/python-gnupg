@@ -14,7 +14,7 @@
       * - Release:
         - |release|
       * - Date:
-        - Jul 06, 2017
+        - Mar 28, 2018
 
 .. module:: gnupg
    :synopsis: A Python wrapper for the GNU Privacy Guard (GnuPG)
