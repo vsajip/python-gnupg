@@ -27,14 +27,14 @@ Vinay Sajip to make use of the subprocess module (Steve's version uses os.fork()
 and so does not work on Windows). Renamed to gnupg.py to avoid confusion with
 the previous versions.
 
-Modifications Copyright (C) 2008-2017 Vinay Sajip. All rights reserved.
+Modifications Copyright (C) 2008-2018 Vinay Sajip. All rights reserved.
 
 A unittest harness (test_gnupg.py) has also been added.
 """
 
-__version__ = "0.4.2.dev0"
+__version__ = "0.4.2"
 __author__ = "Vinay Sajip"
-__date__  = "$06-Jul-2017 15:09:20$"
+__date__  = "$28-Mar-2018 15:26:51$"
 
 try:
     from io import StringIO
@@ -830,7 +830,8 @@ class GPG(object):
         a passphrase will be sent to GPG, else False.
         """
         cmd = [self.gpgbinary, '--status-fd', '2', '--no-tty']
-        cmd.extend(['--debug', 'ipc'])
+        if 'DEBUG_IPC' in os.environ:
+            cmd.extend(['--debug', 'ipc'])
         if passphrase and hasattr(self, 'version'):
             if self.version >= (2, 1):
                 cmd[1:1] = ['--pinentry-mode', 'loopback']

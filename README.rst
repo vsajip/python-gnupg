@@ -63,10 +63,16 @@ Change log
 
 .. note:: GCnn refers to an issue nn on Google Code.
 
-0.4.2 (future)
+0.4.3 (future)
 --------------
 
 Released: Not yet.
+
+
+0.4.2
+-----
+
+Released: 2018-03-28
 
 * Fixed #81: Subkey information is now collected and returned in a ``subkey_info``
   dictionary keyed by the subkey's ID.

@@ -2,7 +2,7 @@
 """
 A test harness for gnupg.py.
 
-Copyright (C) 2008-2017 Vinay Sajip. All rights reserved.
+Copyright (C) 2008-2018 Vinay Sajip. All rights reserved.
 """
 import doctest
 import logging
@@ -28,7 +28,7 @@ except ImportError:
 import gnupg
 
 __author__ = "Vinay Sajip"
-__date__  = "$06-Jul-2017 15:09:39$"
+__date__  = "$28-Mar-2018 15:27:14$"
 
 ALL_TESTS = True
 
@@ -612,7 +612,9 @@ class GPGTestCase(unittest.TestCase):
         if sig.key_id:
             self.assertTrue(key.fingerprint.endswith(sig.key_id))
         self.assertTrue(sig.hash_algo)
+        logger.debug('verification start')
         verified = self.gpg.verify(sig.data)
+        logger.debug('verification end')
         if key.fingerprint != verified.fingerprint:  # pragma: no cover
             logger.debug("key: %r", key.fingerprint)
             logger.debug("ver: %r", verified.fingerprint)
@@ -987,7 +989,7 @@ TEST_GROUPS = {
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-    'test': set(['test_invalid_outputs']),
+    'test': set(['test_signature_verification']),
 }
 
 def suite(args=None):
