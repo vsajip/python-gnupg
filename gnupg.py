@@ -829,7 +829,7 @@ class GPG(object):
         will be appended. The ``passphrase`` argument needs to be True if
         a passphrase will be sent to GPG, else False.
         """
-        cmd = [self.gpgbinary, '--status-fd', '2', '--no-tty']
+        cmd = [self.gpgbinary, '--status-fd', '2', '--no-tty', '--no-verbose']
         if 'DEBUG_IPC' in os.environ:
             cmd.extend(['--debug', 'ipc'])
         if passphrase and hasattr(self, 'version'):
