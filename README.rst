@@ -68,6 +68,9 @@ Change log
 
 Released: Not yet.
 
+* Added --no-verbose to the gpg command line, in case verbose is specified in
+  gpg.conf - we don't need verbose output.
+
 
 0.4.2
 -----
