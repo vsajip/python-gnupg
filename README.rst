@@ -63,10 +63,16 @@ Change log
 
 .. note:: GCnn refers to an issue nn on Google Code.
 
-0.4.3 (future)
+0.4.4 (future)
 --------------
 
 Released: Not yet.
+
+
+0.4.3
+-----
+
+Released: 2018-06-13
 
 * Added --no-verbose to the gpg command line, in case verbose is specified in
   gpg.conf - we don't need verbose output.
