@@ -12,6 +12,6 @@ python:
 install:
     - pip install coveralls
 script:
-    - "python test_gnupg.py --no-doctests"
-    - "coverage run test_gnupg.py --no-doctests"
+    - "NO_EXTERNAL_TESTS=1 python test_gnupg.py --no-doctests"
+    - "NO_EXTERNAL_TESTS=1 coverage run test_gnupg.py --no-doctests"
 after_success: coveralls

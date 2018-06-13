@@ -836,12 +836,13 @@ class GPGTestCase(unittest.TestCase):
     #@skipIf(os.name == 'nt', 'Test not suitable for Windows')
     def test_search_keys(self):
         "Test that searching for keys works"
-        r = self.gpg.search_keys('<vinay_sajip@hotmail.com>')
-        self.assertTrue(r)
-        self.assertTrue('Vinay Sajip <vinay_sajip@hotmail.com>' in r[0]['uids'])
-        r = self.gpg.search_keys('92905378')
-        self.assertTrue(r)
-        self.assertTrue('Vinay Sajip <vinay_sajip@hotmail.com>' in r[0]['uids'])
+        if 'NO_EXTERNAL_TESTS' not in os.environ:
+            r = self.gpg.search_keys('<vinay_sajip@hotmail.com>')
+            self.assertTrue(r)
+            self.assertTrue('Vinay Sajip <vinay_sajip@hotmail.com>' in r[0]['uids'])
+            r = self.gpg.search_keys('92905378')
+            self.assertTrue(r)
+            self.assertTrue('Vinay Sajip <vinay_sajip@hotmail.com>' in r[0]['uids'])
 
     def test_quote_with_shell(self):
         "Test shell quoting with a real shell"

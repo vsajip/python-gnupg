@@ -1118,7 +1118,7 @@ class GPG(object):
         >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
         >>> os.chmod('keys', 0x1C0)
         >>> result = gpg.recv_keys('pgp.mit.edu', '92905378')
-        >>> assert result
+        >>> if 'NO_EXTERNAL_TESTS' not in os.environ: assert result
 
         """
         result = self.result_map['import'](self)
@@ -1321,7 +1321,7 @@ class GPG(object):
         >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome='keys')
         >>> os.chmod('keys', 0x1C0)
         >>> result = gpg.search_keys('<vinay_sajip@hotmail.com>')
-        >>> assert result, 'Failed using default keyserver'
+        >>> if 'NO_EXTERNAL_TESTS' not in os.environ: assert result, 'Failed using default keyserver'
         >>> #keyserver = 'keyserver.ubuntu.com'
         >>> #result = gpg.search_keys('<vinay_sajip@hotmail.com>', keyserver)
         >>> #assert result, 'Failed using keyserver.ubuntu.com'
