@@ -68,6 +68,16 @@ Change log
 
 Released: Not yet.
 
+* Changed how any return value from the ``on_data`` callable is processed. In
+  earlier versions, the return value was ignored. In this version, if the
+  return value is ``False``, the data received from ``gpg`` is not buffered.
+  Otherwise (if the value is ``None`` or ``True``, for example), the data is
+  buffered as normal. This functionality can be used to do your own buffering,
+  or to prevent buffering altogether.
+
+  The ``on_data`` callable is also called once with an empty byte-string to
+  signal the end of data from ``gpg``.
+
 
 0.4.3
 -----
@@ -76,7 +86,6 @@ Released: 2018-06-13
 
 * Added --no-verbose to the gpg command line, in case verbose is specified in
   gpg.conf - we don't need verbose output.
-
 
 0.4.2
 -----

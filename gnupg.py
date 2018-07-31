@@ -921,11 +921,15 @@ class GPG(object):
         while True:
             data = stream.read(1024)
             if len(data) == 0:
+                if on_data:
+                    on_data(data)
                 break
             logger.debug("chunk: %r" % data[:256])
-            chunks.append(data)
+            append = True
             if on_data:
-                on_data(data)
+                append = on_data(data) != False
+            if append:
+                chunks.append(data)
         if _py3k:
             # Join using b'' or '', as appropriate
             result.data = type(data)().join(chunks)
