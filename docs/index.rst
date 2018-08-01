@@ -400,7 +400,7 @@ user-friendly, but nevertheless it should be usable.)
    dictionaries: ``cap``, ``issuer``, ``flag``, ``token``, ``hash``, ``curve``,
    ``compliance``, ``updated`` and ``origin``.
 
-.. versionchanged: 0.4.4
+.. versionchanged:: 0.4.4
    The ``on_data`` callable will now be called with an empty chunk when the
    data stream from ``gpg`` is exhausted. It can now also return a value: if the
    value ``False`` is returned, the chunk will *not* be buffered within
