@@ -78,6 +78,12 @@ Released: Not yet.
   The ``on_data`` callable is also called once with an empty byte-string to
   signal the end of data from ``gpg``.
 
+* Fixed #97: Added an additional attribute ``check_fingerprint_collisions`` to
+  ``GPG`` instances, which defaults to ``False``. It seems that ``gpg`` is happy
+  to have duplicate keys and fingerprints in a keyring, so we can't be too
+  strict. A user can set this attribute of an instance to ``True`` to trigger a
+  check for collisions.
+
 
 0.4.3
 -----

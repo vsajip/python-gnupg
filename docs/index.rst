@@ -400,6 +400,14 @@ user-friendly, but nevertheless it should be usable.)
    dictionaries: ``cap``, ``issuer``, ``flag``, ``token``, ``hash``, ``curve``,
    ``compliance``, ``updated`` and ``origin``.
 
+.. versionadded:: 0.4.4
+   Instances of the ``GPG`` class now have an additional
+   ``check_fingerprint_collisions`` attribute, which defaults to ``False``. If
+   set to a truthy value, fingerprint collisions are checked for (and a
+   ``ValueError`` raised if a collision is detected) when listing or scanning
+   keys. It appears that ``gpg`` is quite lenient about allowing duplicated
+   keys in keyrings, which would lead to collisions.
+
 .. versionchanged:: 0.4.4
    The ``on_data`` callable will now be called with an empty chunk when the
    data stream from ``gpg`` is exhausted. It can now also return a value: if the

@@ -524,7 +524,7 @@ class ListKeys(SearchKeys):
 
     def fpr(self, args):
         fp = args[9]
-        if fp in self.key_map:  # pragma: no cover
+        if fp in self.key_map and self.gpg.check_fingerprint_collisions:  # pragma: no cover
             raise ValueError('Unexpected fingerprint collision: %s' % fp)
         if not self.in_subkey:
             self.curkey['fingerprint'] = fp
@@ -822,6 +822,10 @@ class GPG(object):
         else:
             dot = '.'.encode('ascii')
             self.version = tuple([int(s) for s in m.groups()[0].split(dot)])
+
+        # See issue #97. It seems gpg allow duplicate keys in keyrings, so we
+        # can't be too strict.
+        self.check_fingerprint_collisions = False
 
     def make_args(self, args, passphrase):
         """
