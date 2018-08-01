@@ -400,6 +400,15 @@ user-friendly, but nevertheless it should be usable.)
    dictionaries: ``cap``, ``issuer``, ``flag``, ``token``, ``hash``, ``curve``,
    ``compliance``, ``updated`` and ``origin``.
 
+.. versionchanged: 0.4.4
+   The ``on_data`` callable will now be called with an empty chunk when the
+   data stream from ``gpg`` is exhausted. It can now also return a value: if the
+   value ``False`` is returned, the chunk will *not* be buffered within
+   ``python-gnupg``. This might be useful if you want to do your own buffering
+   or avoid buffering altogether. If any other value is returned (including the
+   value ``None``, for backward compatibility) the chunk will be buffered as
+   normal by ``python-gnupg``.
+
 .. _RFC-4880: https://tools.ietf.org/html/rfc4880#section-5.2.1
 
 
