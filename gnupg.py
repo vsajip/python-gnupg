@@ -1285,7 +1285,8 @@ class GPG(object):
 
         if sigs:
             which = 'sigs'
-        else:            which='keys'
+        else:
+            which = 'keys'
         if secret:
             which='secret-keys'
         args = ['--list-%s' % which,
