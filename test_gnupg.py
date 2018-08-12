@@ -173,11 +173,14 @@ def prepare_homedir(hd):
 
 class GPGTestCase(unittest.TestCase):
     def setUp(self):
-        hd = os.path.join(os.getcwd(), 'keys')
-        if os.path.exists(hd):
-            self.assertTrue(os.path.isdir(hd),
-                            "Not a directory: %s" % hd)
-            shutil.rmtree(hd, ignore_errors=True)
+        if 'STATIC_TEST_HOMEDIR' not in os.environ:
+            hd = tempfile.mkdtemp(prefix='keys-')
+        else:
+            hd = os.path.join(os.getcwd(), 'keys')
+            if os.path.exists(hd):
+                self.assertTrue(os.path.isdir(hd),
+                                "Not a directory: %s" % hd)
+                shutil.rmtree(hd, ignore_errors=True)
         prepare_homedir(hd)
         self.homedir = hd
         self.gpg = gpg = gnupg.GPG(gnupghome=hd, gpgbinary=GPGBINARY)
@@ -192,6 +195,10 @@ class GPGTestCase(unittest.TestCase):
             data_file = open(test_fn, 'wb')
             data_file.write(os.urandom(5120 * 1024))
             data_file.close()
+
+    def tearDown(self):
+        if 'STATIC_TEST_HOMEDIR' not in os.environ:
+            shutil.rmtree(self.homedir, ignore_errors=True)
 
     def test_environment(self):
         "Test the environment by ensuring that setup worked"
@@ -373,7 +380,7 @@ class GPGTestCase(unittest.TestCase):
             # and the keyring file name has changed.
             pkn = 'pubring.kbx'
             skn = None
-        hd = os.path.join(os.getcwd(), 'keys')
+        hd = self.homedir
         if os.name == 'posix':
             pkn = os.path.join(hd, pkn)
             if skn:
