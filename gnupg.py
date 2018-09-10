@@ -262,10 +262,14 @@ class Verify(object):
             self.key_id, self.username = value.split(None, 1)
         elif key == "ERRSIG":  # pragma: no cover
             self.valid = False
+            parts = value.split()
             (self.key_id,
              algo, hash_algo,
              cls,
-             self.timestamp) = value.split()[:5]
+             self.timestamp) = parts[:5]
+            # Since GnuPG 2.2.7, a fingerprint is tacked on
+            if len(parts) >= 7:
+                self.fingerprint = parts[6]
             self.status = 'signature error'
         elif key == "EXPSIG":  # pragma: no cover
             self.valid = False
