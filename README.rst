@@ -84,6 +84,9 @@ Released: Not yet.
   strict. A user can set this attribute of an instance to ``True`` to trigger a
   check for collisions.
 
+* Fixed #111: With GnuPG 2.2.7 or later, provide the fingerprint of a signing
+  key for a failed signature verification, if available.
+
 
 0.4.3
 -----
@@ -92,6 +95,7 @@ Released: 2018-06-13
 
 * Added --no-verbose to the gpg command line, in case verbose is specified in
   gpg.conf - we don't need verbose output.
+
 
 0.4.2
 -----
