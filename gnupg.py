@@ -244,6 +244,7 @@ class Verify(object):
         self.sig_timestamp = None
         self.trust_text = None
         self.trust_level = None
+        self.sig_info = {}
 
     def __nonzero__(self):
         return self.valid
@@ -251,15 +252,26 @@ class Verify(object):
     __bool__ = __nonzero__
 
     def handle_status(self, key, value):
+
+        def update_sig_info(**kwargs):
+            sig_id = self.signature_id
+            if sig_id:
+                info = self.sig_info[sig_id]
+                info.update(kwargs)
+
         if key in self.TRUST_LEVELS:
             self.trust_text = key
             self.trust_level = self.TRUST_LEVELS[key]
+            update_sig_info(trust_level=self.trust_level,
+                            trust_text=self.trust_text)
         elif key in ("WARNING", "ERROR"):
             logger.warning('potential problem: %s: %s', key, value)
         elif key == "BADSIG":  # pragma: no cover
             self.valid = False
             self.status = 'signature bad'
             self.key_id, self.username = value.split(None, 1)
+            update_sig_info(keyid=self.key_id, username=self.username,
+                            status=self.status)
         elif key == "ERRSIG":  # pragma: no cover
             self.valid = False
             parts = value.split()
@@ -271,25 +283,41 @@ class Verify(object):
             if len(parts) >= 7:
                 self.fingerprint = parts[6]
             self.status = 'signature error'
+            update_sig_info(keyid=self.key_id, timestamp=self.timestamp,
+                            fingerprint=self.fingerprint, status=self.status)
         elif key == "EXPSIG":  # pragma: no cover
             self.valid = False
             self.status = 'signature expired'
             self.key_id, self.username = value.split(None, 1)
+            update_sig_info(keyid=self.key_id, username=self.username,
+                            status=self.status)
         elif key == "GOODSIG":
             self.valid = True
             self.status = 'signature good'
             self.key_id, self.username = value.split(None, 1)
+            update_sig_info(keyid=self.key_id, username=self.username,
+                            status=self.status)
         elif key == "VALIDSIG":
+            fingerprint, creation_date, sig_ts, expire_ts = value.split()[:4]
             (self.fingerprint,
              self.creation_date,
              self.sig_timestamp,
-             self.expire_timestamp) = value.split()[:4]
+             self.expire_timestamp) = (fingerprint, creation_date, sig_ts,
+                                       expire_ts)
             # may be different if signature is made with a subkey
             self.pubkey_fingerprint = value.split()[-1]
             self.status = 'signature valid'
+            update_sig_info(fingerprint=fingerprint, creation_date=creation_date,
+                            timestamp=sig_ts, expiry=expire_ts,
+                            pubkey_fingerprint=self.pubkey_fingerprint,
+                            status=self.status)
         elif key == "SIG_ID":
+            sig_id, creation_date, timestamp = value.split()
+            self.sig_info[sig_id] = {'creation_date': creation_date,
+                                     'timestamp': timestamp}
             (self.signature_id,
-             self.creation_date, self.timestamp) = value.split()
+             self.creation_date, self.timestamp) = (sig_id, creation_date,
+                                                    timestamp)
         elif key == "DECRYPTION_FAILED":  # pragma: no cover
             self.valid = False
             self.key_id = value
@@ -307,6 +335,7 @@ class Verify(object):
             else:
                 self.key_status = 'signing key was revoked'
             self.status = self.key_status
+            update_sig_info(status=self.status, keyid=self.key_id)
         elif key in ("UNEXPECTED", "FAILURE"):  # pragma: no cover
             self.valid = False
             self.key_id = value

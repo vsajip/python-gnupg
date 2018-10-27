@@ -724,10 +724,35 @@ The data that was signed should be in a separate file whose path is indicated by
    but if a value is specified, it should be a list of extra arguments to pass to
    the ``gpg`` executable.
 
-When a signature is verified, signer information is held in attributes of ``verified``: ``username``, ``key_id``, ``signature_id``,
-``fingerprint``, ``trust_level`` and ``trust_text``. If the message wasn't signed, these attributes will all be set to ``None``.
+.. versionadded:: 0.4.4
+   When signature verification is performed, multiple signatures might be present.
+   Information about all signatures is now captured in a ``sig_info`` attribute
+   of the value returned from ``verify``. This is a dictionary keyed by the
+   signature ID and whose values are dictionaries containing the following
+   information (note - all are string values):
 
-The trust levels are (in increasing order) TRUST_UNDEFINED, TRUST_NEVER, TRUST_MARGINAL, TRUST_FULLY and TRUST_ULTIMATE. If verification succeeded,
+   * ``fingerprint`` - the fingerprint of the signing key.
+   * ``pubkey_fingerprint`` - this is usually the same as ``fingerprint``, but
+     it might be different if a subkey was used for the signing.
+   * ``keyid`` - the key id.
+   * ``username`` - user information for the signing key.
+   * ``status`` - this indicates the status of the signature.
+   * ``creation_date`` - the creation date of the signature in text format,
+     YYYY-MM-DD.
+   * ``timestamp`` - the signature creation time as a timestamp.
+   * ``expiry`` - the signature expiry time as a timestamp, or ``'0'`` to
+     indicate no expiry.
+   * ``trust_level`` - the trust level, see below.
+   * ``trust_text`` - the text corresponding to the trust level.
+
+When a signature is verified, signer information is held in attributes of
+``verified``: ``username``, ``key_id``, ``signature_id``, ``fingerprint``,
+``trust_level`` and ``trust_text``. If the message wasn't signed, these
+attributes will all be set to ``None``. If there were multiple signatures, the
+last values seen will be shown.
+
+The trust levels are (in increasing order) TRUST_UNDEFINED, TRUST_NEVER,
+TRUST_MARGINAL, TRUST_FULLY and TRUST_ULTIMATE. If verification succeeded,
 you can test the trust level against known values as in the following example::
 
     verified = gpg.verify(data)

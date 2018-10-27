@@ -87,6 +87,10 @@ Released: Not yet.
 * Fixed #111: With GnuPG 2.2.7 or later, provide the fingerprint of a signing
   key for a failed signature verification, if available.
 
+* Fixed #21: For verification where multiple signatures are involved, a
+  mapping of signature_ids to fingerprint, keyid, username, creation date,
+  creation timestamp and expiry timestamp are provided.
+
 
 0.4.3
 -----
