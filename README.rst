@@ -91,7 +91,8 @@ Released: Not yet.
   mapping of signature_ids to fingerprint, keyid, username, creation date,
   creation timestamp and expiry timestamp is provided.
 
-* Added a check to disallow newline-type characters ('\r', '\n') in passphrases.
+* Added a check to disallow certain control characters ('\r', '\n', NUL) in
+  passphrases.
 
 
 0.4.3

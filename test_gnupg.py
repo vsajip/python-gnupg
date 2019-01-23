@@ -496,6 +496,8 @@ class GPGTestCase(unittest.TestCase):
         data = data.encode(gpg.encoding)
         edata = str(gpg.encrypt(data, barbara))
         self.assertNotEqual(data, edata, "Data must have changed")
+        self.assertRaises(ValueError, gpg.decrypt, edata, passphrase="bbr\x00own")
+        self.assertRaises(ValueError, gpg.decrypt, edata, passphrase="bbr\rown")
         self.assertRaises(ValueError, gpg.decrypt, edata, passphrase="bbr\nown")
         ddata = gpg.decrypt(edata, passphrase="bbrown")
         if data != ddata.data:  # pragma: no cover
@@ -511,6 +513,10 @@ class GPGTestCase(unittest.TestCase):
         logger.debug("test_encryption_and_decryption ends")
         # Test symmetric encryption
         data = "chippy was here"
+        self.assertRaises(ValueError, gpg.encrypt, data, None,
+                          passphrase='bbr\x00own', symmetric=True)
+        self.assertRaises(ValueError, gpg.encrypt, data, None,
+                          passphrase='bbr\rown', symmetric=True)
         self.assertRaises(ValueError, gpg.encrypt, data, None,
                           passphrase='bbr\nown', symmetric=True)
         edata = str(gpg.encrypt(data, None, passphrase='bbrown', symmetric=True))
@@ -613,6 +619,8 @@ class GPGTestCase(unittest.TestCase):
         else:
             data = unicode('Hello, André', self.gpg.encoding)
         data = data.encode(self.gpg.encoding)
+        self.assertRaises(ValueError, self.gpg.sign, data, keyid=key.fingerprint, passphrase="bbr\x00own")
+        self.assertRaises(ValueError, self.gpg.sign, data, keyid=key.fingerprint, passphrase="bbr\rown")
         self.assertRaises(ValueError, self.gpg.sign, data, keyid=key.fingerprint, passphrase="bbr\nown")
         sig = self.gpg.sign(data, keyid=key.fingerprint, passphrase='bbrown')
         self.assertFalse(sig, "Bad passphrase should fail")

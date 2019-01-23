@@ -1043,7 +1043,8 @@ class GPG(object):
         it is passed in a pipe to gpg, and so not checking could lead to
         spoofing attacks by passing arbitrary text after passphrase and newline.
         """
-        return ('\n' not in passphrase and '\r' not in passphrase)
+        return ('\n' not in passphrase and '\r' not in passphrase and
+                '\x00' not in passphrase)
 
     def sign_file(self, file, keyid=None, passphrase=None, clearsign=True,
                   detach=False, binary=False, output=None, extra_args=None):
