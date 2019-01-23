@@ -89,7 +89,9 @@ Released: Not yet.
 
 * Fixed #21: For verification where multiple signatures are involved, a
   mapping of signature_ids to fingerprint, keyid, username, creation date,
-  creation timestamp and expiry timestamp are provided.
+  creation timestamp and expiry timestamp is provided.
+
+* Added a check to disallow newline-type characters ('\r', '\n') in passphrases.
 
 
 0.4.3

@@ -27,7 +27,7 @@ Vinay Sajip to make use of the subprocess module (Steve's version uses os.fork()
 and so does not work on Windows). Renamed to gnupg.py to avoid confusion with
 the previous versions.
 
-Modifications Copyright (C) 2008-2018 Vinay Sajip. All rights reserved.
+Modifications Copyright (C) 2008-2019 Vinay Sajip. All rights reserved.
 
 A unittest harness (test_gnupg.py) has also been added.
 """
@@ -1037,9 +1037,19 @@ class GPG(object):
             args.extend(['--yes'])
         args.extend(['--output', no_quote(output)])
 
+    def is_valid_passphrase(self, passphrase):
+        """
+        Confirm that the passphrase doesn't contain newline-type characters -
+        it is passed in a pipe to gpg, and so not checking could lead to
+        spoofing attacks by passing arbitrary text after passphrase and newline.
+        """
+        return ('\n' not in passphrase and '\r' not in passphrase)
+
     def sign_file(self, file, keyid=None, passphrase=None, clearsign=True,
                   detach=False, binary=False, output=None, extra_args=None):
         """sign file"""
+        if passphrase and not self.is_valid_passphrase(passphrase):
+            raise ValueError('Invalid passphrase')
         logger.debug("sign_file: %s", file)
         if binary:  # pragma: no cover
             args = ['-s']
@@ -1200,6 +1210,8 @@ class GPG(object):
         via pinentry, you should specify expect_passphrase=False. (It's only
         checked for GnuPG >= 2.1).
         """
+        if passphrase and not self.is_valid_passphrase(passphrase):
+            raise ValueError('Invalid passphrase')
         which='key'
         if secret:  # pragma: no cover
             if (self.version >= (2, 1) and passphrase is None and
@@ -1237,7 +1249,8 @@ class GPG(object):
         via pinentry, you should specify expect_passphrase=False. (It's only
         checked for GnuPG >= 2.1).
         """
-
+        if passphrase and not self.is_valid_passphrase(passphrase):
+            raise ValueError('Invalid passphrase')
         which=''
         if secret:
             which='-secret-key'
@@ -1469,6 +1482,8 @@ class GPG(object):
             always_trust=False, passphrase=None,
             armor=True, output=None, symmetric=False, extra_args=None):
         "Encrypt the message read from the file-like object 'file'"
+        if passphrase and not self.is_valid_passphrase(passphrase):
+            raise ValueError('Invalid passphrase')
         args = ['--encrypt']
         if symmetric:
             # can't be False or None - could be True or a cipher algo value
@@ -1557,6 +1572,8 @@ class GPG(object):
 
     def decrypt_file(self, file, always_trust=False, passphrase=None,
                      output=None, extra_args=None):
+        if passphrase and not self.is_valid_passphrase(passphrase):
+            raise ValueError('Invalid passphrase')
         args = ["--decrypt"]
         if output:  # write the output to a file with the specified name
             self.set_output_without_confirmation(args, output)
