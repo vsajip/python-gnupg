@@ -1,3 +1,4 @@
+dist: xenial
 language: python
 sudo: false
 python:
@@ -8,6 +9,7 @@ python:
     - "3.4"
     - "3.5"
     - "3.6"
+    - "3.7"
     - "pypy"
 install:
     - pip install coveralls
