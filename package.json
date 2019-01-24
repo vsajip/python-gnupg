@@ -50,13 +50,13 @@
     },
     "source_url": "https://pypi.io/packages/source/p/python-gnupg/python-gnupg-0.4.4.tar.gz",
     "summary": "A wrapper for the Gnu Privacy Guard (GPG or GnuPG)",
-    "version": "0.4.4.dev0"
+    "version": "0.4.4"
   },
   "metadata": {
     "description": "This module allows easy access to GnuPG's key management, encryption and signature functionality from Python programs. It is intended for use with Python 2.4 or greater.",
     "name": "python-gnupg",
     "platform": "No particular restrictions",
-    "version": "0.4.4.dev0"
+    "version": "0.4.4"
   },
   "source": {
     "modules": [

@@ -63,10 +63,16 @@ Change log
 
 .. note:: GCnn refers to an issue nn on Google Code.
 
-0.4.4 (future)
+0.4.5 (future)
 --------------
 
 Released: Not yet.
+
+
+0.4.4
+-----
+
+Released: 2019-01-24
 
 * Fixed #108: Changed how any return value from the ``on_data`` callable is
   processed. In earlier versions, the return value was ignored. In this version,
