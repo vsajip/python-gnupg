@@ -744,6 +744,14 @@ class GPGTestCase(unittest.TestCase):
             gnupg.GPG(gnupghome=self.homedir, gpgbinary='frob')
         self.assertIn('frob', str(ar.exception))
 
+    def test_invalid_home(self):
+        "Test that any specified gnupghome directory actually is one"
+        hd = tempfile.mkdtemp(prefix='keys-')
+        shutil.rmtree(hd)  # make sure it isn't there anymore
+        with self.assertRaises(ValueError) as ar:
+            gnupg.GPG(gnupghome=hd)
+        self.assertTrue('gnupghome should be a directory' in str(ar.exception))
+
     def test_make_args(self):
         "Test argument line construction"
         self.gpg.options = ['--foo', '--bar']
@@ -1009,7 +1017,7 @@ TEST_GROUPS = {
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-    'test': set(['test_signature_verification']),
+    'test': set(['test_invalid_home']),
 }
 
 def suite(args=None):

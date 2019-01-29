@@ -813,6 +813,9 @@ class GPG(object):
         """
         self.gpgbinary = gpgbinary
         self.gnupghome = gnupghome
+        # issue 112: fail if the specified value isn't a directory
+        if gnupghome and not os.path.isdir(gnupghome):
+            raise ValueError('gnupghome should be a directory (it isn\'t): %s' % gnupghome)
         if keyring:
             # Allow passing a string or another iterable. Make it uniformly
             # a list of keyring filenames
@@ -997,6 +1000,8 @@ class GPG(object):
         if writer is not None:
             writer.join()
         process.wait()
+        if process.returncode != 0:
+            logger.warning('gpg returned a non-zero error code: %d', process.returncode)
         if stdin is not None:
             try:
                 stdin.close()
@@ -1088,7 +1093,8 @@ class GPG(object):
         """Verify the signature on the contents of the string 'data'
 
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
-        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
+        >>> if not os.path.isdir('keys'): os.mkdir('keys')
+        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome='keys')
         >>> input = gpg.gen_key_input(passphrase='foo')
         >>> key = gpg.gen_key(input)
         >>> assert key
@@ -1167,7 +1173,8 @@ class GPG(object):
         >>> import shutil
         >>> shutil.rmtree("keys", ignore_errors=True)
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
-        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
+        >>> if not os.path.isdir('keys'): os.mkdir('keys')
+        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome='keys')
         >>> os.chmod('keys', 0x1C0)
         >>> result = gpg.recv_keys('pgp.mit.edu', '92905378')
         >>> if 'NO_EXTERNAL_TESTS' not in os.environ: assert result
@@ -1318,7 +1325,8 @@ class GPG(object):
         >>> import shutil
         >>> shutil.rmtree("keys", ignore_errors=True)
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
-        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
+        >>> if not os.path.isdir('keys'): os.mkdir('keys')
+        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome='keys')
         >>> input = gpg.gen_key_input(passphrase='foo')
         >>> result = gpg.gen_key(input)
         >>> fp1 = result.fingerprint
@@ -1374,6 +1382,7 @@ class GPG(object):
         >>> import shutil
         >>> shutil.rmtree('keys', ignore_errors=True)
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
+        >>> if not os.path.isdir('keys'): os.mkdir('keys')
         >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome='keys')
         >>> os.chmod('keys', 0x1C0)
         >>> result = gpg.search_keys('<vinay_sajip@hotmail.com>')
@@ -1416,7 +1425,8 @@ class GPG(object):
         control input.
 
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
-        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
+        >>> if not os.path.isdir('keys'): os.mkdir('keys')
+        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome='keys')
         >>> input = gpg.gen_key_input(passphrase='foo')
         >>> result = gpg.gen_key(input)
         >>> assert result
@@ -1525,7 +1535,8 @@ class GPG(object):
         >>> if os.path.exists("keys"):
         ...     shutil.rmtree("keys", ignore_errors=True)
         >>> GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
-        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome="keys")
+        >>> if not os.path.isdir('keys'): os.mkdir('keys')
+        >>> gpg = GPG(gpgbinary=GPGBINARY, gnupghome='keys')
         >>> input = gpg.gen_key_input(name_email='user1@test', passphrase='pp1')
         >>> result = gpg.gen_key(input)
         >>> fp1 = result.fingerprint
