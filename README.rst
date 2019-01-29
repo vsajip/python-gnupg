@@ -71,6 +71,7 @@ Released: Not yet.
 * Fixed #112: Raised a ValueError if a gnupghome is specified which is not an
   existing directory.
 
+* A warning is logged if gpg returns a non-zero return code.
 
 
 0.4.4
