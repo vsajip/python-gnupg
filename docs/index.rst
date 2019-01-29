@@ -212,7 +212,7 @@ If you don't specify any parameters, the values in the table above will be used 
 
 __ parm_details_
 
-.. _parm_details: http://cvs.gnupg.org/cgi-bin/viewcvs.cgi/trunk/doc/DETAILS?rev=5056&root=GnuPG&view=markup
+.. _parm_details: https://github.com/gpg/gnupg/blob/master/doc/DETAILS
 
 +---------------+------------------+--------------------------------+---------------------------------------------+
 | Parameter     | Keyword Argument | Example values                 | Meaning of parameter                        |
