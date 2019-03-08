@@ -313,7 +313,7 @@ The returned value from :meth:`list_keys` is a subclass of Python's ``list`` cla
 The following entries are in the returned dictionary. Some of the key names are
 not ideal for describing the values, but they have been left as is for backward
 compatibility reasons. As `GnuPG documentation
-<https://git.gnupg.org/cgi-bin/gitweb.cgi?p=gnupg.git;a=blob_plain;f=doc/DETAILS>`_
+<https://github.com/gpg/gnupg/blob/master/doc/DETAILS>`_
 has improved, a better understanding is possible of the information returned by
 ``gpg``.
 
