@@ -546,7 +546,7 @@ passphrase (defaults to ``None``)
     A passphrase to use when accessing the keyrings.
 extra_args (defaults to ``None``)
     A list of additional arguments to pass to the ``gpg`` executable. For example, you could pass ``extra_args=['-z', '0']``
-    to disable compression.
+    to disable compression, or you could pass ``extra_args=['--set-filename', 'name-to-embed-in-encrypted-file.txt']`` to embed a specific file name in the encrypted message.
 
 .. index:: Encryption; symmetric
 
