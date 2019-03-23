@@ -551,6 +551,19 @@ class GPGTestCase(unittest.TestCase):
         expected = type(chunks[0])().join(chunks)
         self.assertEqual(expected.decode('ascii'), data)
 
+        # test signing with encryption and verification during decryption
+        logger.debug('encrypting with signature')
+        gpg.on_data = None
+        edata = str(gpg.encrypt(data, barbara, sign=andrew, passphrase='andy'))
+        logger.debug('decrypting with verification')
+        ddata = gpg.decrypt(edata, passphrase='bbrown')
+        self.assertEqual(data.encode('ascii'), ddata.data, 'Round-trip must work')
+        sig_values = list(ddata.sig_info.values())
+        self.assertTrue(sig_values)
+        sig_info = sig_values[0]
+        self.assertEqual(sig_info['fingerprint'], andrew)
+        logger.debug('decrypting with verification succeeded')
+
     def test_import_and_export(self):
         "Test that key import and export works"
         logger.debug("test_import_and_export begins")
@@ -1017,7 +1030,7 @@ TEST_GROUPS = {
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-    'test': set(['test_invalid_home']),
+    'test': set(['test_encryption_and_decryption']),
 }
 
 def suite(args=None):
