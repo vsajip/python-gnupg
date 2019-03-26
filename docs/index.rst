@@ -297,6 +297,7 @@ This will fetch keys with all specified keyids and import them. Note that on Win
 ``gpg_hkp.exe``, distributed with GnuPG, to successfully run ``recv_keys``. On Jython, security permissions may lead to failure
 of ``recv_keys``.
 
+Note that when you import keys, you may get spurious "key expired" / "signature expired" messages which are sent by ``gpg`` and collected by ``python-gnupg``. This may happen, for example, if there are subkey expiry dates which have been extended, so that the keys haven't actually expired, even when ``gpg`` sends messages that they have. Make sure you just look at the ``count`` and ``fingerprints`` attributes to identify the keys that were imported.
 
 .. index:: Key; listing
 
