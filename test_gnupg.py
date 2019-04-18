@@ -1060,6 +1060,7 @@ def init_logging():
 
 def main():
     init_logging()
+    logger.debug('Python version: %s', sys.version.replace('\n', ' '))
     tests = suite()
     results = unittest.TextTestRunner(verbosity=1).run(tests)
     return not results.wasSuccessful()
