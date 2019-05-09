@@ -1155,14 +1155,17 @@ class GPG(object):
     # KEY MANAGEMENT
     #
 
-    def import_keys(self, key_data):
+    def import_keys(self, key_data, extra_args=None):
         """
         Import the key_data into our keyring.
         """
         result = self.result_map['import'](self)
         logger.debug('import_keys: %r', key_data[:256])
         data = _make_binary_stream(key_data, self.encoding)
-        self._handle_io(['--import'], data, result, binary=True)
+        args = ['--import']
+        if extra_args:
+            args.extend(extra_args)
+        self._handle_io(args, data, result, binary=True)
         logger.debug('import_keys result: %r', result.__dict__)
         data.close()
         return result
