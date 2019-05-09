@@ -73,6 +73,7 @@ Released: Not yet.
 
 * A warning is logged if gpg returns a non-zero return code.
 
+* Added ``extra_args`` to ``import_keys``.
 
 0.4.4
 -----
