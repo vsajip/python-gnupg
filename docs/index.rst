@@ -859,6 +859,8 @@ __ discussion_
 
 .. _discussion: http://groups.google.com/group/python-gnupg
 
+.. cssclass:: hidden
+
 Index
 =====
 
