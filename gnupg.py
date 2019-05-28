@@ -1235,6 +1235,8 @@ class GPG(object):
         else:
             fingerprints = [no_quote(fingerprints)]
         args = ['--delete-%s' % which]
+        if secret and self.version >= (2, 1):
+            args.insert(0, '--yes')
         args.extend(fingerprints)
         result = self.result_map['delete'](self)
         if not secret or self.version < (2, 1):
