@@ -68,12 +68,23 @@ Change log
 
 Released: Not yet.
 
+* Fixed #107: Improved documentation.
+
 * Fixed #112: Raised a ValueError if a gnupghome is specified which is not an
   existing directory.
+
+* Fixed #113: Corrected stale link in the documentation.
+
+* Fixed #116: Updated documentation to clarify when spurious key-expired/
+  signature-expired messages might be seen.
+
+* Fixed #119: Added --yes to avoid pinentry when deleting secret keys with
+  GnuPG >= 2.1.
 
 * A warning is logged if gpg returns a non-zero return code.
 
 * Added ``extra_args`` to ``import_keys``.
+
 
 0.4.4
 -----
