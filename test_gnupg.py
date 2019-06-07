@@ -840,7 +840,7 @@ class GPGTestCase(unittest.TestCase):
         self.do_file_encryption_and_decryption(encfname, decfname)
         logger.debug("test_file_encryption_and_decryption ends")
 
-    #@skipIf(os.name == 'nt', 'Test not suitable for Windows')
+    @skipIf(os.name == 'nt', 'Test not suitable for Windows')
     def test_invalid_outputs(self):
         "Test encrypting to invalid output files"
         encfno, encfname = tempfile.mkstemp()
