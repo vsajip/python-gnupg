@@ -1,4 +1,4 @@
-(build|dist|keys|\.tox)/
+(build|dist|keys|\.(tox|egg-info))/
 (DETAILS|MANIFEST|random_binary_data)$
 \.(pyc|log|dict-validwords)$
 local.*\.(sh|cmd)
