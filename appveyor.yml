@@ -1,4 +1,7 @@
 version: 1.0.{build}
+image:
+  - Visual Studio 2017
+  - ubuntu1804
 environment:
   NO_EXTERNAL_TESTS: 1
   matrix:
