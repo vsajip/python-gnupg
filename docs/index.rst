@@ -289,6 +289,13 @@ To import keys, get the key data as an ASCII string, say ``key_data``. Then::
 
 This will import all the keys in ``key_data``. The number of keys imported will be available in ``import_result.count`` and the fingerprints of the imported keys will be in ``import_result.fingerprints``.
 
+In addition, an ``extra_args`` keyword parameter can be specified. If
+provided, this is treated as a list of additional arguments to pass to the
+``gpg`` executable.
+
+.. versionadded:: 0.4.5
+   The ``extra_args`` keyword argument was added.
+
 To receive keys from a keyserver, use::
 
     >>> import_result = gpg.recv_keys('server-name', 'keyid1', 'keyid2', ...)
