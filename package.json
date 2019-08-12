@@ -18,10 +18,11 @@
           "Programming Language :: Python :: 3.4",
           "Programming Language :: Python :: 3.5",
           "Programming Language :: Python :: 3.6",
+          "Programming Language :: Python :: 3.7",
           "Operating System :: OS Independent",
           "Topic :: Software Development :: Libraries :: Python Modules"
         ],
-        "license": "Copyright (C) 2008-2017 by Vinay Sajip. All Rights Reserved. See LICENSE.txt for license."
+        "license": "Copyright (C) 2008-2019 by Vinay Sajip. All Rights Reserved. See LICENSE.txt for license."
       },
       "python.project": {
         "contacts": [
@@ -48,15 +49,15 @@
         "gnupg"
       ]
     },
-    "source_url": "https://pypi.io/packages/source/p/python-gnupg/python-gnupg-0.4.4.tar.gz",
+    "source_url": "https://pypi.io/packages/source/p/python-gnupg/python-gnupg-0.4.5.tar.gz",
     "summary": "A wrapper for the Gnu Privacy Guard (GPG or GnuPG)",
-    "version": "0.4.4"
+    "version": "0.4.5"
   },
   "metadata": {
     "description": "This module allows easy access to GnuPG's key management, encryption and signature functionality from Python programs. It is intended for use with Python 2.4 or greater.",
     "name": "python-gnupg",
     "platform": "No particular restrictions",
-    "version": "0.4.4"
+    "version": "0.4.5"
   },
   "source": {
     "modules": [
