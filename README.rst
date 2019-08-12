@@ -63,10 +63,17 @@ Change log
 
 .. note:: GCnn refers to an issue nn on Google Code.
 
-0.4.5 (future)
+
+0.4.6 (future)
 --------------
 
 Released: Not yet.
+
+
+0.4.5
+-----
+
+Released: 2019-08-12
 
 * Fixed #107: Improved documentation.
 
@@ -84,6 +91,8 @@ Released: Not yet.
 * A warning is logged if gpg returns a non-zero return code.
 
 * Added ``extra_args`` to ``import_keys``.
+
+* Added support for CI using AppVeyor.
 
 
 0.4.4
