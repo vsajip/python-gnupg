@@ -127,7 +127,7 @@ You interface to the GnuPG functionality through an instance of the ``GPG`` clas
 
     >>> gpg = gnupg.GPG(gnupghome='/path/to/home/directory')
 
-If the home directory does not exist, it will be created (including any missing parent directories). Thereafter, all the operations available are accessed via methods of this instance. If the ``gnupghome`` parameter is omitted, GnuPG will use whatever directory is the default (consult the GnuPG documentation for more information on what this might be).
+If the home directory does not exist, a ValueError will be raised. Thereafter, all the operations available are accessed via methods of this instance. If the ``gnupghome`` parameter is omitted, GnuPG will use whatever directory is the default (consult the GnuPG documentation for more information on what this might be).
 
 The :meth:`GPG` constructor also accepts the following additional optional keyword arguments:
 
