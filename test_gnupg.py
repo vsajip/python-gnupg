@@ -448,6 +448,11 @@ class GPGTestCase(unittest.TestCase):
             for key in keys:
                 self.assertEqual(key['ownertrust'], expected)
         self.assertRaises(ValueError, gpg.trust_keys, fingerprints, 'TRUST_FOOBAR')
+        self.assertRaises(ValueError, gpg.trust_keys, 'NO_SUCH_FINGERPRINT', 'TRUST_NEVER')
+        # gpg should raise an error for the following - but it doesn't!
+        # self.assertRaises(ValueError, gpg.trust_keys,
+                         # 'BADF00DBADF00DBADF00DBADF00DBADF00DBADF0',
+                         # 'TRUST_NEVER')
 
     def test_list_signatures(self):
         logger.debug("test_list_signatures begins")
@@ -1034,7 +1039,7 @@ TEST_GROUPS = {
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-    'test': set(['test_encryption_and_decryption']),
+    'test': set(['test_key_trust']),
 }
 
 def suite(args=None):

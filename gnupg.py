@@ -736,6 +736,10 @@ class DeleteResult(object):
     __bool__ = __nonzero__
 
 
+class TrustResult(DeleteResult):
+    pass
+
+
 class Sign(TextHandler):
     "Handle status messages for --sign"
     def __init__(self, gpg):
@@ -790,6 +794,7 @@ class GPG(object):
         'scan': ScanKeys,
         'search': SearchKeys,
         'sign': Sign,
+        'trust': TrustResult,
         'verify': Verify,
         'export': ExportResult,
     }
@@ -1624,9 +1629,12 @@ class GPG(object):
             logger.debug('writing ownertrust info: %s', s);
             os.write(fd, s.encode(self.encoding))
             os.close(fd)
-            result = self.result_map['delete'](self)
+            result = self.result_map['trust'](self)
             p = self._open_subprocess(['--import-ownertrust', fn])
             self._collect_output(p, result, stdin=p.stdin)
+            if p.returncode != 0:
+                raise ValueError('gpg returned an error - return code %d' %
+                                 p.returncode)
         finally:
             os.remove(fn)
         return result
