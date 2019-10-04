@@ -376,11 +376,10 @@ class ImportResult(object):
             sec_dups not_imported'''.split()
     def __init__(self, gpg):
         self.gpg = gpg
-        self.imported = []
         self.results = []
         self.fingerprints = []
         for result in self.counts:
-            setattr(self, result, None)
+            setattr(self, result, 0)
 
     def __nonzero__(self):
         if self.not_imported: return False
@@ -450,11 +449,11 @@ class ImportResult(object):
             logger.debug('message ignored: %s, %s', key, value)
 
     def summary(self):
-        l = []
-        l.append('%d imported' % self.imported)
+        result = []
+        result.append('%d imported' % self.imported)
         if self.not_imported:  # pragma: no cover
-            l.append('%d not imported' % self.not_imported)
-        return ', '.join(l)
+            result.append('%d not imported' % self.not_imported)
+        return ', '.join(result)
 
 ESCAPE_PATTERN = re.compile(r'\\x([0-9a-f][0-9a-f])', re.I)
 BASIC_ESCAPES = {
@@ -990,7 +989,8 @@ class GPG(object):
         rr.start()
 
         stdout = process.stdout
-        dr = threading.Thread(target=self._read_data, args=(stdout, result, self.on_data))
+        dr = threading.Thread(target=self._read_data, args=(stdout, result,
+                              self.on_data))
         dr.setDaemon(True)
         logger.debug('stdout reader: %r', dr)
         dr.start()
@@ -1000,8 +1000,9 @@ class GPG(object):
         if writer is not None:
             writer.join()
         process.wait()
-        if process.returncode != 0:
-            logger.warning('gpg returned a non-zero error code: %d', process.returncode)
+        rc = process.returncode
+        if rc != 0:
+            logger.warning('gpg returned a non-zero error code: %d', rc)
         if stdin is not None:
             try:
                 stdin.close()

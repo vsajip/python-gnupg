@@ -1011,6 +1011,10 @@ class GPGTestCase(unittest.TestCase):
             self.assertFalse(result)
         logger.debug("test_doctest_import_keys ends")
 
+    def test_recv_keys_no_server(self):
+        result = self.gpg.recv_keys('foo.bar.baz', '92905378')
+        self.assertEqual(result.summary(), '0 imported')
+
 
 TEST_GROUPS = {
     'sign' : set(['test_signature_verification',
