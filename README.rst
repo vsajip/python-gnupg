@@ -69,6 +69,14 @@ Change log
 
 Released: Not yet.
 
+* Fixed #122: Updated documentation about gnupghome needing to be an existing
+  directory.
+
+* Fixed #123: Handled error conditions from gpg when calling trust_keys().
+
+* Fixed #124: Avoided an exception being raised when ImportResult.summary()
+  was called after a failed recv_keys().
+
 
 0.4.5
 -----
