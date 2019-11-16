@@ -1,0 +1,13 @@
+build
+dist
+keys
+.tox
+.egg-info
+DETAILS
+MANIFEST
+random_binary_data
+*.pyc
+*.log
+.dict-validwords
+docs/themes
+docs/_build
