@@ -339,8 +339,8 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(uid, 'Test Name (Funny chars: '
                               '\r\n\x0c\x0b\x00\x08) <test.name@example.com>')
 
-    def test_key_generation_with_empty_value(self):
-        "Test that key generation handles empty values"
+    def test_key_generation_input(self):
+        "Test that key generation input handles empty values, curves etc."
         params = {
             'key_type': ' ',
             'key_length': 2048,
@@ -350,6 +350,18 @@ class GPGTestCase(unittest.TestCase):
         params['key_type'] = 'DSA'
         cmd = self.gpg.gen_key_input(**params)
         self.assertTrue('Key-Type: DSA\n' in cmd)
+        params = {
+            'key_type': 'ECDSA',
+            'key_curve': 'nistp384',
+            'subkey_type': 'ECDH',
+            'subkey_curve': 'nistp384',
+            'name_comment': 'NIST P-384',
+        }
+        cmd = self.gpg.gen_key_input(**params)
+        for s in ('Key-Type: ECDSA', 'Key-Curve: nistp384', 'Subkey-Type: ECDH',
+                  'Subkey-Curve: nistp384', 'Name-Comment: NIST P-384'):
+            self.assertTrue('%s\n' %s in cmd)
+        self.assertFalse('Key-Length: ' in cmd)
 
     def test_list_keys_after_generation(self):
         "Test that after key generation, the generated key is available"
@@ -1079,14 +1091,14 @@ TEST_GROUPS = {
                  'test_list_signatures',
                  'test_key_generation_with_invalid_key_type',
                  'test_key_generation_with_escapes',
-                 'test_key_generation_with_empty_value',
+                 'test_key_generation_input',
                  'test_key_generation_with_colons',
                  'test_search_keys', 'test_scan_keys', 'test_key_trust']),
     'import' : set(['test_import_only', 'test_doctest_import_keys']),
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-    'test': set(['test_import_and_export']),
+    'test': set(['test_key_generation_input']),
 }
 
 def suite(args=None):
