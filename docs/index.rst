@@ -46,6 +46,8 @@ __ gnupg_
 
 .. index:: Deployment
 
+.. _deployment:
+
 Deployment Requirements
 =======================
 Apart from a recent-enough version of Python, in order to use this module you need to have access to a compatible version of the GnuPG executable. The system has been tested with GnuPG v1.4.9 on Windows and Ubuntu. On a Linux platform, this will typically be installed via your distribution's package manager (e.g. ``apt-get`` on Debian/Ubuntu). Windows binaries are available `here`__ -- use one of the ``gnupg-w32cli-1.4.x.exe`` installers
@@ -60,7 +62,7 @@ for the simplest deployment options.
    there are more dependent files which you have to ship. For this reason, our recommendation is to stick with GnuPG 1.4.x on Windows, unless you
    specifically need 2.0 features - in which case, you may have to do a full installation rather than just relying on a couple of files).*
 
-   The latest version of GnuPG (2.1.x) introduces a number of changes:
+   Recent versions of GnuPG (>= 2.1.x) introduce a number of changes:
 
    * By default, passphrases cannot be passed via streams to ``gpg`` unless the line ``allow-loopback-pinentry`` is added to ``gpg-agent.conf`` in the home
      directory used by ``gpg`` (this is also where the keyring files are kept). If that file does not exist, you will need to create it with that single line.
@@ -229,7 +231,11 @@ __ parm_details_
 | Passphrase    | passphrase       | "secret"                       | The passphrase to use. If this parameter is |
 |               |                  |                                | not specified, no passphrase is needed to   |
 |               |                  |                                | access the key. *Passphrases using newlines |
-|               |                  |                                | are not supported*.                         |
+|               |                  |                                | are not supported*. **Note that for GnuPG   |
+|               |                  |                                | versions >= 2.1, a passphrase must be       |
+|               |                  |                                | provided, unless extra steps are taken**:   |
+|               |                  |                                | see the :ref:`deployment` section for more  |
+|               |                  |                                | information.                                |
 +---------------+------------------+--------------------------------+---------------------------------------------+
 
 Whatever keyword arguments you pass to :meth:`gen_key_input` will be converted to the parameters expected by GnuPG by replacing underscores with hyphens and title-casing the result. You can of course construct the parameters in your own dictionary ``params`` and then pass it as follows::
