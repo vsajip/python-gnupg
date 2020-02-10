@@ -197,6 +197,11 @@ verbose
 debug ipc
 '''
 
+ENABLE_TOFU = 'ENABLE_TOFU' in os.environ
+
+if ENABLE_TOFU:
+    GPG_CONFIG = b'trust-model tofu+pgp\ntofu-default-policy unknown\n'
+
 def prepare_homedir(hd):
     if not os.path.isdir(hd):
         os.makedirs(hd)
@@ -204,6 +209,11 @@ def prepare_homedir(hd):
     fn = os.path.join(hd, 'gpg-agent.conf')
     with open(fn, 'wb') as f:
         f.write(AGENT_CONFIG)
+    if ENABLE_TOFU:
+        fn = os.path.join(hd, 'gpg.conf')
+        with open(fn, 'wb') as f:
+            f.write(GPG_CONFIG)
+
 
 class GPGTestCase(unittest.TestCase):
     def setUp(self):
