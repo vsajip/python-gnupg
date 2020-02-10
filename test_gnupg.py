@@ -5,6 +5,7 @@ A test harness for gnupg.py.
 Copyright (C) 2008-2018 Vinay Sajip. All rights reserved.
 """
 import doctest
+import io
 import logging
 import os.path
 import os
@@ -191,7 +192,7 @@ def compare_keys(k1, k2):
     # ignoring things like spurious blank lines
     return get_key_data(k1) != get_key_data(k2)
 
-AGENT_CONFIG = b'''allow-loopback-pinentry
+AGENT_CONFIG = '''allow-loopback-pinentry
 log-file socket:///tmp/S.my-gnupg-log
 verbose
 debug ipc
@@ -200,18 +201,19 @@ debug ipc
 ENABLE_TOFU = 'ENABLE_TOFU' in os.environ
 
 if ENABLE_TOFU:
-    GPG_CONFIG = b'trust-model tofu+pgp\ntofu-default-policy unknown\n'
+    GPG_CONFIG = 'trust-model tofu+pgp\ntofu-default-policy unknown\n'
+
 
 def prepare_homedir(hd):
     if not os.path.isdir(hd):
         os.makedirs(hd)
     os.chmod(hd, 0x1C0)
     fn = os.path.join(hd, 'gpg-agent.conf')
-    with open(fn, 'wb') as f:
+    with open(fn, 'w') as f:
         f.write(AGENT_CONFIG)
     if ENABLE_TOFU:
         fn = os.path.join(hd, 'gpg.conf')
-        with open(fn, 'wb') as f:
+        with open(fn, 'w') as f:
             f.write(GPG_CONFIG)
 
 
