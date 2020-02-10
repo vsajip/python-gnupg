@@ -14,4 +14,4 @@ install:
 - cmd: pip install tox
 build: off
 test_script:
-- cmd: tox
+- cmd: tox -c av-tox.ini
