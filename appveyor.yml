@@ -10,11 +10,15 @@ environment:
   - TOXENV: py35
   - TOXENV: py36
   - TOXENV: py37
+
 for:
 -
   matrix:
     only:
       - image: Visual Studio 2017
+
+  environment:
+    GPGBINARY: gpg2
 
   install:
   - ps: |
