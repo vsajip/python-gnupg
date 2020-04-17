@@ -10,6 +10,19 @@ environment:
   - TOXENV: py35
   - TOXENV: py36
   - TOXENV: py37
+for:
+-
+  matrix:
+    only:
+      - image: Visual Studio 2017
+
+  install:
+  - ps: |
+          $path = [Environment]::GetEnvironmentVariable("path", "machine")
+          $newPath = ($path.Split(';') | Where-Object { $_ -eq 'C:\ProgramData\chocolatey\bin' }) -join ';'
+          [Environment]::SetEnvironmentVariable("path", $newPath, "machine")
+  - cmd: appveyor-retry choco install gpg4win
+
 install:
 - cmd: pip install tox
 build: off
