@@ -23,9 +23,10 @@ for:
   install:
   - ps: |
           $path = [Environment]::GetEnvironmentVariable("path", "machine")
-          $newPath = ($path.Split(';') | Where-Object { $_ -eq 'C:\ProgramData\chocolatey\bin' }) -join ';'
+          $newPath = $path + ";C:\Program Files (x86)\GnuPG\bin;"
           [Environment]::SetEnvironmentVariable("path", $newPath, "machine")
   - cmd: appveyor-retry choco install gpg4win
+  - cmd: refreshenv
   - cmd: pip install tox
 
 install:
