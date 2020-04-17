@@ -349,17 +349,20 @@ class Verify(object):
                 # write to "/etc/foo" as a non-root user, a "permission denied"
                 # error will be sent as a non-status message.
                 message = 'error - %s' % value
-                parts = value.split()
-                if parts[-1].isdigit():
-                    code = int(parts[-1])
-                    system_error = bool(code & 0x8000)
-                    code = code & 0x7FFF
-                    if system_error:
-                        mapping = self.GPG_SYSTEM_ERROR_CODES
+                operation, code = value.rsplit(' ', 1)
+                if code.isdigit():
+                    code = int(code) & 0xFFFFFF  # lose the error source
+                    if self.gpg.error_map and code in self.gpg.error_map:
+                        message = '%s: %s' % (operation, self.gpg.error_map[code])
                     else:
-                        mapping = self.GPG_ERROR_CODES
-                    if code in mapping:
-                        message = mapping[code]
+                        system_error = bool(code & 0x8000)
+                        code = code & 0x7FFF
+                        if system_error:
+                            mapping = self.GPG_SYSTEM_ERROR_CODES
+                        else:
+                            mapping = self.GPG_ERROR_CODES
+                        if code in mapping:
+                            message = '%s: %s' % (operation, mapping[code])
                 if not self.status:
                     self.status = message
         elif key in ("DECRYPTION_INFO", "PLAINTEXT", "PLAINTEXT_LENGTH",
@@ -781,6 +784,8 @@ VERSION_RE = re.compile(r'gpg \(GnuPG(?:/MacGPG2)?\) (\d+(\.\d+)*)'.encode('asci
 HEX_DIGITS_RE = re.compile(r'[0-9a-f]+$', re.I)
 
 class GPG(object):
+
+    error_map = None
 
     decode_errors = 'strict'
 

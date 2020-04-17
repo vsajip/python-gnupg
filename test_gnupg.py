@@ -2,10 +2,11 @@
 """
 A test harness for gnupg.py.
 
-Copyright (C) 2008-2018 Vinay Sajip. All rights reserved.
+Copyright (C) 2008-2020 Vinay Sajip. All rights reserved.
 """
 import doctest
 import io
+import json
 import logging
 import os.path
 import os
@@ -922,8 +923,8 @@ class GPGTestCase(unittest.TestCase):
         encfno, encfname = tempfile.mkstemp()
         os.close(encfno)
         cases = (
-            ('/dev/null/foo', 'not a directory'),
-            ('/etc/foo', 'permission denied'),
+            ('/dev/null/foo', 'encrypt: not a directory'),
+            ('/etc/foo', 'encrypt: permission denied'),
         )
         key = self.generate_key("Barbara", "Brown", "beta.com")
         barbara = key.fingerprint
@@ -936,6 +937,31 @@ class GPGTestCase(unittest.TestCase):
             # which case status will not be set
             if edata.status:
                 self.assertEqual(edata.status, message)
+
+        # now try with custom error map, if available
+        if os.path.exists('messages.json'):
+            with open('messages.json') as f:
+                mdata = json.load(f)
+            messages = {}
+            for k, v in mdata.items():
+                messages[int(k, 16)] = v
+
+            self.gpg.error_map = messages
+
+            cases = (
+                ('/dev/null/foo', 'encrypt: Not a directory'),
+                ('/etc/foo', 'encrypt: Permission denied'),
+            )
+
+            for badout, message in cases:
+                stream = gnupg._make_binary_stream(data, self.gpg.encoding)
+                edata = self.gpg.encrypt_file(stream,
+                                              barbara, armor=False, output=badout)
+                # on GnuPG 1.4, you sometimes don't get any FAILURE messages, in
+                # which case status will not be set
+                if edata.status:
+                    self.assertEqual(edata.status, message)
+
 
     def test_filenames_with_spaces(self):       # See Issue #16
         "Test that filenames with spaces are correctly handled"
@@ -1110,7 +1136,7 @@ TEST_GROUPS = {
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-    'test': set(['test_key_generation_input']),
+    'test': set(['test_invalid_outputs']),
 }
 
 def suite(args=None):
