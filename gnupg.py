@@ -32,9 +32,9 @@ Modifications Copyright (C) 2008-2019 Vinay Sajip. All rights reserved.
 A unittest harness (test_gnupg.py) has also been added.
 """
 
-__version__ = "0.4.6.dev0"
+__version__ = "0.4.6"
 __author__ = "Vinay Sajip"
-__date__  = "$12-Aug-2019 15:58:03$"
+__date__  = "$17-Apr-2020 09:35:35$"
 
 try:
     from io import StringIO

@@ -431,6 +431,15 @@ user-friendly, but nevertheless it should be usable.)
    value ``None``, for backward compatibility) the chunk will be buffered as
    normal by ``python-gnupg``.
 
+.. versionadded:: 0.4.6
+   Instances of the ``GPG`` class now have an additional ``error_map`` attribute,
+   which defaults to ``None``. If you set this, the value should be a dictionary
+   mapping error codes to error messages. The source distribution includes a file
+   ``messages.json`` which contains such a mapping, gleaned from the GnuPG library
+   libgpg-error, version 1.37. The test suite shows how to convert that JSON to a
+   form suitable for converting to an ``error_map`` value (basically, converting the
+   string keys in the JSON to integers using base 16).
+
 .. _RFC-4880: https://tools.ietf.org/html/rfc4880#section-5.2.1
 
 

@@ -30,7 +30,7 @@ except ImportError:
 import gnupg
 
 __author__ = "Vinay Sajip"
-__date__  = "$12-Aug-2019 15:58:32$"
+__date__  = "$17-Apr-2020 09:36:09$"
 
 ALL_TESTS = True
 

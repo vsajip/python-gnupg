@@ -64,10 +64,16 @@ Change log
 .. note:: GCnn refers to an issue nn on Google Code.
 
 
-0.4.6 (future)
+0.4.7 (future)
 --------------
 
 Released: Not yet.
+
+
+0.4.6
+-----
+
+Released: 2020-04-17
 
 * Fixed #122: Updated documentation about gnupghome needing to be an existing
   directory.
@@ -76,6 +82,13 @@ Released: Not yet.
 
 * Fixed #124: Avoided an exception being raised when ImportResult.summary()
   was called after a failed recv_keys().
+
+* Fixed #128: Added ECC support by changing key generation parameters. (The Key-Length
+  value isn't added if a curve is specified.)
+
+* Fixed #130: Provided a mechanism to provide more complete error messages.
+
+Support for Python versions 3.5 and under is discontinued, except for Python 2.7.
 
 
 0.4.5
