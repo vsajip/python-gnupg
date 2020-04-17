@@ -22,6 +22,7 @@ for:
           $newPath = ($path.Split(';') | Where-Object { $_ -eq 'C:\ProgramData\chocolatey\bin' }) -join ';'
           [Environment]::SetEnvironmentVariable("path", $newPath, "machine")
   - cmd: appveyor-retry choco install gpg4win
+  - cmd: pip install tox
 
 install:
 - cmd: pip install tox
