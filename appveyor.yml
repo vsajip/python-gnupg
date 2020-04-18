@@ -23,13 +23,13 @@ for:
   install:
   - ps: |
           $path = [Environment]::GetEnvironmentVariable("path", "machine")
+          $origPath = $path
           $newPath = ($path.Split(';') | Where-Object { $_ -eq 'C:\ProgramData\chocolatey\bin' }) -join ';'
           [Environment]::SetEnvironmentVariable("path", $newPath, "machine")
           Write-Host $newPath
           refreshenv
           appveyor-retry choco install gpg4win
-          $path = [Environment]::GetEnvironmentVariable("path", "machine")
-          $newPath = $newPath + ";C:\Program Files (x86)\GnuPG\bin;"
+          $newPath = $origPath + ";C:\Program Files (x86)\GnuPG\bin;"
           [Environment]::SetEnvironmentVariable("path", $newPath, "machine")
           Write-Host $newPath
           refreshenv
