@@ -1169,7 +1169,10 @@ def main():
     logger.debug('Python version: %s', sys.version.replace('\n', ' '))
     tests = suite()
     results = unittest.TextTestRunner(verbosity=1).run(tests)
-    return not results.wasSuccessful()
+    failed = not results.wasSuccessful()
+    if failed and 'TOXENV' in os.environ and os.name != 'posix':
+        os.system('type test_gnupg.log')
+    return failed
 
 
 if __name__ == "__main__":

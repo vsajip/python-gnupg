@@ -31,7 +31,6 @@ for:
           appveyor-retry choco install gpg4win
           $newPath = $origPath + ";C:\Program Files (x86)\GnuPG\bin;"
           [Environment]::SetEnvironmentVariable("path", $newPath, "machine")
-          Write-Host $newPath
           refreshenv
           gpg --version
   - cmd: pip install tox
