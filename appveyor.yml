@@ -21,6 +21,10 @@ for:
     GPGBINARY: gpg2
 
   install:
+  - ps: |
+          $path = [Environment]::GetEnvironmentVariable("path", "machine")
+          $newPath = ($path.Split(';') | Where-Object { $_ -eq 'C:\ProgramData\chocolatey\bin' }) -join ';'
+          [Environment]::SetEnvironmentVariable("path", $newPath, "machine")
   - cmd: appveyor-retry choco install gpg4win
   - cmd: refreshenv
   - ps: |
