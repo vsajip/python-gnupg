@@ -33,6 +33,7 @@ for:
           [Environment]::SetEnvironmentVariable("path", $newPath, "machine")
           Write-Host $newPath
           refreshenv
+          gpg --version
   - cmd: pip install tox
 
 install:
