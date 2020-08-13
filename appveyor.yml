@@ -4,6 +4,7 @@ image:
   - ubuntu1804
 environment:
   NO_EXTERNAL_TESTS: 1
+  CAT: cat
   matrix:
   - TOXENV: py27
   - TOXENV: py34
@@ -16,6 +17,9 @@ for:
   matrix:
     only:
       - image: Visual Studio 2017
+
+  environment:
+    CAT: type
 
   install:
   - ps: |
@@ -37,3 +41,6 @@ install:
 build: off
 test_script:
 - cmd: tox -c av-tox.ini
+on_failure:
+- cmd: ${CAT} test_gnupg.log
+
