@@ -31,6 +31,7 @@ for:
           refreshenv
           Write-Host $newPath
           gpg --version
+          mkdir keys
           gpg-agent --homedir=keys --daemon
 
   - cmd: pip install tox
