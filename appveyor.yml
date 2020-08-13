@@ -17,9 +17,6 @@ for:
     only:
       - image: Visual Studio 2017
 
-  environment:
-    GPGBINARY: gpg2
-
   install:
   - ps: |
           $path = [Environment]::GetEnvironmentVariable("path", "machine")
