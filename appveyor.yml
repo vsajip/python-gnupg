@@ -1,7 +1,7 @@
 version: 1.0.{build}
 image:
   - Visual Studio 2017
-  - ubuntu1804
+#  - ubuntu1804
 environment:
   NO_EXTERNAL_TESTS: 1
   matrix:
@@ -25,7 +25,7 @@ for:
           [Environment]::SetEnvironmentVariable("path", $newPath, "machine")
           refreshenv
           appveyor-retry choco install gnupg
-          $newPath = $origPath + ";C:\Program Files (x86)\GnuPG\bin;"
+          $newPath = "C:\Program Files (x86)\GnuPG\bin;" + $origPath
           [Environment]::SetEnvironmentVariable("path", $newPath, "machine")
           refreshenv
           Write-Host $newPath
