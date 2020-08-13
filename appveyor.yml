@@ -25,7 +25,7 @@ for:
           [Environment]::SetEnvironmentVariable("path", $newPath, "machine")
           Write-Host $newPath
           refreshenv
-          appveyor-retry choco install gpg4win
+          appveyor-retry choco install gnupg
           $newPath = $origPath + ";C:\Program Files (x86)\GnuPG\bin;"
           [Environment]::SetEnvironmentVariable("path", $newPath, "machine")
           refreshenv
