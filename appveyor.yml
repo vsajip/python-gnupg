@@ -4,6 +4,7 @@ image:
 #  - ubuntu1804
 environment:
   NO_EXTERNAL_TESTS: 1
+  STATIC_TEST_HOMEDIR: 1
   matrix:
 #  - TOXENV: py27
 #  - TOXENV: py34
@@ -29,8 +30,9 @@ for:
           [Environment]::SetEnvironmentVariable("path", $newPath, "machine")
           refreshenv
           Write-Host $newPath
-          cmd /r dir /s "C:\Program Files (x86)\GnuPG\gpg.exe";
           gpg --version
+          gpg-agent --homedir=keys --daemon
+
   - cmd: pip install tox
 
 install:
