@@ -2,6 +2,8 @@ version: 1.0.{build}
 image:
   - Visual Studio 2017
   - ubuntu1804
+  - macos
+  - macos-mojave
 environment:
   NO_EXTERNAL_TESTS: 1
   matrix:
