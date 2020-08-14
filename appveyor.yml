@@ -1,15 +1,16 @@
 version: 1.0.{build}
 image:
   - Visual Studio 2017
-#  - ubuntu1804
+  - ubuntu1804
 environment:
   NO_EXTERNAL_TESTS: 1
   matrix:
-#  - TOXENV: py27
-#  - TOXENV: py34
-#  - TOXENV: py35
+  - TOXENV: py27
+  - TOXENV: py34
+  - TOXENV: py35
   - TOXENV: py36
-#  - TOXENV: py37
+  - TOXENV: py37
+  - TOXENV: py38
 
 for:
 -
