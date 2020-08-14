@@ -30,6 +30,8 @@ for:
           refreshenv
           Write-Host $newPath
           cmd /r "C:\Program Files (x86)\GnuPG\bin\gpg.exe" --version
+          [Environment]::SetEnvironmentVariable("GPGBINARY", "C:\Program Files (x86)\GnuPG\bin\gpg.exe", "machine")
+          refreshenv
 
   - cmd: pip install tox
 
