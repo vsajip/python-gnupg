@@ -922,9 +922,10 @@ class GPGTestCase(unittest.TestCase):
         "Test encrypting to invalid output files"
         encfno, encfname = tempfile.mkstemp()
         os.close(encfno)
+        os.chmod(encfname, 0o400)
         cases = (
             ('/dev/null/foo', 'encrypt: not a directory'),
-            ('/etc/foo', 'encrypt: permission denied'),
+            (encfname, 'encrypt: permission denied'),
         )
         key = self.generate_key("Barbara", "Brown", "beta.com")
         barbara = key.fingerprint
@@ -948,20 +949,27 @@ class GPGTestCase(unittest.TestCase):
 
             self.gpg.error_map = messages
 
-            cases = (
-                ('/dev/null/foo', 'encrypt: Not a directory'),
-                ('/etc/foo', 'encrypt: Permission denied'),
-            )
+            encfno, encfname = tempfile.mkstemp()
+            os.close(encfno)
+            os.chmod(encfname, 0o400)
 
-            for badout, message in cases:
-                stream = gnupg._make_binary_stream(data, self.gpg.encoding)
-                edata = self.gpg.encrypt_file(stream,
-                                              barbara, armor=False, output=badout)
-                # on GnuPG 1.4, you sometimes don't get any FAILURE messages, in
-                # which case status will not be set
-                if edata.status:
-                    self.assertEqual(edata.status, message)
+            try:
+                cases = (
+                    ('/dev/null/foo', 'encrypt: Not a directory'),
+                    (encfname, 'encrypt: Permission denied'),
+                )
 
+                for badout, message in cases:
+                    stream = gnupg._make_binary_stream(data, self.gpg.encoding)
+                    edata = self.gpg.encrypt_file(stream,
+                                                  barbara, armor=False, output=badout)
+                    # on GnuPG 1.4, you sometimes don't get any FAILURE messages, in
+                    # which case status will not be set
+                    if edata.status:
+                        self.assertEqual(edata.status, message)
+            finally:
+                os.chmod(encfname, 0o700)
+                os.remove(encfname)
 
     def test_filenames_with_spaces(self):       # See Issue #16
         "Test that filenames with spaces are correctly handled"
