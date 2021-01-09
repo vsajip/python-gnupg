@@ -20,7 +20,7 @@ https://bitbucket.org/vinay.sajip/python-gnupg/downloads/
 
 The archives should be the same as those uploaded to PyPI.
 """,
-    license="""Copyright (C) 2008-2020 by Vinay Sajip. All Rights Reserved. See LICENSE.txt for license.""",
+    license="""Copyright (C) 2008-2021 by Vinay Sajip. All Rights Reserved. See LICENSE.txt for license.""",
     version=version,
     author="Vinay Sajip",
     author_email="vinay_sajip@yahoo.co.uk",

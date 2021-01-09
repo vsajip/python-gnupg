@@ -27,7 +27,7 @@ Vinay Sajip to make use of the subprocess module (Steve's version uses os.fork()
 and so does not work on Windows). Renamed to gnupg.py to avoid confusion with
 the previous versions.
 
-Modifications Copyright (C) 2008-2019 Vinay Sajip. All rights reserved.
+Modifications Copyright (C) 2008-2021 Vinay Sajip. All rights reserved.
 
 A unittest harness (test_gnupg.py) has also been added.
 """
@@ -1307,7 +1307,7 @@ class GPG(object):
                                 binary=True)
             finally:
                 f.close()
-        logger.debug('export_keys result: %r', result.data)
+        logger.debug('export_keys result[:100]: %r', result.data[:100])
         # Issue #49: Return bytes if armor not specified, else text
         result = result.data
         if armor:
@@ -1542,7 +1542,7 @@ class GPG(object):
             args.extend(extra_args)
         result = self.result_map['crypt'](self)
         self._handle_io(args, file, result, passphrase=passphrase, binary=True)
-        logger.debug('encrypt result: %r', result.data)
+        logger.debug('encrypt result[:100]: %r', result.data[:100])
         return result
 
     def encrypt(self, data, recipients, **kwargs):
@@ -1612,7 +1612,7 @@ class GPG(object):
             args.extend(extra_args)
         result = self.result_map['crypt'](self)
         self._handle_io(args, file, result, passphrase, binary=True)
-        logger.debug('decrypt result: %r', result.data)
+        logger.debug('decrypt result[:100]: %r', result.data[:100])
         return result
 
     def trust_keys(self, fingerprints, trustlevel):

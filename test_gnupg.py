@@ -2,7 +2,7 @@
 """
 A test harness for gnupg.py.
 
-Copyright (C) 2008-2020 Vinay Sajip. All rights reserved.
+Copyright (C) 2008-2021 Vinay Sajip. All rights reserved.
 """
 import doctest
 import io
