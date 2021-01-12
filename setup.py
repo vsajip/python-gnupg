@@ -41,6 +41,7 @@ The archives should be the same as those uploaded to PyPI.
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Operating System :: OS Independent",
         "Topic :: Software Development :: Libraries :: Python Modules"
     ]
