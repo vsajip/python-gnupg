@@ -1462,6 +1462,7 @@ class GPG(object):
         Generate --gen-key input per gpg doc/DETAILS
         """
         parms = {}
+        no_protection = kwargs.pop('no_protection', False)
         for key, val in list(kwargs.items()):
             key = key.replace('_','-').title()
             if str(val).strip():    # skip empty strings
@@ -1478,6 +1479,8 @@ class GPG(object):
         out = "Key-Type: %s\n" % parms.pop('Key-Type')
         for key, val in list(parms.items()):
             out += "%s: %s\n" % (key, val)
+        if no_protection:
+            out += '%no-protection\n'
         out += "%commit\n"
         return out
 

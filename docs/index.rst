@@ -36,6 +36,8 @@ This module is expected to be used with Python versions >= 3.6, or Python 2.7 fo
 legacy code. Install this module using ``pip install python-gnupg``. You can then use
 this module in your own code by doing ``import gnupg`` or similar.
 
+.. _fork-note:
+
 .. note::
    There is at least one fork of this project, which was apparently created because an
    earlier version of this software used the ``subprocess`` module with
@@ -299,17 +301,34 @@ __ parm_details_
 |               |                  |                                | are not supported*. **Note that for GnuPG   |
 |               |                  |                                | versions >= 2.1, a passphrase must be       |
 |               |                  |                                | provided, unless extra steps are taken**:   |
-|               |                  |                                | see the :ref:`deployment` section for more  |
-|               |                  |                                | information.                                |
+|               |                  |                                | see the ``no_protection`` argument, below.  |
++---------------+------------------+--------------------------------+---------------------------------------------+
+| %no-protection| no_protection    | False (the default), True      | If no passphrase is wanted for a key (which |
+|               |                  |                                | might be the default for tests, say), or if |
+|               |                  |                                | you want to use an empty string as a        |
+|               |                  |                                | passphrase, then you should specify ``True``|
+|               |                  |                                | for this parameter. Otherwise, and if you   |
+|               |                  |                                | don't use pinentry to enter a passphrase,   |
+|               |                  |                                | then GnuPG >= 2.1 will not allow this. It   |
+|               |                  |                                | doesn't make sense to specify ``True`` if a |
+|               |                  |                                | non-empty passphrase is being supplied.     |
 +---------------+------------------+--------------------------------+---------------------------------------------+
 
-Whatever keyword arguments you pass to :meth:`gen_key_input` will be converted to the
-parameters expected by GnuPG by replacing underscores with hyphens and title-casing
-the result. You can of course construct the parameters in your own dictionary
-``params`` and then pass it as follows::
+.. versionadded:: 0.4.7
+   The ``no_protection`` keyword argument was added.
+
+Whatever keyword arguments you pass to :meth:`gen_key_input` (other
+than ``no_protection``) will be converted to the parameters expected by
+GnuPG by replacing underscores with hyphens and title-casing the
+result. You can of course construct the parameters in your own
+dictionary ``params`` and then pass it as follows::
 
     >>> input_data = gpg.gen_key_input(**params)
 
+
+The ``no_protection`` argument, if `True`, will be used to generate a
+`%no-protection` line which tells GnuPG that no protection with a
+passphrase is desired.
 
 .. index::
     single: Key; performance issues
