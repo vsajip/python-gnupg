@@ -1166,7 +1166,7 @@ class GPG(object):
     # KEY MANAGEMENT
     #
 
-    def import_keys(self, key_data, extra_args=None):
+    def import_keys(self, key_data, extra_args=None, passphrase=None):
         """
         Import the key_data into our keyring.
         """
@@ -1176,7 +1176,7 @@ class GPG(object):
         args = ['--import']
         if extra_args:
             args.extend(extra_args)
-        self._handle_io(args, data, result, binary=True)
+        self._handle_io(args, data, result, passphrase=passphrase, binary=True)
         logger.debug('import_keys result: %r', result.__dict__)
         data.close()
         return result

@@ -403,11 +403,16 @@ This will import all the keys in ``key_data``. The number of keys imported will 
 available in ``import_result.count`` and the fingerprints of the imported keys will be
 in ``import_result.fingerprints``.
 
-In addition, an ``extra_args`` keyword parameter can be specified. If provided, this
-is treated as a list of additional arguments to pass to the ``gpg`` executable.
+In addition, ``extra_args`` and ``passphrase`` keyword parameter can be specified. If
+provided, ``extra_args`` is treated as a list of additional arguments to pass to the
+``gpg`` executable. If ``passphrase`` is specified, it is passed to ``gpgg`` for when
+an imported secret key has a passphrase.
 
 .. versionadded:: 0.4.5
    The ``extra_args`` keyword argument was added.
+
+.. versionadded:: 0.4.7
+   The ``passphrase`` keyword argument was added.
 
 To receive keys from a keyserver, use::
 
