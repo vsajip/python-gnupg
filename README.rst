@@ -64,10 +64,24 @@ Change log
 .. note:: GCnn refers to an issue nn on Google Code.
 
 
-0.4.7 (future)
+0.4.8 (future)
 --------------
 
 Released: Not yet.
+
+0.4.7
+-----
+
+Released: 2021-03-10
+
+* Fixed #129, #141: Added support for no passphrase during key generation.
+
+* Fixed #143: Improved permission-denied test. Thanks to Elliot Cameron for the patch.
+
+* Fixed #144: Updated logging to only show partial results.
+
+* Fixed #146: Allowed a passphrase to be passed to import_keys(). Thanks to Chris de
+  Graaf for the patch.
 
 
 0.4.6
