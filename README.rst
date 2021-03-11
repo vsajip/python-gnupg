@@ -72,7 +72,7 @@ Released: Not yet.
 0.4.7
 -----
 
-Released: 2021-03-10
+Released: 2021-03-11
 
 * Fixed #129, #141: Added support for no passphrase during key generation.
 
