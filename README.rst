@@ -69,6 +69,8 @@ Change log
 
 Released: Not yet.
 
+* Fixed #147: Return gpg's return code in all result instances.
+
 0.4.7
 -----
 

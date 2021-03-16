@@ -230,6 +230,8 @@ class Verify(object):
         11: 'incorrect passphrase',
     }
 
+    returncode = None
+
     def __init__(self, gpg):
         self.gpg = gpg
         self.valid = False
@@ -377,6 +379,9 @@ class ImportResult(object):
     counts = '''count no_user_id imported imported_rsa unchanged
             n_uids n_subk n_sigs n_revoc sec_read sec_imported
             sec_dups not_imported'''.split()
+
+    returncode = None
+
     def __init__(self, gpg):
         self.gpg = gpg
         self.results = []
@@ -469,6 +474,9 @@ BASIC_ESCAPES = {
 }
 
 class SendResult(object):
+
+    returncode = None
+
     def __init__(self, gpg):
         self.gpg = gpg
 
@@ -492,6 +500,7 @@ class SearchKeys(list):
 
     UID_INDEX = 1
     FIELDS = 'type keyid algo length date expires'.split()
+    returncode = None
 
     def __init__(self, gpg):
         self.gpg = gpg
@@ -675,6 +684,9 @@ class Crypt(Verify, TextHandler):
 
 class GenKey(object):
     "Handle status messages for --gen-key"
+
+    returncode = None
+
     def __init__(self, gpg):
         self.gpg = gpg
         self.type = None
@@ -713,6 +725,9 @@ class ExportResult(GenKey):
 
 class DeleteResult(object):
     "Handle status messages for --delete-key and --delete-secret-key"
+
+    returncode = None
+
     def __init__(self, gpg):
         self.gpg = gpg
         self.status = 'ok'
@@ -745,6 +760,9 @@ class TrustResult(DeleteResult):
 
 class Sign(TextHandler):
     "Handle status messages for --sign"
+
+    returncode = None
+
     def __init__(self, gpg):
         self.gpg = gpg
         self.type = None
@@ -1010,7 +1028,7 @@ class GPG(object):
         if writer is not None:
             writer.join()
         process.wait()
-        rc = process.returncode
+        result.returncode = rc = process.returncode
         if rc != 0:
             logger.warning('gpg returned a non-zero error code: %d', rc)
         if stdin is not None:
@@ -1020,6 +1038,7 @@ class GPG(object):
                 pass
         stderr.close()
         stdout.close()
+        return rc
 
     def _handle_io(self, args, fileobj, result, passphrase=None, binary=False):
         "Handle a call to GPG - pass input data, collect output data"
