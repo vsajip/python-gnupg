@@ -1207,6 +1207,12 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(2, result.returncode, "Unexpected return code")
         self.assertEqual(result.summary(), '0 imported')
 
+    def test_invalid_fileobject(self):
+        # accidentally on purpose pass in a filename rather than the file itself
+        with self.assertRaises(TypeError) as ec:
+            self.gpg.decrypt_file('foobar.txt', passphrase='',
+                                  output='/tmp/decrypted.txt')
+        self.assertEqual(str(ec.exception), 'Not a valid file: foobar.txt')
 
 TEST_GROUPS = {
     'sign' : set(['test_signature_verification',
@@ -1226,7 +1232,7 @@ TEST_GROUPS = {
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-    'test': set(['test_invalid_outputs']),
+    'test': set(['test_invalid_fileobject']),
 }
 
 def suite(args=None):

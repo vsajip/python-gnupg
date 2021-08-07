@@ -71,6 +71,8 @@ Released: Not yet.
 
 * Fixed #147: Return gpg's return code in all result instances.
 
+* Fixed #152: Add check for invalid file objects.
+
 0.4.7
 -----
 

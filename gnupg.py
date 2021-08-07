@@ -1040,10 +1040,18 @@ class GPG(object):
         stdout.close()
         return rc
 
+    def is_valid_file(self, fileobj):
+        """
+        Simplistic check for a file object
+        """
+        return hasattr(fileobj, 'read')
+
     def _handle_io(self, args, fileobj, result, passphrase=None, binary=False):
         "Handle a call to GPG - pass input data, collect output data"
         # Handle a basic data call - pass data to GPG, handle the output
         # including status information. Garbage In, Garbage Out :)
+        if not self.is_valid_file(fileobj):
+            raise TypeError('Not a valid file: %s' % fileobj)
         p = self._open_subprocess(args, passphrase is not None)
         if not binary:  # pragma: no cover
             stdin = codecs.getwriter(self.encoding)(p.stdin)
