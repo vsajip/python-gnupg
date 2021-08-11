@@ -701,7 +701,8 @@ If you want to encrypt data in a file (or file-like object), use::
 
 These methods both return an object such that:
 
-* If encryption succeeded, the returned object's ``ok`` attribute is set to ``True``.
+* If encryption succeeded, the returned object's ``ok`` attribute is set to ``True``
+  and the ``data`` attribute holds the encrypted data.
   Otherwise, the returned object's ``ok`` attribute is set to ``False`` and its
   ``status`` attribute (a message string) provides more information as to the reason
   for failure (for example, ``'invalid recipient'`` or ``'key expired'``).
@@ -775,7 +776,7 @@ decrypted data in a non-binary format. If decryption succeeded, the returned obj
 ``ok`` attribute is set to ``True``. Otherwise, the returned object's ``ok`` attribute
 is set to ``False`` and its ``status`` attribute (a message string) provides more
 information as to the reason for failure (for example, ``'bad passphrase'`` or
-``'decryption failed'``).
+``'decryption failed'``). The ``data`` attribute holds the decrypted data.
 
 Both methods accept the following optional keyword arguments:
 
