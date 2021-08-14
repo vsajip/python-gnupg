@@ -603,7 +603,6 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(data, ddata.data, "Round-trip must work")
         ddata = gpg.decrypt(edata, passphrase="bbrown")
         self.assertEqual(data, ddata.data, "Round-trip must work")
-        logger.debug("test_encryption_and_decryption ends")
         # Test symmetric encryption
         data = "chippy was here"
         self.assertRaises(ValueError, gpg.encrypt, data, None,
@@ -669,6 +668,7 @@ class GPGTestCase(unittest.TestCase):
         sig_info = sig_values[0]
         self.assertEqual(sig_info['fingerprint'], andrew)
         logger.debug('decrypting with verification succeeded')
+        logger.debug("test_encryption_and_decryption ends")
 
     def test_import_and_export(self):
         "Test that key import and export works"
@@ -1214,12 +1214,40 @@ class GPGTestCase(unittest.TestCase):
                                   output='/tmp/decrypted.txt')
         self.assertEqual(str(ec.exception), 'Not a valid file: foobar.txt')
 
+    def remove_all_existing_keys(self):
+        for root, dirs, files in os.walk(self.homedir):
+            for d in dirs:
+                p = os.path.join(root, d)
+                shutil.rmtree(p)
+            for f in files:
+                if f.endswith('.conf'):
+                    continue
+                p = os.path.join(root, f)
+                os.remove(p)
+
+    def test_no_such_key(self):
+        key = self.generate_key("Barbara", "Brown", "beta.com")
+        barbara = key.fingerprint
+        gpg = self.gpg
+        if gnupg._py3k:
+            data = 'Hello, André!'
+        else:
+            data = unicode('Hello, André', gpg.encoding)
+        data = data.encode(gpg.encoding)
+        encrypted = gpg.encrypt(data, barbara)
+        self.remove_all_existing_keys()
+        decrypted = gpg.decrypt(str(encrypted), passphrase='bbrown')
+        self.assertFalse(decrypted.ok)
+        expected = 'decryption failed' if gpg.version >= (2,) else 'no secret key'
+        self.assertEqual(decrypted.status, expected)
+
 TEST_GROUPS = {
     'sign' : set(['test_signature_verification',
                   'test_signature_file']),
     'crypt' : set(['test_encryption_and_decryption',
                    'test_file_encryption_and_decryption',
-                   'test_filenames_with_spaces', 'test_invalid_outputs']),
+                   'test_filenames_with_spaces', 'test_invalid_outputs',
+                   'test_no_such_key']),
     'key' : set(['test_deletion', 'test_import_and_export',
                  'test_list_keys_after_generation',
                  'test_list_signatures',
@@ -1232,7 +1260,7 @@ TEST_GROUPS = {
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-    'test': set(['test_invalid_fileobject']),
+    'test': set(['test_no_such_key']),
 }
 
 def suite(args=None):

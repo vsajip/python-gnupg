@@ -73,6 +73,9 @@ Released: Not yet.
 
 * Fixed #152: Add check for invalid file objects.
 
+* Fixed #157: Provide more useful status message when a secret key is absent.
+
+
 0.4.7
 -----
 

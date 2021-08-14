@@ -328,6 +328,10 @@ class Verify(object):
             self.valid = False
             self.key_id = value
             self.status = 'no public key'
+        elif key == "NO_SECKEY":  # pragma: no cover
+            self.valid = False
+            self.key_id = value
+            self.status = 'no secret key'
         elif key in ("EXPKEYSIG", "REVKEYSIG"):  # pragma: no cover
             # signed with expired or revoked key
             self.valid = False
@@ -368,7 +372,7 @@ class Verify(object):
                 if not self.status:
                     self.status = message
         elif key in ("DECRYPTION_INFO", "PLAINTEXT", "PLAINTEXT_LENGTH",
-                     "NO_SECKEY", "BEGIN_SIGNING"):
+                     "BEGIN_SIGNING"):
             pass
         else:  # pragma: no cover
             logger.debug('message ignored: %s, %s', key, value)
@@ -646,15 +650,19 @@ class Crypt(Verify, TextHandler):
         if key in ("WARNING", "ERROR"):
             logger.warning('potential problem: %s: %s', key, value)
         elif key == "NODATA":
-            self.status = "no data was provided"
+            if self.status not in ("decryption failed",):
+                self.status = "no data was provided"
         elif key in ("NEED_PASSPHRASE", "BAD_PASSPHRASE", "GOOD_PASSPHRASE",
-                     "MISSING_PASSPHRASE", "DECRYPTION_FAILED",
-                     "KEY_NOT_CREATED", "NEED_PASSPHRASE_PIN"):
+                     "MISSING_PASSPHRASE", "KEY_NOT_CREATED", "NEED_PASSPHRASE_PIN"):
             self.status = key.replace("_", " ").lower()
+        elif key == "DECRYPTION_FAILED":
+            if self.status != 'no secret key':  # don't overwrite more useful message
+                self.status = 'decryption failed'
         elif key == "NEED_PASSPHRASE_SYM":
             self.status = 'need symmetric passphrase'
         elif key == "BEGIN_DECRYPTION":
-            self.status = 'decryption incomplete'
+            if self.status != 'no secret key':  # don't overwrite more useful message
+                self.status = 'decryption incomplete'
         elif key == "BEGIN_ENCRYPTION":
             self.status = 'encryption incomplete'
         elif key == "DECRYPTION_OKAY":
