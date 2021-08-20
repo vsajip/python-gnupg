@@ -34,7 +34,7 @@ jobs:
       run: |
         python test_gnupg.py --no-doctests
       env:
-        NO_EXTERNAL_TESTS=1
+        NO_EXTERNAL_TESTS: 1
     - name: Report failure info
       if: ${{ failure() }}
       run: |
