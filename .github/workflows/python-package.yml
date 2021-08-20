@@ -31,4 +31,8 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Test with tox
       run: |
-        tox
+        tox -c gh-tox.ini
+    - name: Report failure info
+      if: ${{ failure() }}
+      run: |
+        cat test_gnupg.log

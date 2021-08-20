@@ -1226,6 +1226,7 @@ class GPGTestCase(unittest.TestCase):
                 os.remove(p)
 
     def test_no_such_key(self):
+        logger.debug("test_no_such_key begins")
         key = self.generate_key("Barbara", "Brown", "beta.com")
         barbara = key.fingerprint
         gpg = self.gpg
@@ -1233,13 +1234,16 @@ class GPGTestCase(unittest.TestCase):
             data = 'Hello, André!'
         else:
             data = unicode('Hello, André', gpg.encoding)
-        data = data.encode(gpg.encoding)
-        encrypted = gpg.encrypt(data, barbara)
-        self.remove_all_existing_keys()
-        decrypted = gpg.decrypt(str(encrypted), passphrase='bbrown')
-        self.assertFalse(decrypted.ok)
-        expected = 'decryption failed' if gpg.version >= (2,) else 'no secret key'
-        self.assertEqual(decrypted.status, expected)
+        try:
+            data = data.encode(gpg.encoding)
+            encrypted = gpg.encrypt(data, barbara)
+            self.remove_all_existing_keys()
+            decrypted = gpg.decrypt(str(encrypted), passphrase='bbrown')
+            self.assertFalse(decrypted.ok)
+            expected = 'decryption failed' if gpg.version >= (2,) else 'no secret key'
+            self.assertEqual(decrypted.status, expected)
+        finally:
+            logger.debug("test_no_such_key ends")
 
 TEST_GROUPS = {
     'sign' : set(['test_signature_verification',
