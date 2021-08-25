@@ -800,6 +800,21 @@ output (defaults to ``None``)
     The name of an output file to write to. If a name is specified, the decrypted
     output is written directly to the file.
 
+.. _caching-warning:
+
+.. warning::
+   **Passphrase caching:** By default, ``gpg-agent`` caches passphrases, and this can
+   lead to unexpected results such as successfully decrypting messages even when
+   passing the wrong passphrase. To avoid this, disable caching by putting the
+   following two lines in ``gpg-agent.conf``:
+
+   * ``default-cache-ttl 0`` and either
+   * ``maximum-cache-ttl 0`` for GnuPG < 2.1, or
+   * ``max-cache-ttl 0`` for GnuPG >= 2.1.
+
+   For more information, see the `GnuPG documentation on agent configuration
+   <https://www.gnupg.org/documentation/manuals/gnupg/Agent-Options.html>`_.
+
 Using signing and encryption together
 -------------------------------------
 
