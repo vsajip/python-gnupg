@@ -75,6 +75,9 @@ Released: Not yet.
 
 * Fixed #157: Provide more useful status message when a secret key is absent.
 
+* Fixed #158: Added a get_recipients() API to find the recipients of an encrypted
+  message without decrypting it.
+
 
 0.4.7
 -----

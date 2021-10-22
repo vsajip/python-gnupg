@@ -1245,6 +1245,25 @@ class GPGTestCase(unittest.TestCase):
         finally:
             logger.debug("test_no_such_key ends")
 
+    def test_get_recipients(self):
+        logger.debug("test_get_recipients begins")
+        try:
+            gpg = self.gpg
+            inp = gpg.gen_key_input(name_email='user1@test', passphrase='pp1')
+            key1 = gpg.gen_key(inp)
+            inp = gpg.gen_key_input(name_email='user2@test', passphrase='pp2')
+            key2 = gpg.gen_key(inp)
+            data = 'super secret'.encode(gpg.encoding)
+            edata = gpg.encrypt(data, (key1.fingerprint, key2.fingerprint))
+            ids = gpg.get_recipients(edata.data)
+            self.assertGreater(len(ids), 0)
+            idlen = len(ids[0])
+            ids = set(ids)
+            expected = set((key1.fingerprint[-idlen:], key2.fingerprint[-idlen:]))
+            self.assertEqual(expected, ids)
+        finally:
+            logger.debug("test_get_recipients ends")
+
 TEST_GROUPS = {
     'sign' : set(['test_signature_verification',
                   'test_signature_file']),
@@ -1264,7 +1283,7 @@ TEST_GROUPS = {
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-    'test': set(['test_no_such_key']),
+    'test': set(['test_get_recipients']),
 }
 
 def suite(args=None):

@@ -808,6 +808,7 @@ class Sign(TextHandler):
 
 VERSION_RE = re.compile(r'gpg \(GnuPG(?:/MacGPG2)?\) (\d+(\.\d+)*)'.encode('ascii'), re.I)
 HEX_DIGITS_RE = re.compile(r'[0-9a-f]+$', re.I)
+PUBLIC_KEY_RE = re.compile(r'gpg: public key is (\w+)')
 
 class GPG(object):
 
@@ -1652,6 +1653,23 @@ class GPG(object):
         self._handle_io(args, file, result, passphrase, binary=True)
         logger.debug('decrypt result[:100]: %r', result.data[:100])
         return result
+
+    def get_recipients(self, message, **kwargs):
+        data = _make_binary_stream(message, self.encoding)
+        result = self.get_recipients_file(data, **kwargs)
+        data.close()
+        return result
+
+    def get_recipients_file(self, file, extra_args=None):
+        args = ['--decrypt', '--list-only', '-v']
+        if extra_args:
+            args.extend(extra_args)
+        result = self.result_map['crypt'](self)
+        self._handle_io(args, file, result, passphrase=None)
+        ids = []
+        for m in PUBLIC_KEY_RE.finditer(result.stderr):
+            ids.append(m.group(1))
+        return ids
 
     def trust_keys(self, fingerprints, trustlevel):
         levels = Verify.TRUST_LEVELS
