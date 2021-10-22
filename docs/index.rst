@@ -769,7 +769,7 @@ To decrypt a message, use the following approach::
 
 If you want to decrypt data in a file (or file-like object), use::
 
-    >>> decrypted_data = gpg.decrypt_file(stream) # e.g. after stream = open(filename, "rb")
+    >>> decrypted_data = gpg.decrypt_file(stream) # e.g. after stream = open(filename, 'rb')
 
 These methods both return an object such that ``str(decrypted_data)`` gives the
 decrypted data in a non-binary format. If decryption succeeded, the returned object's
@@ -844,6 +844,24 @@ you can test the trust level against known values as in the following example::
 
 .. versionadded:: 0.3.1
    The ``trust_level`` and ``trust_text`` attributes were added.
+
+
+Finding the recipients for an encrypted message
+-----------------------------------------------
+
+Sometimes, it's desirable to find the recipients for an encrypted message, without
+actually performing decryption. You can do this using the :meth:`get_recipients` or
+:meth:`get_recipients_file` methods:
+
+    >>> ids = gpg.get_recipients(data)
+
+or, with a file or file-like object:
+
+    >>> ids = gpg.get_recipients_file(stream) # e.g. after stream = open(filename, 'rb')
+
+.. versionadded:: 0.4.8
+   The ``get_recipients`` and ``get_recipients_file`` methods were added.
+
 
 Signing and Verification
 ========================

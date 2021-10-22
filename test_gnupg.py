@@ -1240,8 +1240,8 @@ class GPGTestCase(unittest.TestCase):
             self.remove_all_existing_keys()
             decrypted = gpg.decrypt(str(encrypted), passphrase='bbrown')
             self.assertFalse(decrypted.ok)
-            expected = 'decryption failed' if gpg.version == (2, 3, 1) else 'no secret key'
-            self.assertEqual(decrypted.status, expected)
+            expected = {'decryption failed', 'no secret key', 'no data was provided'}
+            self.assertIn(decrypted.status, expected)
         finally:
             logger.debug("test_no_such_key ends")
 
