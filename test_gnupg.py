@@ -1240,7 +1240,7 @@ class GPGTestCase(unittest.TestCase):
             self.remove_all_existing_keys()
             decrypted = gpg.decrypt(str(encrypted), passphrase='bbrown')
             self.assertFalse(decrypted.ok)
-            expected = 'decryption failed' if gpg.version >= (2, 3) else 'no secret key'
+            expected = 'decryption failed' if gpg.version == (2, 3, 1) else 'no secret key'
             self.assertEqual(decrypted.status, expected)
         finally:
             logger.debug("test_no_such_key ends")
@@ -1255,7 +1255,8 @@ class GPGTestCase(unittest.TestCase):
             key2 = gpg.gen_key(inp)
             data = 'super secret'.encode(gpg.encoding)
             edata = gpg.encrypt(data, (key1.fingerprint, key2.fingerprint))
-            ids = gpg.get_recipients(edata.data)
+            logger.debug('Getting recipients')
+            ids = gpg.get_recipients(edata.data.decode(gpg.encoding))
             self.assertGreater(len(ids), 0)
             idlen = len(ids[0])
             ids = set(ids)

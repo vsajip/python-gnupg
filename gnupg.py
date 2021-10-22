@@ -1665,7 +1665,7 @@ class GPG(object):
         if extra_args:
             args.extend(extra_args)
         result = self.result_map['crypt'](self)
-        self._handle_io(args, file, result, passphrase=None)
+        self._handle_io(args, file, result, binary=True)
         ids = []
         for m in PUBLIC_KEY_RE.finditer(result.stderr):
             ids.append(m.group(1))
