@@ -64,10 +64,15 @@ Change log
 .. note:: GCnn refers to an issue nn on Google Code.
 
 
-0.4.8 (future)
+0.4.9 (future)
 --------------
 
 Released: Not yet.
+
+0.4.8
+-----
+
+Released: 2021-11-24
 
 * Fixed #147: Return gpg's return code in all result instances.
 
