@@ -358,26 +358,6 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(uid, 'Test Name (Funny chars: '
                               '\r\n\x0c\x0b\x00\x08) <test.name@example.com>')
 
-    def test_key_generation_failure(self):
-        if not os.path.exists('rokeys'):
-            os.mkdir('rokeys')
-        os.chmod('rokeys', 0o400)  # noone can write/search this directory
-        gpg = gnupg.GPG(gnupghome='rokeys', gpgbinary=GPGBINARY)
-        params = {
-            'Key-Type': 'RSA',
-            'Key-Length': 1024,
-            'Subkey-Type': 'ELG-E',
-            'Subkey-Length': 2048,
-            'Name-Comment': 'A test user',
-            'Expire-Date': 0,
-            'Name-Real': 'Test Name',
-            'Name-Email': 'test.name@example.com',
-        }
-        cmd = gpg.gen_key_input(**params)
-        result = gpg.gen_key(cmd)
-        self.assertNotEqual(result.returncode, 0)
-        self.assertEqual(result.status, 'key not created')
-
     def test_key_generation_input(self):
         "Test that key generation input handles empty values, curves etc."
         params = {
@@ -1304,7 +1284,7 @@ TEST_GROUPS = {
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
                    'test_quote_with_shell']),
-    'test': set(['test_key_generation_failure']),
+    'test': set(['test_get_recipients']),
 }
 
 def suite(args=None):

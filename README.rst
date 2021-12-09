@@ -69,10 +69,6 @@ Change log
 
 Released: Not yet.
 
-* Fixed #161: Added a status attribute to the returned object from gen_key() which
-   is set to 'ok' if a key was successfully created, or 'key not created' if that
-   was reported by gpg, or None in any other case.
-
 0.4.8
 -----
 
