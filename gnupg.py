@@ -699,6 +699,7 @@ class GenKey(object):
         self.gpg = gpg
         self.type = None
         self.fingerprint = None
+        self.status = None
 
     def __nonzero__(self):
         if self.fingerprint: return True
@@ -710,11 +711,14 @@ class GenKey(object):
         return self.fingerprint or ''
 
     def handle_status(self, key, value):
-        if key in ("WARNING", "ERROR"):  # pragma: no cover
+        if key in ('WARNING', 'ERROR'):  # pragma: no cover
             logger.warning('potential problem: %s: %s', key, value)
-        elif key == "KEY_CREATED":
+        elif key == 'KEY_CREATED':
             (self.type,self.fingerprint) = value.split()
-        elif key in ("PROGRESS", "GOOD_PASSPHRASE", "KEY_NOT_CREATED"):
+            self.status = 'ok'
+        elif key == 'KEY_NOT_CREATED':
+            self.status = key.replace('_', ' ').lower()
+        elif key in ('PROGRESS', 'GOOD_PASSPHRASE'):
             pass
         else:  # pragma: no cover
             logger.debug('message ignored: %s, %s', key, value)
