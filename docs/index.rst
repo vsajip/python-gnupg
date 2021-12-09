@@ -330,9 +330,27 @@ The ``no_protection`` argument, if `True`, will be used to generate a
 `%no-protection` line which tells GnuPG that no protection with a
 passphrase is desired.
 
+The return value from :meth:`gen_key` is an object whose `type` and `fingerprint`
+attributes indicate the type and fingerprint of the created key. If no key was created,
+these will be `None`.
+
+.. versionadded:: 0.4.9
+   There is now also a `status` attribute to the returned object which will be `'ok'`
+   if a key was created, `'key not created'` if that was reported by `gpg`, or `None`
+   in other cases.
+
 .. index::
     single: Key; performance issues
     single: Entropy
+
+Generating elliptic curve keys
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To generate keys with elliptic curves, pass a `key_curve` keyword parameter to
+:meth:`gen_key_input` and omit `key_length`. For example, `key_curve='cv25519'` or
+`key_type='ECDSA', key_curve='nistp384'`. Refer to `GnuPG resources
+<https://wiki.gnupg.org/ECC>`_ to see which options are supported. Note that you'll
+need GnuPG >= 2.1 for this to work.
 
 Performance Issues
 ^^^^^^^^^^^^^^^^^^
