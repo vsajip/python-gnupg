@@ -16,6 +16,10 @@ CA74 9061 914E AC13 8E66  EADB 9147 B477 339A 9B86
 As PyPI no longer shows signatures, you should be able to download release archives \
 and signatures from
 
+https://github.com/vsajip/python-gnupg/releases
+
+or older releases from
+
 https://bitbucket.org/vinay.sajip/python-gnupg/downloads/
 
 The archives should be the same as those uploaded to PyPI.

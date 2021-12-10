@@ -27,10 +27,10 @@
    :maxdepth: 4
 
 The ``gnupg`` module allows Python programs to make use of the functionality provided
-by the `GNU Privacy Guard`__ (abbreviated GPG or GnuPG). Using this module, Python
-programs can encrypt and decrypt data, digitally sign documents and verify digital
-signatures, manage (generate, list and delete) encryption keys, using Public Key
-Infrastructure (PKI) encryption technology based on OpenPGP.
+by the `GNU Privacy Guard <https://gnupg.org/>`_ (abbreviated GPG or GnuPG). Using
+this module, Python programs can encrypt and decrypt data, digitally sign documents
+and verify digital signatures, manage (generate, list and delete) encryption keys,
+using Public Key Infrastructure (PKI) encryption technology based on OpenPGP.
 
 This module is expected to be used with Python versions >= 3.6, or Python 2.7 for
 legacy code. Install this module using ``pip install python-gnupg``. You can then use
@@ -47,10 +47,6 @@ this module in your own code by doing ``import gnupg`` or similar.
    Forks may not be drop-in compatible with this software, so take care to use the
    correct version, as indicated in the ``pip install`` command above.
 
-__ gnupg_
-
-.. _gnupg: http://gnupg.org/
-
 .. index:: Deployment
 
 .. _deployment:
@@ -62,8 +58,9 @@ Apart from a recent-enough version of Python, in order to use this module you ne
 have access to a compatible version of the GnuPG executable. The system has been
 tested with GnuPG v1.4.9 on Windows and Ubuntu. On a Linux platform, this will
 typically be installed via your distribution's package manager (e.g. ``apt-get`` on
-Debian/Ubuntu). Windows binaries are available `here`__ -- use one of the
-``gnupg-w32cli-1.4.x.exe`` installers for the simplest deployment options.
+Debian/Ubuntu). Windows binaries are available `here
+<ftp://ftp.gnupg.org/gcrypt/binary/>`_ -- use one of the ``gnupg-w32cli-1.4.x.exe``
+installers for the simplest deployment options.
 
 .. note::
    On Windows, it is *not* necessary to perform a full installation of GnuPG, using
@@ -92,10 +89,6 @@ Debian/Ubuntu). Windows binaries are available `here`__ -- use one of the
      from source on the same machine worked as expected.
    * To export secret keys, a passphrase must be provided.
 
-__ gnupg-win-bin_
-
-.. _gnupg-win-bin: ftp://ftp.gnupg.org/gcrypt/binary/
-
 .. index:: Acknowledgements
 
 Acknowledgements
@@ -103,10 +96,11 @@ Acknowledgements
 
 This module is based on an earlier version, ``GPG.py``, written by Andrew Kuchling.
 This was further improved by Richard Jones, and then even further by Steve Traugott.
-The ``gnupg`` module is derived from `Steve Traugott's module`__ (the original site no
-longer exists - this link is to the Wayback Machine), and uses Python's ``subprocess``
-module to communicate with the GnuPG executable, which it uses to spawn a subprocess
-to do the real work.
+The ``gnupg`` module is derived from `Steve Traugott's module
+<https://web.archive.org/web/20150310174851/http://trac.t7a.org/isconf/browser/trunk/lib/python/isconf/GPG.py>`_
+(the original site no longer exists - this link is to the Wayback Machine), and uses
+Python's ``subprocess`` module to communicate with the GnuPG executable, which it uses
+to spawn a subprocess to do the real work.
 
 I've gratefully incorporated improvements contributed or suggested by:
 
@@ -139,10 +133,6 @@ and Google Code / BitBucket users
 
 (If I've missed anyone from this list, please let me know.)
 
-__ module_
-
-.. _module: https://web.archive.org/web/20150310174851/http://trac.t7a.org/isconf/browser/trunk/lib/python/isconf/GPG.py
-
 
 Before you Start
 ================
@@ -174,7 +164,7 @@ gpgbinary (defaults to "gpg")
 verbose (defaults to ``False``)
     Print information (e.g. the gpg command lines, and status messages returned by
     gpg) to the console. You don't generally need to set this option, since the module
-    uses Python's ``logging`` package to provide `more flexible functionality`__. The
+    uses Python's ``logging`` package to provide more flexible functionality. The
     status messages from GPG are quite voluminous, especially during key generation.
 use_agent (defaults to ``False``)
     If specified as True, the ``--use-agent`` parameter is passed to GPG, asking it to
@@ -226,8 +216,6 @@ instantiation, like this::
    environment settings (e.g. environment variables, code page etc.) but defaults to
    latin-1.
 
-__ logging_
-
 .. index:: Key; management
 
 Key Management
@@ -274,14 +262,11 @@ following table:
 
 If you don't specify any parameters, the values in the table above will be used with
 the defaults indicated. There is a whole set of other parameters you can specify; see
-`this GnuPG document`__ for more details. While use of RSA keys is common (they can be
-used for both signing and encryption), another popular option is to use a DSA primary
-key (for signing) together with a secondary El-Gamal key (for encryption). For this
-latter option, you could supply the following additional parameters:
-
-__ parm_details_
-
-.. _parm_details: https://github.com/gpg/gnupg/blob/master/doc/DETAILS
+`this GnuPG document <https://github.com/gpg/gnupg/blob/master/doc/DETAILS>`_ for more
+details. While use of RSA keys is common (they can be used for both signing and
+encryption), another popular option is to use a DSA primary key (for signing) together
+with a secondary El-Gamal key (for encryption). For this latter option, you could
+supply the following additional parameters:
 
 +---------------+------------------+--------------------------------+---------------------------------------------+
 | Parameter     | Keyword Argument | Example values                 | Meaning of parameter                        |
@@ -1158,17 +1143,9 @@ for key editing) is not available. This is because it requires essentially a sta
 machine which manages the interaction - moreover, a state machine which varies
 according to the specific version of the ``gpg`` executable being used.
 
-If you find bugs and want to raise issues, please do so via the `BitBucket project`__.
+If you find bugs and want to raise issues, please do so via the `project issue tracker <https://github.com/vsajip/python-gnupg/issues/new/choose>`_.
 
-__ issues_
-
-.. _issues: https://bitbucket.org/vinay.sajip/python-gnupg/issues/new
-
-All feedback will be gratefully received; please send it to the `discussion group`__.
-
-__ discussion_
-
-.. _discussion: http://groups.google.com/group/python-gnupg
+All feedback will be gratefully received; please send it to the `discussion group <https://groups.google.com/group/python-gnupg>`_.
 
 .. cssclass:: hidden
 
