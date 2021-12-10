@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['2.7', '3.7', '3.8', '3.9', '3.10', 'pypy3']
+        python-version: ['2.7', '3.7', '3.8', '3.9', '3.10', 'pypy-2.7', 'pypy3']
 
     steps:
     - uses: actions/checkout@v2
@@ -33,7 +33,8 @@ jobs:
       if: ${{ matrix.os == 'windows-latest' }}
     - name: Test with unittest
       run: |
-        python test_gnupg.py --no-doctests
+        gpg --version
+        python test_gnupg.py
       env:
         NO_EXTERNAL_TESTS: 1
     - name: Report failure info
