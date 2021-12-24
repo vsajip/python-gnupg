@@ -267,16 +267,19 @@ class GPGTestCase(unittest.TestCase):
         self.assertTrue(is_list_with_len(private_keys, 0),
                         "Empty list expected")
 
-    def generate_key(self, first_name, last_name, domain, passphrase=None):
+    def generate_key(self, first_name, last_name, domain, passphrase=None, with_subkey=True):
         "Generate a key"
         params = {
             'Key-Type': 'DSA',
             'Key-Length': 1024,
-            'Subkey-Type': 'ELG-E',
-            'Subkey-Length': 2048,
             'Name-Comment': 'A test user',
             'Expire-Date': 0,
         }
+        if with_subkey:
+            params['Subkey-Type'] = 'ELG-E'
+            params['Subkey-Length'] = 2048
+            
+
         options = self.gpg.options or []
         if '--debug-quick-random' in options or '--quick-random' in options:
             # If using the fake RNG, a key isn't regarded as valid
@@ -410,26 +413,118 @@ class GPGTestCase(unittest.TestCase):
     def test_add_subkey(self):
         "Test that subkeys can be added"
 
-        master_key = self.generate_key("Charlie", "Clark", "gamma.com", passphrase="123")
+        master_key = self.generate_key("Charlie", "Clark", "gamma.com", 
+            passphrase="123", with_subkey=False)
         self.assertEqual(0, master_key.returncode, "Non-zero return code")
 
-        result = self.gpg.addSubKey(master_key=master_key.fingerprint, master_passphrase="123", 
+        result = self.gpg.add_subkey(master_key=master_key.fingerprint, master_passphrase="123", 
             algorithm="dsa", usage="sign", expire=0)
-
-        self.assertEqual(result.returncode, 0)
+        self.assertEqual(0, result.returncode, "Non-zero return code")
 
     def test_add_subkey_with_invalid_key_type(self):
         "Test that subkey generation handles invalid key type"
 
-        master_key = self.generate_key("Charlie", "Clark", "gamma.com", passphrase="123")
+        master_key = self.generate_key("Charlie", "Clark", "gamma.com", 
+            passphrase="123", with_subkey=False)
         self.assertEqual(0, master_key.returncode, "Non-zero return code")
 
-        result = self.gpg.addSubKey(master_key=master_key.fingerprint, master_passphrase="123", 
+        result = self.gpg.add_subkey(master_key=master_key.fingerprint, master_passphrase="123", 
             algorithm="INVALID", usage="sign", expire=0)
 
         self.assertFalse(result.data, 'Null data result')
-        self.assertEqual(None, result.fingerprint, 'Null fingerprint result')
+        self.assertEqual('', result.fingerprint, 'Empty fingerprint result')
         self.assertEqual(2, result.returncode, "Unexpected return code")
+
+    def test_deletion_subkey(self):
+        "Test that subkey deletion works"
+        master_key = self.generate_key("Charlie", "Clark", "gamma.com", 
+            passphrase="123", with_subkey=False)
+        self.assertEqual(0, master_key.returncode, "Non-zero return code")
+
+        subkey = self.gpg.add_subkey(master_key=master_key.fingerprint, master_passphrase="123", 
+            algorithm="dsa", usage="sign", expire=0)
+        self.assertEqual(0, subkey.returncode, "Non-zero return code")
+       
+        public_keys = self.gpg.list_keys()
+        key_info = public_keys[0]
+
+        private_keys = self.gpg.list_keys(secret=True)
+        secret_key_info = private_keys[0]
+
+
+        self.assertEqual(0, public_keys.returncode, "Non-zero return code")
+        self.assertTrue(is_list_with_len(public_keys, 1),
+                        "1-element list expected")
+        self.assertEqual(len(key_info['subkeys']), 1,
+                        "1-element list expected")
+
+        self.assertTrue(is_list_with_len(private_keys, 1),
+                        "1-element list expected")   
+        self.assertEqual(len(secret_key_info['subkeys']), 1,
+                        "1-element list expected")
+        result = self.gpg.delete_keys(subkey.fingerprint, secret=True, 
+            passphrase="123", exclamation_mode=True)
+        result = self.gpg.delete_keys(subkey.fingerprint, exclamation_mode=True)
+        self.assertEqual(0, result.returncode, "Non-zero return code")
+
+        public_keys = self.gpg.list_keys()
+        key_info = public_keys[0]
+
+        private_keys = self.gpg.list_keys(secret=True)
+        secret_key_info = private_keys[0]
+
+        self.assertEqual(0, public_keys.returncode, "Non-zero return code")
+        self.assertTrue(is_list_with_len(public_keys, 1),
+                        "1-element list expected")
+        self.assertEqual(len(key_info['subkeys']), 0,
+                        "0-element list expected")
+
+        self.assertTrue(is_list_with_len(private_keys, 1),
+                        "1-element list expected")   
+        self.assertEqual(len(secret_key_info['subkeys']), 0,
+                        "1-element list expected")
+
+
+    def test_list_subkey_after_generation(self):
+        "Test that after subkey generation, the generated subkey is available"
+        self.test_list_keys_initial()
+
+        master_key = self.generate_key("Charlie", "Clark", "gamma.com", 
+            passphrase="123", with_subkey=False)
+        self.assertEqual(0, master_key.returncode, "Non-zero return code")
+
+        subkey_sign = self.gpg.add_subkey(master_key=master_key.fingerprint, master_passphrase="123", 
+            algorithm="dsa", usage="sign", expire=0)
+        self.assertEqual(0, subkey_sign.returncode, "Non-zero return code")
+
+        subkey_encrypt = self.gpg.add_subkey(master_key=master_key.fingerprint, master_passphrase="123", 
+            algorithm="rsa", usage="encrypt", expire=0)
+        self.assertEqual(0, subkey_encrypt.returncode, "Non-zero return code")
+
+        public_keys = self.gpg.list_keys()
+        self.assertEqual(0, public_keys.returncode, "Non-zero return code")
+        self.assertTrue(is_list_with_len(public_keys, 1),
+                        "1-element list expected")
+        key_info = public_keys[0]
+        fp = key_info['fingerprint']
+        self.assertTrue(fp in public_keys.key_map)
+        self.assertTrue(public_keys.key_map[fp] is key_info)
+        self.assertEqual(fp, master_key.fingerprint)
+        self.assertTrue('subkey_info' in key_info)
+        skinfo = key_info['subkey_info']
+        self.assertEqual(len(skinfo), 2)
+        self.assertEqual(key_info['subkeys'][0][1], "s")
+        self.assertEqual(key_info['subkeys'][0][2], subkey_sign.fingerprint)
+
+        self.assertEqual(key_info['subkeys'][1][1], "e")
+        self.assertEqual(key_info['subkeys'][1][2], subkey_encrypt.fingerprint)
+        for skid, _, sfp in key_info['subkeys']:
+            self.assertTrue(skid in skinfo)
+            info = skinfo[skid]
+            self.assertEqual(info['keyid'], skid)
+            self.assertEqual(info['type'], 'sub')
+            self.assertTrue(sfp in public_keys.key_map)
+            self.assertTrue(public_keys.key_map[sfp] is key_info)
 
     def test_list_keys_after_generation(self):
         "Test that after key generation, the generated key is available"
@@ -910,6 +1005,44 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(key.fingerprint, verified.fingerprint,
                          "Fingerprints must match")
 
+    def test_subkey_signature_file(self):
+        "Test that signing and verification works via the GPG output for subkeys"
+        master_key = self.generate_key("Charlie", "Clark", "gamma.com", 
+            passphrase="123", with_subkey=False)
+        self.assertEqual(0, master_key.returncode, "Non-zero return code")
+
+        subkey = self.gpg.add_subkey(master_key=master_key.fingerprint, master_passphrase="123", 
+            algorithm="dsa", usage="sign", expire=0)
+        self.assertEqual(0, subkey.returncode, "Non-zero return code")
+        
+        data_file = open(self.test_fn, 'rb')
+        sig_file = self.test_fn + '.asc'
+        sig = self.gpg.sign_file(data_file, keyid=subkey.fingerprint,
+                                 passphrase='123', detach=True,
+                                 output=sig_file)
+        print(sig.status)
+        self.assertEqual(0, sig.returncode, "Non-zero return code")
+        data_file.close()
+        self.assertTrue(sig, "File signing should succeed")
+        self.assertTrue(sig.hash_algo)
+        self.assertTrue(os.path.exists(sig_file))
+        # Test in-memory verification
+        data_file = open(self.test_fn, 'rb')
+        data = data_file.read()
+        data_file.close()
+        try:
+            verified = self.gpg.verify_data(sig_file, data)
+            self.assertTrue(verified.username.startswith('Charlie Clark'))
+            self.assertTrue(subkey.fingerprint.endswith(verified.key_id))
+        finally:
+            os.unlink(sig_file)
+        self.assertEqual(0, verified.returncode, "Non-zero return code")
+        if subkey.fingerprint != verified.fingerprint:
+            logger.debug("key: %r", subkey.fingerprint)
+            logger.debug("ver: %r", verified.fingerprint)
+        self.assertEqual(subkey.fingerprint, verified.fingerprint,
+                         "Fingerprints must match")
+
     def test_deletion(self):
         "Test that key deletion works"
         result = self.gpg.import_keys(KEYS_TO_IMPORT)
@@ -1286,7 +1419,7 @@ class GPGTestCase(unittest.TestCase):
 
 TEST_GROUPS = {
     'sign' : set(['test_signature_verification',
-                  'test_signature_file']),
+                  'test_signature_file', 'test_subkey_signature_file']),
     'crypt' : set(['test_encryption_and_decryption',
                    'test_file_encryption_and_decryption',
                    'test_filenames_with_spaces', 'test_invalid_outputs',
@@ -1299,7 +1432,8 @@ TEST_GROUPS = {
                  'test_key_generation_input',
                  'test_key_generation_with_colons',
                  'test_search_keys', 'test_scan_keys', 'test_key_trust',
-                 'test_add_subkey', 'test_add_subkey_with_invalid_key_type']),
+                 'test_add_subkey', 'test_add_subkey_with_invalid_key_type',
+                 'test_deletion_subkey', 'test_list_subkey_after_generation']),
     'import' : set(['test_import_only', 'test_doctest_import_keys']),
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',

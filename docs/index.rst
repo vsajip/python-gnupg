@@ -342,18 +342,22 @@ need GnuPG >= 2.1 for this to work.
 
 Generating subkeys
 ^^^^^^^^^^^^^^^^^^
-To generate a subkey for an already generated key use the :meth:`addSubKey` method::
+To generate a subkey for an already generated key use the :meth:`add_subkey` method::
 
-    >>> subkey = gpg.addSubKey(master_key) # same as gpg.addSubKey(master_key, None)
-    >>> subkey = gpg.addSubKey(master_key, master_key_password)
+    >>> subkey = gpg.add_subkey(master_key) # same as gpg.add_subkey(master_key, None)
+    >>> subkey = gpg.add_subkey(master_key, master_key_password)
 
-The ``addSubKey`` method has some additional keyword arguments:
+The ``add_subkey`` method has some additional keyword arguments:
 
 * ``algorithm`` (defaulting to ``rsa``)
 * ``usage`` (defaulting to ``encrypt``)
 * ``expire`` (defaulting to ``-``)
 
 The parameters are explained with every possible value in `this GnuPG documentation <https://www.gnupg.org/documentation/manuals/gnupg/OpenPGP-Key-Management.html>`_ under ``quick-add-key``.
+
+.. versionadded:: 0.4.9
+   The ``add_subkey`` method was added.
+
 
 Performance Issues
 ^^^^^^^^^^^^^^^^^^
@@ -662,12 +666,18 @@ The ``delete_keys`` method has some additional keyword arguments:
   passphrase is to be passed to ``gpg`` via pinentry, you wouldn't pass it here - so
   specify ``expect_passphrase=False`` in that case. If you don't do that, and don't
   pass a passphrase, a ``ValueError`` will be raised.
+* ``exclamation_mode`` - defaults to ``False`` for backward compatibility. If the exclamation
+  mode is set, and a fingerprint of a subkey is passed only that subkey will be deleted. If the 
+  fingerprint is of a primary key the entire key will be deleted.
 
 .. versionadded:: 0.4.0
    The ``passphrase`` keyword argument was added.
 
 .. versionadded:: 0.4.2
    The ``expect_passphrase`` keyword argument was added.
+
+.. versionadded:: 0.4.9
+   The ``exclamation_mode`` keyword argument was added.
 
 
 .. index:: Key; searching
