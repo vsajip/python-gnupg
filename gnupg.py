@@ -723,6 +723,35 @@ class GenKey(object):
         else:  # pragma: no cover
             logger.debug('message ignored: %s, %s', key, value)
 
+class AddSubKey(object):
+    "Handle status messages for --quick-add-key"
+
+    returncode = None
+
+    def __init__(self, gpg):
+        self.gpg = gpg
+        self.type = None
+        self.fingerprint = None
+        self.status = None
+
+    def __nonzero__(self):
+        if self.fingerprint: return True
+        return False
+
+    __bool__ = __nonzero__
+
+    def __str__(self):
+        return self.fingerprint or ''
+
+    def handle_status(self, key, value):
+        if key in ('WARNING', 'ERROR'):  # pragma: no cover
+            logger.warning('potential problem: %s: %s', key, value)
+        elif key == 'KEY_CREATED':
+            (self.type,self.fingerprint) = value.split()
+            self.status = 'ok'
+        else:  # pragma: no cover
+            logger.debug('message ignored: %s, %s', key, value)
+
 class ExportResult(GenKey):
     """Handle status messages for --export[-secret-key].
 
@@ -824,6 +853,7 @@ class GPG(object):
         'crypt': Crypt,
         'delete': DeleteResult,
         'generate': GenKey,
+        'addSubKey': AddSubKey,
         'import': ImportResult,
         'send': SendResult,
         'list': ListKeys,
@@ -1545,6 +1575,32 @@ class GPG(object):
         # %pubring foo.pub
         # %secring foo.sec
         # %commit
+
+    def addSubKey(self, master_key, master_passphrase=None, 
+            algorithm="rsa", usage="encrypt", expire="-"):
+        """
+        Add subkeys to a masterkey
+        """
+
+        if not master_key:
+            raise ValueError('No master key fingerprint specified')
+
+        if master_passphrase and not self.is_valid_passphrase(master_passphrase):
+            raise ValueError('Invalid passphrase')
+
+        args = [
+            "--quick-add-key",
+            master_key,
+            algorithm,
+            usage,
+            str(expire)
+        ]
+
+        result = self.result_map['addSubKey'](self)
+
+        f = _make_binary_stream('', self.encoding)
+        self._handle_io(args, f, result, passphrase=master_passphrase, binary=True)
+        return result
 
     #
     # ENCRYPTION

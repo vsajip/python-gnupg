@@ -407,6 +407,30 @@ class GPGTestCase(unittest.TestCase):
             self.assertTrue('%s\n' %s in cmd)
         self.assertFalse('Key-Length: ' in cmd)
 
+    def test_add_subkey(self):
+        "Test that subkeys can be added"
+
+        master_key = self.generate_key("Charlie", "Clark", "gamma.com", passphrase="123")
+        self.assertEqual(0, master_key.returncode, "Non-zero return code")
+
+        result = self.gpg.addSubKey(master_key=master_key.fingerprint, master_passphrase="123", 
+            algorithm="dsa", usage="sign", expire=0)
+
+        self.assertEqual(result.returncode, 0)
+
+    def test_add_subkey_with_invalid_key_type(self):
+        "Test that subkey generation handles invalid key type"
+
+        master_key = self.generate_key("Charlie", "Clark", "gamma.com", passphrase="123")
+        self.assertEqual(0, master_key.returncode, "Non-zero return code")
+
+        result = self.gpg.addSubKey(master_key=master_key.fingerprint, master_passphrase="123", 
+            algorithm="INVALID", usage="sign", expire=0)
+
+        self.assertFalse(result.data, 'Null data result')
+        self.assertEqual(None, result.fingerprint, 'Null fingerprint result')
+        self.assertEqual(2, result.returncode, "Unexpected return code")
+
     def test_list_keys_after_generation(self):
         "Test that after key generation, the generated key is available"
         self.test_list_keys_initial()
@@ -1274,7 +1298,8 @@ TEST_GROUPS = {
                  'test_key_generation_with_escapes',
                  'test_key_generation_input',
                  'test_key_generation_with_colons',
-                 'test_search_keys', 'test_scan_keys', 'test_key_trust']),
+                 'test_search_keys', 'test_scan_keys', 'test_key_trust',
+                 'test_add_subkey', 'test_add_subkey_with_invalid_key_type']),
     'import' : set(['test_import_only', 'test_doctest_import_keys']),
     'basic' : set(['test_environment', 'test_list_keys_initial',
                    'test_nogpg', 'test_make_args',
