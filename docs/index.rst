@@ -340,6 +340,21 @@ need GnuPG >= 2.1 for this to work.
     single: Key; performance issues
     single: Entropy
 
+Generating subkeys
+^^^^^^^^^^^^^^^^^^
+To generate a subkey for an already generated key use the :meth:`addSubKey` method::
+
+    >>> subkey = gpg.addSubKey(master_key) # same as gpg.addSubKey(master_key, None)
+    >>> subkey = gpg.addSubKey(master_key, master_key_password)
+
+The ``addSubKey`` method has some additional keyword arguments:
+
+* ``algorithm`` (defaulting to ``rsa``)
+* ``usage`` (defaulting to ``encrypt``)
+* ``expire`` (defaulting to ``-``)
+
+The parameters are explained with every possible value in `this GnuPG documentation <https://www.gnupg.org/documentation/manuals/gnupg/OpenPGP-Key-Management.html>`_ under ``quick-add-key``.
+
 Performance Issues
 ^^^^^^^^^^^^^^^^^^
 
