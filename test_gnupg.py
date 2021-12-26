@@ -1020,7 +1020,7 @@ class GPGTestCase(unittest.TestCase):
         sig = self.gpg.sign_file(data_file, keyid=subkey.fingerprint,
                                  passphrase='123', detach=True,
                                  output=sig_file)
-        print(sig.status)
+
         self.assertEqual(0, sig.returncode, "Non-zero return code")
         data_file.close()
         self.assertTrue(sig, "File signing should succeed")

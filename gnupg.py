@@ -1316,7 +1316,7 @@ class GPG(object):
             fingerprints = [no_quote(fingerprints)]
 
         if exclamation_mode:
-            fingerprints = [f"{f}!" for f in fingerprints]
+            fingerprints = [f + "!" for f in fingerprints]
 
         args = ['--delete-%s' % which]
         if secret and self.version >= (2, 1):
