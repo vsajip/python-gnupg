@@ -723,6 +723,34 @@ class GenKey(object):
         else:  # pragma: no cover
             logger.debug('message ignored: %s, %s', key, value)
 
+class AddSubkey(object):
+    "Handle status messages for --quick-add-key"
+
+    returncode = None
+
+    def __init__(self, gpg):
+        self.gpg = gpg
+        self.type = None
+        self.fingerprint = ''
+        self.status = None
+
+    def __nonzero__(self):
+        return bool(self.fingerprint)
+
+    __bool__ = __nonzero__
+
+    def __str__(self):
+        return self.fingerprint
+
+    def handle_status(self, key, value):
+        if key in ('WARNING', 'ERROR'):  # pragma: no cover
+            logger.warning('potential problem: %s: %s', key, value)
+        elif key == 'KEY_CREATED':
+            (self.type,self.fingerprint) = value.split()
+            self.status = 'ok'
+        else:  # pragma: no cover
+            logger.debug('message ignored: %s, %s', key, value)
+
 class ExportResult(GenKey):
     """Handle status messages for --export[-secret-key].
 
@@ -824,6 +852,7 @@ class GPG(object):
         'crypt': Crypt,
         'delete': DeleteResult,
         'generate': GenKey,
+        'addSubkey': AddSubkey,
         'import': ImportResult,
         'send': SendResult,
         'list': ListKeys,
@@ -1263,7 +1292,7 @@ class GPG(object):
         return result
 
     def delete_keys(self, fingerprints, secret=False, passphrase=None,
-                    expect_passphrase=True):
+                    expect_passphrase=True, exclamation_mode=False):
         """
         Delete the indicated keys.
 
@@ -1285,6 +1314,10 @@ class GPG(object):
             fingerprints = [no_quote(s) for s in fingerprints]
         else:
             fingerprints = [no_quote(fingerprints)]
+
+        if exclamation_mode:
+            fingerprints = [f + "!" for f in fingerprints]
+
         args = ['--delete-%s' % which]
         if secret and self.version >= (2, 1):
             args.insert(0, '--yes')
@@ -1545,6 +1578,32 @@ class GPG(object):
         # %pubring foo.pub
         # %secring foo.sec
         # %commit
+
+    def add_subkey(self, master_key, master_passphrase=None, 
+            algorithm="rsa", usage="encrypt", expire="-"):
+        """
+        Add subkeys to a masterkey
+        """
+
+        if not master_key:
+            raise ValueError('No master key fingerprint specified')
+
+        if master_passphrase and not self.is_valid_passphrase(master_passphrase):
+            raise ValueError('Invalid passphrase')
+
+        args = [
+            "--quick-add-key",
+            master_key,
+            algorithm,
+            usage,
+            str(expire)
+        ]
+
+        result = self.result_map['addSubkey'](self)
+
+        f = _make_binary_stream('', self.encoding)
+        self._handle_io(args, f, result, passphrase=master_passphrase, binary=True)
+        return result
 
     #
     # ENCRYPTION
