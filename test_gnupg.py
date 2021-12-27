@@ -412,7 +412,8 @@ class GPGTestCase(unittest.TestCase):
 
     def test_add_subkey(self):
         "Test that subkeys can be added"
-
+        if self.gpg.version[0] < 2:
+            raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
         master_key = self.generate_key("Charlie", "Clark", "gamma.com",
             passphrase="123", with_subkey=False)
         self.assertEqual(0, master_key.returncode, "Non-zero return code")
@@ -423,7 +424,8 @@ class GPGTestCase(unittest.TestCase):
 
     def test_add_subkey_with_invalid_key_type(self):
         "Test that subkey generation handles invalid key type"
-
+        if self.gpg.version[0] < 2:
+            raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
         master_key = self.generate_key("Charlie", "Clark", "gamma.com",
             passphrase="123", with_subkey=False)
         self.assertEqual(0, master_key.returncode, "Non-zero return code")
@@ -437,6 +439,8 @@ class GPGTestCase(unittest.TestCase):
 
     def test_deletion_subkey(self):
         "Test that subkey deletion works"
+        if self.gpg.version[0] < 2:
+            raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
         master_key = self.generate_key("Charlie", "Clark", "gamma.com",
             passphrase="123", with_subkey=False)
         self.assertEqual(0, master_key.returncode, "Non-zero return code")
@@ -487,6 +491,8 @@ class GPGTestCase(unittest.TestCase):
 
     def test_list_subkey_after_generation(self):
         "Test that after subkey generation, the generated subkey is available"
+        if self.gpg.version[0] < 2:
+            raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
         self.test_list_keys_initial()
 
         master_key = self.generate_key("Charlie", "Clark", "gamma.com",
@@ -1007,6 +1013,8 @@ class GPGTestCase(unittest.TestCase):
 
     def test_subkey_signature_file(self):
         "Test that signing and verification works via the GPG output for subkeys"
+        if self.gpg.version[0] < 2:
+            raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
         master_key = self.generate_key("Charlie", "Clark", "gamma.com",
             passphrase="123", with_subkey=False)
         self.assertEqual(0, master_key.returncode, "Non-zero return code")

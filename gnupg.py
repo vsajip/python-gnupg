@@ -1584,7 +1584,8 @@ class GPG(object):
         """
         Add subkeys to a masterkey
         """
-
+        if self.version[0] < 2:
+            raise NotImplementedError('Not available in GnuPG 1.x')
         if not master_key:
             raise ValueError('No master key fingerprint specified')
 
