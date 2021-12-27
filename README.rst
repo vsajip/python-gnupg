@@ -73,6 +73,9 @@ Released: Not yet.
   is set to 'ok' if a key was successfully created, or 'key not created' if that
   was reported by gpg, or None in any other case.
 
+* Fixed #164: Provided the ability to add subkeys. Thanks to Daniel Kilimnik for the
+  feature request and patch.
+
 
 0.4.8
 -----

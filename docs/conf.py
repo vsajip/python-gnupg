@@ -40,7 +40,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Python Wrapper for GnuPG'
-copyright = u'2008-2020, Vinay Sajip'
+copyright = u'2008-%s, Vinay Sajip' %  datetime.date.today().year
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
