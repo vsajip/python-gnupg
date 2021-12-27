@@ -1579,7 +1579,7 @@ class GPG(object):
         # %secring foo.sec
         # %commit
 
-    def add_subkey(self, master_key, master_passphrase=None, 
+    def add_subkey(self, master_key, master_passphrase=None,
             algorithm="rsa", usage="encrypt", expire="-"):
         """
         Add subkeys to a masterkey
