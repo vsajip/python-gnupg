@@ -5,7 +5,6 @@ A test harness for gnupg.py.
 Copyright (C) 2008-2021 Vinay Sajip. All rights reserved.
 """
 import argparse
-import io
 import json
 import logging
 import os.path
@@ -29,8 +28,8 @@ except ImportError:
 
 import gnupg
 
-__author__ = "Vinay Sajip"
-__date__  = "$24-Nov-2021 09:14:09$"
+__author__ = 'Vinay Sajip'
+__date__ = '$24-Nov-2021 09:14:09$'
 
 ALL_TESTS = True
 
@@ -93,7 +92,7 @@ WdPQjKEfKnr+bW4yubwMUYKyAJ4uiE8Rv/oEED1oM3xeJqa+MJ9V1w==
 =sqld
 -----END PGP PUBLIC KEY BLOCK-----"""
 
-SIGNED_KEYS="""-----BEGIN PGP PUBLIC KEY BLOCK-----
+SIGNED_KEYS = """-----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v2
 
 mI0EVcnKUQEEAKWazmfM0kbvDdw7Kos2NARaX67c8iJ3GOBimUvYLj4VR3Mqrm34
@@ -173,10 +172,13 @@ tO8f06R3yfjxLRD8y89frVP3+tGMvt2yGOd5TT0zht5yYcG6QkiHlfdgXqeE8nsU
 -----END PGP PRIVATE KEY BLOCK-----
 """
 
+
 def is_list_with_len(o, n):
     return isinstance(o, list) and len(o) == n
 
+
 BASE64_PATTERN = re.compile(r'^(?:[A-Z0-9+/]{4})*(?:[A-Z0-9+/]{2}==|[A-Z0-9+/]{3}=)?$', re.I)
+
 
 def get_key_data(s):
     lines = s.split('\n')
@@ -187,11 +189,13 @@ def get_key_data(s):
             result += line
     return result
 
+
 def compare_keys(k1, k2):
     "Compare ASCII keys"
     # See issue #57: we need to compare only the actual key data,
     # ignoring things like spurious blank lines
     return get_key_data(k1) != get_key_data(k2)
+
 
 AGENT_CONFIG = '''allow-loopback-pinentry
 log-file socket:///tmp/S.my-gnupg-log
@@ -228,7 +232,7 @@ class GPGTestCase(unittest.TestCase):
             hd = os.path.join(os.getcwd(), 'keys')
             if os.path.exists(hd):
                 self.assertTrue(os.path.isdir(hd),
-                                "Not a directory: %s" % hd)
+                                'Not a directory: %s' % hd)
                 shutil.rmtree(hd, ignore_errors=True)
         prepare_homedir(hd)
         self.homedir = hd
@@ -255,17 +259,17 @@ class GPGTestCase(unittest.TestCase):
         "Test the environment by ensuring that setup worked"
         hd = self.homedir
         self.assertTrue(os.path.exists(hd) and os.path.isdir(hd),
-                        "Not an existing directory: %s" % hd)
+                        'Not an existing directory: %s' % hd)
 
     def test_list_keys_initial(self):
         "Test that initially there are no keys"
         public_keys = self.gpg.list_keys()
-        self.assertEqual(0, public_keys.returncode, "Non-zero return code")
+        self.assertEqual(0, public_keys.returncode, 'Non-zero return code')
         self.assertTrue(is_list_with_len(public_keys, 0),
-                        "Empty list expected")
+                        'Empty list expected')
         private_keys = self.gpg.list_keys(secret=True)
         self.assertTrue(is_list_with_len(private_keys, 0),
-                        "Empty list expected")
+                        'Empty list expected')
 
     def generate_key(self, first_name, last_name, domain, passphrase=None, with_subkey=True):
         "Generate a key"
@@ -279,25 +283,24 @@ class GPGTestCase(unittest.TestCase):
             params['Subkey-Type'] = 'ELG-E'
             params['Subkey-Length'] = 2048
 
-
         options = self.gpg.options or []
         if '--debug-quick-random' in options or '--quick-random' in options:
             # If using the fake RNG, a key isn't regarded as valid
             # unless its comment has the text (insecure!) in it.
             params['Name-Comment'] = 'A test user (insecure!)'
         params['Name-Real'] = '%s %s' % (first_name, last_name)
-        params['Name-Email'] = ("%s.%s@%s" % (first_name, last_name,
+        params['Name-Email'] = ('%s.%s@%s' % (first_name, last_name,
                                               domain)).lower()
         if passphrase is None:
-            passphrase = ("%s%s" % (first_name[0], last_name)).lower()
+            passphrase = ('%s%s' % (first_name[0], last_name)).lower()
         params['Passphrase'] = passphrase
         cmd = self.gpg.gen_key_input(**params)
         return self.gpg.gen_key(cmd)
 
     def do_key_generation(self):
         "Test that key generation succeeds"
-        result = self.generate_key("Barbara", "Brown", "beta.com")
-        self.assertNotEqual(None, result, "Non-null result")
+        result = self.generate_key('Barbara', 'Brown', 'beta.com')
+        self.assertNotEqual(None, result, 'Non-null result')
         return result
 
     def test_key_generation_with_invalid_key_type(self):
@@ -315,8 +318,8 @@ class GPGTestCase(unittest.TestCase):
         cmd = self.gpg.gen_key_input(**params)
         result = self.gpg.gen_key(cmd)
         self.assertFalse(result.data, 'Null data result')
-        self.assertEqual(None, result.fingerprint, 'Null fingerprint result')
-        self.assertEqual(2, result.returncode, "Unexpected return code")
+        self.assertFalse(result.fingerprint, 'Null fingerprint result')
+        self.assertEqual(2, result.returncode, 'Unexpected return code')
 
     def test_key_generation_with_colons(self):
         "Test that key generation handles colons in key fields"
@@ -330,9 +333,9 @@ class GPGTestCase(unittest.TestCase):
             params['passphrase'] = 'foo'
         cmd = self.gpg.gen_key_input(**params)
         result = self.gpg.gen_key(cmd)
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         keys = self.gpg.list_keys()
-        self.assertEqual(0, keys.returncode, "Non-zero return code")
+        self.assertEqual(0, keys.returncode, 'Non-zero return code')
         self.assertEqual(len(keys), 1)
         key = keys[0]
         uids = key['uids']
@@ -352,9 +355,9 @@ class GPGTestCase(unittest.TestCase):
             params['passphrase'] = 'foo'
         cmd = self.gpg.gen_key_input(**params)
         result = self.gpg.gen_key(cmd)
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         keys = self.gpg.list_keys()
-        self.assertEqual(0, keys.returncode, "Non-zero return code")
+        self.assertEqual(0, keys.returncode, 'Non-zero return code')
         self.assertEqual(len(keys), 1)
         key = keys[0]
         uids = key['uids']
@@ -407,47 +410,50 @@ class GPGTestCase(unittest.TestCase):
         cmd = self.gpg.gen_key_input(**params)
         for s in ('Key-Type: ECDSA', 'Key-Curve: nistp384', 'Subkey-Type: ECDH',
                   'Subkey-Curve: nistp384', 'Name-Comment: NIST P-384'):
-            self.assertTrue('%s\n' %s in cmd)
+            self.assertTrue('%s\n' % s in cmd)
         self.assertFalse('Key-Length: ' in cmd)
 
     def test_add_subkey(self):
         "Test that subkeys can be added"
         if self.gpg.version[0] < 2:
             raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
-        master_key = self.generate_key("Charlie", "Clark", "gamma.com",
-            passphrase="123", with_subkey=False)
-        self.assertEqual(0, master_key.returncode, "Non-zero return code")
+        master_key = self.generate_key('Charlie', 'Clark', 'gamma.com',
+                                       passphrase='123', with_subkey=False)
+        self.assertEqual(0, master_key.returncode, 'Non-zero return code')
 
-        result = self.gpg.add_subkey(master_key=master_key.fingerprint, master_passphrase="123",
-            algorithm="dsa", usage="sign", expire=0)
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        result = self.gpg.add_subkey(master_key=master_key.fingerprint,
+                                     master_passphrase='123',
+                                     algorithm='dsa', usage='sign', expire=0)
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
 
     def test_add_subkey_with_invalid_key_type(self):
         "Test that subkey generation handles invalid key type"
         if self.gpg.version[0] < 2:
             raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
-        master_key = self.generate_key("Charlie", "Clark", "gamma.com",
-            passphrase="123", with_subkey=False)
-        self.assertEqual(0, master_key.returncode, "Non-zero return code")
+        master_key = self.generate_key('Charlie', 'Clark', 'gamma.com',
+                                       passphrase='123', with_subkey=False)
+        self.assertEqual(0, master_key.returncode, 'Non-zero return code')
 
-        result = self.gpg.add_subkey(master_key=master_key.fingerprint, master_passphrase="123",
-            algorithm="INVALID", usage="sign", expire=0)
+        result = self.gpg.add_subkey(master_key=master_key.fingerprint,
+                                     master_passphrase='123',
+                                     algorithm='INVALID', usage='sign', expire=0)
 
         self.assertFalse(result.data, 'Null data result')
         self.assertEqual('', result.fingerprint, 'Empty fingerprint result')
-        self.assertEqual(2, result.returncode, "Unexpected return code")
+        self.assertEqual(2, result.returncode, 'Unexpected return code')
 
     def test_deletion_subkey(self):
         "Test that subkey deletion works"
         if self.gpg.version[0] < 2:
             raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
-        master_key = self.generate_key("Charlie", "Clark", "gamma.com",
-            passphrase="123", with_subkey=False)
-        self.assertEqual(0, master_key.returncode, "Non-zero return code")
+        master_key = self.generate_key('Charlie', 'Clark', 'gamma.com',
+                                       passphrase='123', with_subkey=False)
+        self.assertEqual(0, master_key.returncode, 'Non-zero return code')
 
-        subkey = self.gpg.add_subkey(master_key=master_key.fingerprint, master_passphrase="123",
-            algorithm="dsa", usage="sign", expire=0)
-        self.assertEqual(0, subkey.returncode, "Non-zero return code")
+        subkey = self.gpg.add_subkey(master_key=master_key.fingerprint,
+                                     master_passphrase='123',
+                                     algorithm='dsa', usage='sign', expire=0)
+        self.assertEqual(0, subkey.returncode, 'Non-zero return code')
 
         public_keys = self.gpg.list_keys()
         key_info = public_keys[0]
@@ -455,21 +461,16 @@ class GPGTestCase(unittest.TestCase):
         private_keys = self.gpg.list_keys(secret=True)
         secret_key_info = private_keys[0]
 
+        self.assertEqual(0, public_keys.returncode, 'Non-zero return code')
+        self.assertTrue(is_list_with_len(public_keys, 1), '1-element list expected')
+        self.assertEqual(len(key_info['subkeys']), 1, '1-element list expected')
 
-        self.assertEqual(0, public_keys.returncode, "Non-zero return code")
-        self.assertTrue(is_list_with_len(public_keys, 1),
-                        "1-element list expected")
-        self.assertEqual(len(key_info['subkeys']), 1,
-                        "1-element list expected")
-
-        self.assertTrue(is_list_with_len(private_keys, 1),
-                        "1-element list expected")
-        self.assertEqual(len(secret_key_info['subkeys']), 1,
-                        "1-element list expected")
+        self.assertTrue(is_list_with_len(private_keys, 1), '1-element list expected')
+        self.assertEqual(len(secret_key_info['subkeys']), 1, '1-element list expected')
         result = self.gpg.delete_keys(subkey.fingerprint, secret=True,
-            passphrase="123", exclamation_mode=True)
+                                      passphrase='123', exclamation_mode=True)
         result = self.gpg.delete_keys(subkey.fingerprint, exclamation_mode=True)
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
 
         public_keys = self.gpg.list_keys()
         key_info = public_keys[0]
@@ -477,17 +478,13 @@ class GPGTestCase(unittest.TestCase):
         private_keys = self.gpg.list_keys(secret=True)
         secret_key_info = private_keys[0]
 
-        self.assertEqual(0, public_keys.returncode, "Non-zero return code")
-        self.assertTrue(is_list_with_len(public_keys, 1),
-                        "1-element list expected")
-        self.assertEqual(len(key_info['subkeys']), 0,
-                        "0-element list expected")
+        self.assertEqual(0, public_keys.returncode, 'Non-zero return code')
+        self.assertTrue(is_list_with_len(public_keys, 1), '1-element list expected')
+        self.assertEqual(len(key_info['subkeys']), 0, '0-element list expected')
 
         self.assertTrue(is_list_with_len(private_keys, 1),
-                        "1-element list expected")
-        self.assertEqual(len(secret_key_info['subkeys']), 0,
-                        "1-element list expected")
-
+                        '1-element list expected')
+        self.assertEqual(len(secret_key_info['subkeys']), 0, '1-element list expected')
 
     def test_list_subkey_after_generation(self):
         "Test that after subkey generation, the generated subkey is available"
@@ -495,22 +492,25 @@ class GPGTestCase(unittest.TestCase):
             raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
         self.test_list_keys_initial()
 
-        master_key = self.generate_key("Charlie", "Clark", "gamma.com",
-            passphrase="123", with_subkey=False)
-        self.assertEqual(0, master_key.returncode, "Non-zero return code")
+        master_key = self.generate_key('Charlie', 'Clark', 'gamma.com',
+                                       passphrase='123', with_subkey=False)
+        self.assertEqual(0, master_key.returncode, 'Non-zero return code')
 
-        subkey_sign = self.gpg.add_subkey(master_key=master_key.fingerprint, master_passphrase="123",
-            algorithm="dsa", usage="sign", expire=0)
-        self.assertEqual(0, subkey_sign.returncode, "Non-zero return code")
+        subkey_sign = self.gpg.add_subkey(master_key=master_key.fingerprint,
+                                          master_passphrase='123',
+                                          algorithm='dsa', usage='sign', expire=0)
+        self.assertEqual(0, subkey_sign.returncode, 'Non-zero return code')
 
-        subkey_encrypt = self.gpg.add_subkey(master_key=master_key.fingerprint, master_passphrase="123",
-            algorithm="rsa", usage="encrypt", expire=0)
-        self.assertEqual(0, subkey_encrypt.returncode, "Non-zero return code")
+        subkey_encrypt = self.gpg.add_subkey(master_key=master_key.fingerprint,
+                                             master_passphrase='123',
+                                             algorithm='rsa', usage='encrypt',
+                                             expire=0)
+        self.assertEqual(0, subkey_encrypt.returncode, 'Non-zero return code')
 
         public_keys = self.gpg.list_keys()
-        self.assertEqual(0, public_keys.returncode, "Non-zero return code")
+        self.assertEqual(0, public_keys.returncode, 'Non-zero return code')
         self.assertTrue(is_list_with_len(public_keys, 1),
-                        "1-element list expected")
+                        '1-element list expected')
         key_info = public_keys[0]
         fp = key_info['fingerprint']
         self.assertTrue(fp in public_keys.key_map)
@@ -519,10 +519,10 @@ class GPGTestCase(unittest.TestCase):
         self.assertTrue('subkey_info' in key_info)
         skinfo = key_info['subkey_info']
         self.assertEqual(len(skinfo), 2)
-        self.assertEqual(key_info['subkeys'][0][1], "s")
+        self.assertEqual(key_info['subkeys'][0][1], 's')
         self.assertEqual(key_info['subkeys'][0][2], subkey_sign.fingerprint)
 
-        self.assertEqual(key_info['subkeys'][1][1], "e")
+        self.assertEqual(key_info['subkeys'][1][1], 'e')
         self.assertEqual(key_info['subkeys'][1][2], subkey_encrypt.fingerprint)
         for skid, _, sfp in key_info['subkeys']:
             self.assertTrue(skid in skinfo)
@@ -537,9 +537,9 @@ class GPGTestCase(unittest.TestCase):
         self.test_list_keys_initial()
         self.do_key_generation()
         public_keys = self.gpg.list_keys()
-        self.assertEqual(0, public_keys.returncode, "Non-zero return code")
+        self.assertEqual(0, public_keys.returncode, 'Non-zero return code')
         self.assertTrue(is_list_with_len(public_keys, 1),
-                        "1-element list expected")
+                        '1-element list expected')
         key_info = public_keys[0]
         fp = key_info['fingerprint']
         self.assertTrue(fp in public_keys.key_map)
@@ -556,9 +556,9 @@ class GPGTestCase(unittest.TestCase):
 
         # now test with sigs=True
         public_keys_sigs = self.gpg.list_keys(sigs=True)
-        self.assertEqual(0, public_keys_sigs.returncode, "Non-zero return code")
+        self.assertEqual(0, public_keys_sigs.returncode, 'Non-zero return code')
         self.assertTrue(is_list_with_len(public_keys_sigs, 1),
-                        "1-element list expected")
+                        '1-element list expected')
         key_info = public_keys_sigs[0]
         fp = key_info['fingerprint']
         self.assertTrue(fp in public_keys_sigs.key_map)
@@ -577,9 +577,9 @@ class GPGTestCase(unittest.TestCase):
             self.assertTrue(public_keys_sigs.key_map[sfp] is key_info)
 
         private_keys = self.gpg.list_keys(secret=True)
-        self.assertEqual(0, private_keys.returncode, "Non-zero return code")
+        self.assertEqual(0, private_keys.returncode, 'Non-zero return code')
         self.assertTrue(is_list_with_len(private_keys, 1),
-                        "1-element list expected")
+                        '1-element list expected')
         self.assertEqual(len(private_keys.fingerprints), 1)
         key_info = private_keys[0]
         self.assertTrue('subkey_info' in key_info)
@@ -607,10 +607,10 @@ class GPGTestCase(unittest.TestCase):
                         keyring=pkn, secret_keyring=skn)
         logger.debug('Using keyring and secret_keyring arguments')
         public_keys_2 = gpg.list_keys()
-        self.assertEqual(0, public_keys_2.returncode, "Non-zero return code")
+        self.assertEqual(0, public_keys_2.returncode, 'Non-zero return code')
         self.assertEqual(public_keys_2, public_keys)
         private_keys_2 = gpg.list_keys(secret=True)
-        self.assertEqual(0, private_keys_2.returncode, "Non-zero return code")
+        self.assertEqual(0, private_keys_2.returncode, 'Non-zero return code')
         self.assertEqual(private_keys_2, private_keys)
 
         # generate additional keys so that we can test listing a subset of
@@ -623,14 +623,14 @@ class GPGTestCase(unittest.TestCase):
                     result.add(uid)
             return result
 
-        result = self.generate_key("Charlie", "Clark", "gamma.com")
-        self.assertNotEqual(None, result, "Non-null result")
-        self.assertEqual(0, result.returncode, "Non-zero return code")
-        result = self.generate_key("Donna", "Davis", "delta.com")
-        self.assertNotEqual(None, result, "Non-null result")
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        result = self.generate_key('Charlie', 'Clark', 'gamma.com')
+        self.assertNotEqual(None, result, 'Non-null result')
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
+        result = self.generate_key('Donna', 'Davis', 'delta.com')
+        self.assertNotEqual(None, result, 'Non-null result')
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         public_keys = gpg.list_keys()
-        self.assertEqual(0, public_keys.returncode, "Non-zero return code")
+        self.assertEqual(0, public_keys.returncode, 'Non-zero return code')
         self.assertEqual(len(public_keys), 3)
         actual = get_names(public_keys.key_map)
         expected = set(['Barbara Brown <barbara.brown@beta.com>',
@@ -639,13 +639,13 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(actual, expected)
         # specify a single key as a string
         public_keys = gpg.list_keys(keys='Donna Davis')
-        self.assertEqual(0, public_keys.returncode, "Non-zero return code")
+        self.assertEqual(0, public_keys.returncode, 'Non-zero return code')
         actual = get_names(public_keys.key_map)
         expected = set(['Donna Davis <donna.davis@delta.com>'])
         self.assertEqual(actual, expected)
         # specify multiple keys
         public_keys = gpg.list_keys(keys=['Donna', 'Barbara'])
-        self.assertEqual(0, public_keys.returncode, "Non-zero return code")
+        self.assertEqual(0, public_keys.returncode, 'Non-zero return code')
         actual = get_names(public_keys.key_map)
         expected = set(['Barbara Brown <barbara.brown@beta.com>',
                         'Donna Davis <donna.davis@delta.com>'])
@@ -655,9 +655,9 @@ class GPGTestCase(unittest.TestCase):
         "Test that trusting keys works"
         gpg = self.gpg
         result = gpg.import_keys(KEYS_TO_IMPORT)
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         keys = gpg.list_keys()
-        self.assertEqual(0, keys.returncode, "Non-zero return code")
+        self.assertEqual(0, keys.returncode, 'Non-zero return code')
         fingerprints = []
         for key in keys:
             self.assertEqual(key['ownertrust'], '-')
@@ -678,21 +678,21 @@ class GPGTestCase(unittest.TestCase):
         self.assertRaises(ValueError, gpg.trust_keys, 'NO_SUCH_FINGERPRINT', 'TRUST_NEVER')
         # gpg should raise an error for the following - but it doesn't!
         # self.assertRaises(ValueError, gpg.trust_keys,
-                         # 'BADF00DBADF00DBADF00DBADF00DBADF00DBADF0',
-                         # 'TRUST_NEVER')
+        #                   'BADF00DBADF00DBADF00DBADF00DBADF00DBADF0',
+        #                   'TRUST_NEVER')
 
     def test_list_signatures(self):
         imported = self.gpg.import_keys(SIGNED_KEYS)
-        self.assertEqual(0, imported.returncode, "Non-zero return code")
-        keys = self.gpg.list_keys(keys=["18897CA2"])
-        self.assertEqual(0, keys.returncode, "Non-zero return code")
-        self.assertTrue(is_list_with_len(keys, 1), "importing test signed key")
-        sigs = self.gpg.list_keys(keys=["18897CA2"], sigs=True)[0]['sigs']
-        logger.debug("testing self-signature")
+        self.assertEqual(0, imported.returncode, 'Non-zero return code')
+        keys = self.gpg.list_keys(keys=['18897CA2'])
+        self.assertEqual(0, keys.returncode, 'Non-zero return code')
+        self.assertTrue(is_list_with_len(keys, 1), 'importing test signed key')
+        sigs = self.gpg.list_keys(keys=['18897CA2'], sigs=True)[0]['sigs']
+        logger.debug('testing self-signature')
         self.assertTrue(('BC6F350FB3D04076', 'Joshua Calvert (A test user) <jc@example.com>', '13x') in sigs)
-        logger.debug("testing subkey self-signature")
+        logger.debug('testing subkey self-signature')
         self.assertTrue(('BC6F350FB3D04076', 'Joshua Calvert (A test user) <jc@example.com>', '18x') in sigs)
-        logger.debug("testing other signature")
+        logger.debug('testing other signature')
         self.assertTrue(('057CCF658C074FDA', 'Winston Smith (A test user) <winston@example.com>', '10x') in sigs)
 
     def test_scan_keys(self):
@@ -707,7 +707,7 @@ class GPGTestCase(unittest.TestCase):
             for fn in ('test_pubring.gpg', 'test_secring.gpg'):
                 logger.debug('scanning keys in %s', fn)
                 data = self.gpg.scan_keys(fn)
-                self.assertEqual(0, data.returncode, "Non-zero return code")
+                self.assertEqual(0, data.returncode, 'Non-zero return code')
                 uids = set()
                 for d in data:
                     uids.add(d['uids'][0])
@@ -715,12 +715,12 @@ class GPGTestCase(unittest.TestCase):
 
     def test_encryption_and_decryption(self):
         "Test that encryption and decryption works"
-        key = self.generate_key("Andrew", "Able", "alpha.com",
-                                passphrase="andy")
-        self.assertEqual(0, key.returncode, "Non-zero return code")
+        key = self.generate_key('Andrew', 'Able', 'alpha.com',
+                                passphrase='andy')
+        self.assertEqual(0, key.returncode, 'Non-zero return code')
         andrew = key.fingerprint
-        key = self.generate_key("Barbara", "Brown", "beta.com")
-        self.assertEqual(0, key.returncode, "Non-zero return code")
+        key = self.generate_key('Barbara', 'Brown', 'beta.com')
+        self.assertEqual(0, key.returncode, 'Non-zero return code')
         barbara = key.fingerprint
         gpg = self.gpg
         if gnupg._py3k:
@@ -729,29 +729,29 @@ class GPGTestCase(unittest.TestCase):
             data = unicode('Hello, André', gpg.encoding)
         data = data.encode(gpg.encoding)
         result = gpg.encrypt(data, barbara)
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         edata = str(result)
-        self.assertNotEqual(data, edata, "Data must have changed")
-        self.assertRaises(ValueError, gpg.decrypt, edata, passphrase="bbr\x00own")
-        self.assertRaises(ValueError, gpg.decrypt, edata, passphrase="bbr\rown")
-        self.assertRaises(ValueError, gpg.decrypt, edata, passphrase="bbr\nown")
-        ddata = gpg.decrypt(edata, passphrase="bbrown")
-        self.assertEqual(0, ddata.returncode, "Non-zero return code")
+        self.assertNotEqual(data, edata, 'Data must have changed')
+        self.assertRaises(ValueError, gpg.decrypt, edata, passphrase='bbr\x00own')
+        self.assertRaises(ValueError, gpg.decrypt, edata, passphrase='bbr\rown')
+        self.assertRaises(ValueError, gpg.decrypt, edata, passphrase='bbr\nown')
+        ddata = gpg.decrypt(edata, passphrase='bbrown')
+        self.assertEqual(0, ddata.returncode, 'Non-zero return code')
         if data != ddata.data:  # pragma: no cover
-            logger.debug("was: %r", data)
-            logger.debug("new: %r", ddata.data)
-        self.assertEqual(data, ddata.data, "Round-trip must work")
+            logger.debug('was: %r', data)
+            logger.debug('new: %r', ddata.data)
+        self.assertEqual(data, ddata.data, 'Round-trip must work')
         result = gpg.encrypt(data, [andrew, barbara])
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         edata = str(result)
-        self.assertNotEqual(data, edata, "Data must have changed")
-        ddata = gpg.decrypt(edata, passphrase="andy")
-        self.assertEqual(0, ddata.returncode, "Non-zero return code")
-        self.assertEqual(data, ddata.data, "Round-trip must work")
-        ddata = gpg.decrypt(edata, passphrase="bbrown")
-        self.assertEqual(data, ddata.data, "Round-trip must work")
+        self.assertNotEqual(data, edata, 'Data must have changed')
+        ddata = gpg.decrypt(edata, passphrase='andy')
+        self.assertEqual(0, ddata.returncode, 'Non-zero return code')
+        self.assertEqual(data, ddata.data, 'Round-trip must work')
+        ddata = gpg.decrypt(edata, passphrase='bbrown')
+        self.assertEqual(data, ddata.data, 'Round-trip must work')
         # Test symmetric encryption
-        data = "chippy was here"
+        data = 'chippy was here'
         self.assertRaises(ValueError, gpg.encrypt, data, None,
                           passphrase='bbr\x00own', symmetric=True)
         self.assertRaises(ValueError, gpg.encrypt, data, None,
@@ -759,23 +759,23 @@ class GPGTestCase(unittest.TestCase):
         self.assertRaises(ValueError, gpg.encrypt, data, None,
                           passphrase='bbr\nown', symmetric=True)
         result = gpg.encrypt(data, None, passphrase='bbrown', symmetric=True)
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         edata = str(result)
         ddata = gpg.decrypt(edata, passphrase='bbrown')
-        self.assertEqual(0, ddata.returncode, "Non-zero return code")
+        self.assertEqual(0, ddata.returncode, 'Non-zero return code')
         self.assertEqual(data, str(ddata))
         # Test symmetric encryption with non-default cipher
         result = gpg.encrypt(data, None, passphrase='bbrown', symmetric='AES256')
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         edata = str(result)
         ddata = gpg.decrypt(edata, passphrase='bbrown')
-        self.assertEqual(0, ddata.returncode, "Non-zero return code")
+        self.assertEqual(0, ddata.returncode, 'Non-zero return code')
         self.assertEqual(data, str(ddata))
         # Test that you can't encrypt with no recipients
         self.assertRaises(ValueError, self.gpg.encrypt, data, [])
         # Test extra_args parameter
         result = gpg.encrypt(data, barbara, extra_args=['-z', '0'])
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         edata = str(result)
         ddata = gpg.decrypt(edata, passphrase='bbrown')
         self.assertEqual(data.encode('ascii'), ddata.data, 'Round-trip must work')
@@ -788,14 +788,14 @@ class GPGTestCase(unittest.TestCase):
 
         gpg.on_data = collector
         result = gpg.encrypt(data, barbara)
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         edata = str(result)
         self.assertTrue(chunks)
         expected = type(chunks[0])().join(chunks)
         self.assertEqual(expected.decode('ascii'), edata)
         chunks = []
         ddata = gpg.decrypt(edata, passphrase='bbrown')
-        self.assertEqual(0, ddata.returncode, "Non-zero return code")
+        self.assertEqual(0, ddata.returncode, 'Non-zero return code')
         self.assertEqual(data.encode('ascii'), ddata.data, 'Round-trip must work')
         expected = type(chunks[0])().join(chunks)
         self.assertEqual(expected.decode('ascii'), data)
@@ -804,11 +804,11 @@ class GPGTestCase(unittest.TestCase):
         logger.debug('encrypting with signature')
         gpg.on_data = None
         result = gpg.encrypt(data, barbara, sign=andrew, passphrase='andy')
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         edata = str(result)
         logger.debug('decrypting with verification')
         ddata = gpg.decrypt(edata, passphrase='bbrown')
-        self.assertEqual(0, ddata.returncode, "Non-zero return code")
+        self.assertEqual(0, ddata.returncode, 'Non-zero return code')
         self.assertEqual(data.encode('ascii'), ddata.data, 'Round-trip must work')
         sig_values = list(ddata.sig_info.values())
         self.assertTrue(sig_values)
@@ -821,26 +821,26 @@ class GPGTestCase(unittest.TestCase):
         self.test_list_keys_initial()
         gpg = self.gpg
         result = gpg.import_keys(KEYS_TO_IMPORT)
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         self.assertEqual(result.summary(), '2 imported')
         public_keys = gpg.list_keys()
-        self.assertEqual(0, public_keys.returncode, "Non-zero return code")
+        self.assertEqual(0, public_keys.returncode, 'Non-zero return code')
         self.assertTrue(is_list_with_len(public_keys, 2),
-                        "2-element list expected")
+                        '2-element list expected')
         private_keys = gpg.list_keys(secret=True)
-        self.assertEqual(0, private_keys.returncode, "Non-zero return code")
+        self.assertEqual(0, private_keys.returncode, 'Non-zero return code')
         self.assertTrue(is_list_with_len(private_keys, 0),
-                        "Empty list expected")
+                        'Empty list expected')
         ascii = gpg.export_keys([k['keyid'] for k in public_keys])
-        self.assertTrue(ascii.find("PGP PUBLIC KEY BLOCK") >= 0,
-                        "Exported key should be public")
-        ascii = ascii.replace("\r", "").strip()
+        self.assertTrue(ascii.find('PGP PUBLIC KEY BLOCK') >= 0,
+                        'Exported key should be public')
+        ascii = ascii.replace('\r', '').strip()
         match = compare_keys(ascii, KEYS_TO_IMPORT)
         if match:  # pragma: no cover
-            logger.debug("was: %r", KEYS_TO_IMPORT)
-            logger.debug("now: %r", ascii)
-        self.assertEqual(0, match, "Keys must match")
-        #Generate a key so we can test exporting private keys
+            logger.debug('was: %r', KEYS_TO_IMPORT)
+            logger.debug('now: %r', ascii)
+        self.assertEqual(0, match, 'Keys must match')
+        # Generate a key so we can test exporting private keys
         key = self.do_key_generation()
         if self.gpg.version < (2, 1):
             passphrase = None
@@ -848,15 +848,15 @@ class GPGTestCase(unittest.TestCase):
             passphrase = 'bbrown'
         ascii = gpg.export_keys(key.fingerprint, True, passphrase=passphrase)
         self.assertTrue(isinstance(ascii, gnupg.text_type))
-        self.assertTrue(ascii.find("PGP PRIVATE KEY BLOCK") >= 0,
-                        "Exported key should be private")
+        self.assertTrue(ascii.find('PGP PRIVATE KEY BLOCK') >= 0,
+                        'Exported key should be private')
         binary = gpg.export_keys(key.fingerprint, True, armor=False,
                                  passphrase=passphrase)
         self.assertFalse(isinstance(binary, gnupg.text_type))
         # import a secret key, and confirm that it's found in the list of
         # secret keys.
         result = gpg.import_keys(SECRET_KEY)
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         self.assertEqual(result.summary(), '1 imported')
         private_keys = gpg.list_keys(secret=True)
         self.assertTrue(is_list_with_len(private_keys, 2))
@@ -872,41 +872,41 @@ class GPGTestCase(unittest.TestCase):
         "Test that key import works"
         self.test_list_keys_initial()
         result = self.gpg.import_keys(KEYS_TO_IMPORT)
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         public_keys = self.gpg.list_keys()
-        self.assertEqual(0, public_keys.returncode, "Non-zero return code")
+        self.assertEqual(0, public_keys.returncode, 'Non-zero return code')
         self.assertTrue(is_list_with_len(public_keys, 2),
-                        "2-element list expected")
+                        '2-element list expected')
         private_keys = self.gpg.list_keys(secret=True)
-        self.assertEqual(0, private_keys.returncode, "Non-zero return code")
+        self.assertEqual(0, private_keys.returncode, 'Non-zero return code')
         self.assertTrue(is_list_with_len(private_keys, 0),
-                        "Empty list expected")
+                        'Empty list expected')
         ascii = self.gpg.export_keys([k['keyid'] for k in public_keys])
-        self.assertTrue(ascii.find("PGP PUBLIC KEY BLOCK") >= 0,
-                        "Exported key should be public")
-        ascii = ascii.replace("\r", "").strip()
+        self.assertTrue(ascii.find('PGP PUBLIC KEY BLOCK') >= 0,
+                        'Exported key should be public')
+        ascii = ascii.replace('\r', '').strip()
         match = compare_keys(ascii, KEYS_TO_IMPORT)
         if match:  # pragma: no cover
-            logger.debug("was: %r", KEYS_TO_IMPORT)
-            logger.debug("now: %r", ascii)
-        self.assertEqual(0, match, "Keys must match")
+            logger.debug('was: %r', KEYS_TO_IMPORT)
+            logger.debug('now: %r', ascii)
+        self.assertEqual(0, match, 'Keys must match')
 
     def test_signature_verification(self):
         "Test that signing and verification works"
-        key = self.generate_key("Andrew", "Able", "alpha.com")
+        key = self.generate_key('Andrew', 'Able', 'alpha.com')
         if gnupg._py3k:
             data = 'Hello, André!'
         else:
             data = unicode('Hello, André', self.gpg.encoding)
         data = data.encode(self.gpg.encoding)
-        self.assertRaises(ValueError, self.gpg.sign, data, keyid=key.fingerprint, passphrase="bbr\x00own")
-        self.assertRaises(ValueError, self.gpg.sign, data, keyid=key.fingerprint, passphrase="bbr\rown")
-        self.assertRaises(ValueError, self.gpg.sign, data, keyid=key.fingerprint, passphrase="bbr\nown")
+        self.assertRaises(ValueError, self.gpg.sign, data, keyid=key.fingerprint, passphrase='bbr\x00own')
+        self.assertRaises(ValueError, self.gpg.sign, data, keyid=key.fingerprint, passphrase='bbr\rown')
+        self.assertRaises(ValueError, self.gpg.sign, data, keyid=key.fingerprint, passphrase='bbr\nown')
         sig = self.gpg.sign(data, keyid=key.fingerprint, passphrase='bbrown')
-        self.assertFalse(sig, "Bad passphrase should fail")
+        self.assertFalse(sig, 'Bad passphrase should fail')
         sig = self.gpg.sign(data, keyid=key.fingerprint, passphrase='aable')
-        self.assertEqual(0, sig.returncode, "Non-zero return code")
-        self.assertTrue(sig, "Good passphrase should succeed")
+        self.assertEqual(0, sig.returncode, 'Non-zero return code')
+        self.assertTrue(sig, 'Good passphrase should succeed')
         if sig.username:  # not set in recent versions of GnuPG e.g. 2.2.5
             self.assertTrue(sig.username.startswith('Andrew Able'))
         if sig.key_id:
@@ -914,21 +914,21 @@ class GPGTestCase(unittest.TestCase):
         self.assertTrue(sig.hash_algo)
         logger.debug('verification start')
         verified = self.gpg.verify(sig.data)
-        self.assertEqual(0, verified.returncode, "Non-zero return code")
+        self.assertEqual(0, verified.returncode, 'Non-zero return code')
         logger.debug('verification end')
         if key.fingerprint != verified.fingerprint:  # pragma: no cover
-            logger.debug("key: %r", key.fingerprint)
-            logger.debug("ver: %r", verified.fingerprint)
+            logger.debug('key: %r', key.fingerprint)
+            logger.debug('ver: %r', verified.fingerprint)
         self.assertEqual(key.fingerprint, verified.fingerprint,
-                         "Fingerprints must match")
+                         'Fingerprints must match')
         self.assertEqual(verified.trust_level, verified.TRUST_ULTIMATE)
         self.assertEqual(verified.trust_text, 'TRUST_ULTIMATE')
         data_file = open(self.test_fn, 'rb')
         sig = self.gpg.sign_file(data_file, keyid=key.fingerprint,
                                  passphrase='aable')
-        self.assertEqual(0, sig.returncode, "Non-zero return code")
+        self.assertEqual(0, sig.returncode, 'Non-zero return code')
         data_file.close()
-        self.assertTrue(sig, "File signing should succeed")
+        self.assertTrue(sig, 'File signing should succeed')
         self.assertTrue(sig.hash_algo)
         try:
             file = gnupg._make_binary_stream(sig.data, self.gpg.encoding)
@@ -937,18 +937,18 @@ class GPGTestCase(unittest.TestCase):
             # sometimes happens in Python 2.6
             from io import BytesIO
             verified = self.gpg.verify_file(BytesIO(sig.data))
-        self.assertEqual(0, verified.returncode, "Non-zero return code")
+        self.assertEqual(0, verified.returncode, 'Non-zero return code')
         if key.fingerprint != verified.fingerprint:  # pragma: no cover
-            logger.debug("key: %r", key.fingerprint)
-            logger.debug("ver: %r", verified.fingerprint)
+            logger.debug('key: %r', key.fingerprint)
+            logger.debug('ver: %r', verified.fingerprint)
         self.assertEqual(key.fingerprint, verified.fingerprint,
-                         "Fingerprints must match")
+                         'Fingerprints must match')
         data_file = open(self.test_fn, 'rb')
         sig = self.gpg.sign_file(data_file, keyid=key.fingerprint,
                                  passphrase='aable', detach=True)
-        self.assertEqual(0, sig.returncode, "Non-zero return code")
+        self.assertEqual(0, sig.returncode, 'Non-zero return code')
         data_file.close()
-        self.assertTrue(sig, "File signing should succeed")
+        self.assertTrue(sig, 'File signing should succeed')
         self.assertTrue(sig.hash_algo)
         try:
             file = gnupg._make_binary_stream(sig.data, self.gpg.encoding)
@@ -957,12 +957,12 @@ class GPGTestCase(unittest.TestCase):
             # sometimes happens in Python 2.6
             from io import BytesIO
             verified = self.gpg.verify_file(BytesIO(sig.data))
-        self.assertEqual(0, verified.returncode, "Non-zero return code")
+        self.assertEqual(0, verified.returncode, 'Non-zero return code')
         if key.fingerprint != verified.fingerprint:  # pragma: no cover
-            logger.debug("key: %r", key.fingerprint)
-            logger.debug("ver: %r", verified.fingerprint)
+            logger.debug('key: %r', key.fingerprint)
+            logger.debug('ver: %r', verified.fingerprint)
         self.assertEqual(key.fingerprint, verified.fingerprint,
-                         "Fingerprints must match")
+                         'Fingerprints must match')
         # Test in-memory verification
         data_file = open(self.test_fn, 'rb')
         data = data_file.read()
@@ -974,24 +974,24 @@ class GPGTestCase(unittest.TestCase):
             verified = self.gpg.verify_data(fn, data)
         finally:
             os.unlink(fn)
-        self.assertEqual(0, verified.returncode, "Non-zero return code")
+        self.assertEqual(0, verified.returncode, 'Non-zero return code')
         if key.fingerprint != verified.fingerprint:  # pragma: no cover
-            logger.debug("key: %r", key.fingerprint)
-            logger.debug("ver: %r", verified.fingerprint)
+            logger.debug('key: %r', key.fingerprint)
+            logger.debug('ver: %r', verified.fingerprint)
         self.assertEqual(key.fingerprint, verified.fingerprint,
-                         "Fingerprints must match")
+                         'Fingerprints must match')
 
     def test_signature_file(self):
         "Test that signing and verification works via the GPG output"
-        key = self.generate_key("Andrew", "Able", "alpha.com")
+        key = self.generate_key('Andrew', 'Able', 'alpha.com')
         data_file = open(self.test_fn, 'rb')
         sig_file = self.test_fn + '.asc'
         sig = self.gpg.sign_file(data_file, keyid=key.fingerprint,
                                  passphrase='aable', detach=True,
                                  output=sig_file)
-        self.assertEqual(0, sig.returncode, "Non-zero return code")
+        self.assertEqual(0, sig.returncode, 'Non-zero return code')
         data_file.close()
-        self.assertTrue(sig, "File signing should succeed")
+        self.assertTrue(sig, 'File signing should succeed')
         self.assertTrue(sig.hash_algo)
         self.assertTrue(os.path.exists(sig_file))
         # Test in-memory verification
@@ -1004,24 +1004,24 @@ class GPGTestCase(unittest.TestCase):
             self.assertTrue(key.fingerprint.endswith(verified.key_id))
         finally:
             os.unlink(sig_file)
-        self.assertEqual(0, verified.returncode, "Non-zero return code")
+        self.assertEqual(0, verified.returncode, 'Non-zero return code')
         if key.fingerprint != verified.fingerprint:
-            logger.debug("key: %r", key.fingerprint)
-            logger.debug("ver: %r", verified.fingerprint)
+            logger.debug('key: %r', key.fingerprint)
+            logger.debug('ver: %r', verified.fingerprint)
         self.assertEqual(key.fingerprint, verified.fingerprint,
-                         "Fingerprints must match")
+                         'Fingerprints must match')
 
     def test_subkey_signature_file(self):
         "Test that signing and verification works via the GPG output for subkeys"
         if self.gpg.version[0] < 2:
             raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
-        master_key = self.generate_key("Charlie", "Clark", "gamma.com",
-            passphrase="123", with_subkey=False)
-        self.assertEqual(0, master_key.returncode, "Non-zero return code")
+        master_key = self.generate_key('Charlie', 'Clark', 'gamma.com',
+                                       passphrase='123', with_subkey=False)
+        self.assertEqual(0, master_key.returncode, 'Non-zero return code')
 
-        subkey = self.gpg.add_subkey(master_key=master_key.fingerprint, master_passphrase="123",
-            algorithm="dsa", usage="sign", expire=0)
-        self.assertEqual(0, subkey.returncode, "Non-zero return code")
+        subkey = self.gpg.add_subkey(master_key=master_key.fingerprint, master_passphrase='123',
+                                     algorithm='dsa', usage='sign', expire=0)
+        self.assertEqual(0, subkey.returncode, 'Non-zero return code')
 
         data_file = open(self.test_fn, 'rb')
         sig_file = self.test_fn + '.asc'
@@ -1029,9 +1029,9 @@ class GPGTestCase(unittest.TestCase):
                                  passphrase='123', detach=True,
                                  output=sig_file)
 
-        self.assertEqual(0, sig.returncode, "Non-zero return code")
+        self.assertEqual(0, sig.returncode, 'Non-zero return code')
         data_file.close()
-        self.assertTrue(sig, "File signing should succeed")
+        self.assertTrue(sig, 'File signing should succeed')
         self.assertTrue(sig.hash_algo)
         self.assertTrue(os.path.exists(sig_file))
         # Test in-memory verification
@@ -1044,27 +1044,27 @@ class GPGTestCase(unittest.TestCase):
             self.assertTrue(subkey.fingerprint.endswith(verified.key_id))
         finally:
             os.unlink(sig_file)
-        self.assertEqual(0, verified.returncode, "Non-zero return code")
+        self.assertEqual(0, verified.returncode, 'Non-zero return code')
         if subkey.fingerprint != verified.fingerprint:
-            logger.debug("key: %r", subkey.fingerprint)
-            logger.debug("ver: %r", verified.fingerprint)
+            logger.debug('key: %r', subkey.fingerprint)
+            logger.debug('ver: %r', verified.fingerprint)
         self.assertEqual(subkey.fingerprint, verified.fingerprint,
-                         "Fingerprints must match")
+                         'Fingerprints must match')
 
     def test_deletion(self):
         "Test that key deletion works"
         result = self.gpg.import_keys(KEYS_TO_IMPORT)
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         public_keys = self.gpg.list_keys()
-        self.assertEqual(0, public_keys.returncode, "Non-zero return code")
+        self.assertEqual(0, public_keys.returncode, 'Non-zero return code')
         self.assertTrue(is_list_with_len(public_keys, 2),
-                        "2-element list expected")
+                        '2-element list expected')
         result = self.gpg.delete_keys(public_keys[0]['fingerprint'])
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         public_keys = self.gpg.list_keys()
-        self.assertEqual(0, public_keys.returncode, "Non-zero return code")
+        self.assertEqual(0, public_keys.returncode, 'Non-zero return code')
         self.assertTrue(is_list_with_len(public_keys, 1),
-                        "1-element list expected")
+                        '1-element list expected')
 
     def test_nogpg(self):
         "Test that absence of gpg is handled correctly"
@@ -1100,24 +1100,24 @@ class GPGTestCase(unittest.TestCase):
         logger.debug('Encrypting to: %r', encfname)
         logger.debug('Decrypting to: %r', decfname)
         try:
-            key = self.generate_key("Andrew", "Able", "alpha.com",
-                                    passphrase="andy")
-            self.assertEqual(0, key.returncode, "Non-zero return code")
+            key = self.generate_key('Andrew', 'Able', 'alpha.com',
+                                    passphrase='andy')
+            self.assertEqual(0, key.returncode, 'Non-zero return code')
             andrew = key.fingerprint
-            key = self.generate_key("Barbara", "Brown", "beta.com")
-            self.assertEqual(0, key.returncode, "Non-zero return code")
+            key = self.generate_key('Barbara', 'Brown', 'beta.com')
+            self.assertEqual(0, key.returncode, 'Non-zero return code')
             barbara = key.fingerprint
-            data = "Hello, world!"
+            data = 'Hello, world!'
             file = gnupg._make_binary_stream(data, self.gpg.encoding)
             edata = self.gpg.encrypt_file(file,
-                                          barbara,
+                                          [andrew, barbara],
                                           armor=False, output=encfname)
-            self.assertEqual(0, edata.returncode, "Non-zero return code")
+            self.assertEqual(0, edata.returncode, 'Non-zero return code')
             efile = open(encfname, 'rb')
-            ddata = self.gpg.decrypt_file(efile, passphrase="bbrown",
+            ddata = self.gpg.decrypt_file(efile, passphrase='bbrown',
                                           output=decfname)
-            self.assertEqual(0, ddata.returncode, "Non-zero return code")
-            efile.seek(0, 0) # can't use os.SEEK_SET in 2.4
+            self.assertEqual(0, ddata.returncode, 'Non-zero return code')
+            efile.seek(0, os.SEEK_SET)
             edata = efile.read()
             efile.close()
             self.assertTrue(os.path.exists(decfname))
@@ -1126,19 +1126,19 @@ class GPGTestCase(unittest.TestCase):
             dfile.close()
             data = data.encode(self.gpg.encoding)
             if ddata != data:  # pragma: no cover
-                logger.debug("was: %r", data)
-                logger.debug("new: %r", ddata)
-            self.assertEqual(data, ddata, "Round-trip must work")
+                logger.debug('was: %r', data)
+                logger.debug('new: %r', ddata)
+            self.assertEqual(data, ddata, 'Round-trip must work')
 
             # Try opening the encrypted file in text mode (Issue #39)
             # this doesn't fail in 2.x
             if gnupg._py3k:
                 efile = open(encfname, 'r')
-                ddata = self.gpg.decrypt_file(efile, passphrase="bbrown",
+                ddata = self.gpg.decrypt_file(efile, passphrase='bbrown',
                                               output=decfname)
-                self.assertEqual(2, ddata.returncode, "Unexpected return code")
+                self.assertEqual(2, ddata.returncode, 'Unexpected return code')
                 self.assertFalse(ddata)
-                self.assertEqual(ddata.status, "no data was provided")
+                self.assertEqual(ddata.status, 'no data was provided')
                 efile.close()
         finally:
             for fn in (encfname, decfname):
@@ -1168,14 +1168,14 @@ class GPGTestCase(unittest.TestCase):
             ('/dev/null/foo', 'encrypt: not a directory'),
             (encfname, 'encrypt: permission denied'),
         )
-        key = self.generate_key("Barbara", "Brown", "beta.com")
+        key = self.generate_key('Barbara', 'Brown', 'beta.com')
         barbara = key.fingerprint
-        data = "Hello, world!"
+        data = 'Hello, world!'
         for badout, message in cases:
             stream = gnupg._make_binary_stream(data, self.gpg.encoding)
             edata = self.gpg.encrypt_file(stream,
                                           barbara, armor=False, output=badout)
-            self.assertEqual(2, edata.returncode, "Unexpecteds return code")
+            self.assertEqual(2, edata.returncode, 'Unexpecteds return code')
             # on GnuPG 1.4, you sometimes don't get any FAILURE messages, in
             # which case status will not be set
             if edata.status:
@@ -1205,7 +1205,7 @@ class GPGTestCase(unittest.TestCase):
                     stream = gnupg._make_binary_stream(data, self.gpg.encoding)
                     edata = self.gpg.encrypt_file(stream,
                                                   barbara, armor=False, output=badout)
-                    self.assertEqual(2, edata.returncode, "Unexpected return code")
+                    self.assertEqual(2, edata.returncode, 'Unexpected return code')
                     # on GnuPG 1.4, you sometimes don't get any FAILURE messages, in
                     # which case status will not be set
                     if edata.status:
@@ -1224,22 +1224,23 @@ class GPGTestCase(unittest.TestCase):
         finally:
             shutil.rmtree(d, ignore_errors=True)
 
-    #@skipIf(os.name == 'nt', 'Test not suitable for Windows')
+    # @skipIf(os.name == 'nt', 'Test not suitable for Windows')
     def test_search_keys(self):
         "Test that searching for keys works"
         if 'NO_EXTERNAL_TESTS' not in os.environ:
             r = self.gpg.search_keys('<vinay_sajip@hotmail.com>')
-            self.assertEqual(0, r.returncode, "Non-zero return code")
+            self.assertEqual(0, r.returncode, 'Non-zero return code')
             self.assertTrue(r)
             self.assertTrue('Vinay Sajip <vinay_sajip@hotmail.com>' in r[0]['uids'])
             r = self.gpg.search_keys('92905378')
-            self.assertEqual(0, r.returncode, "Non-zero return code")
+            self.assertEqual(0, r.returncode, 'Non-zero return code')
             self.assertTrue(r)
             self.assertTrue('Vinay Sajip <vinay_sajip@hotmail.com>' in r[0]['uids'])
 
     def test_quote_with_shell(self):
         "Test shell quoting with a real shell"
-        if os.name != 'posix': return
+        if os.name != 'posix':
+            return
 
         from subprocess import PIPE, Popen
 
@@ -1264,16 +1265,15 @@ class GPGTestCase(unittest.TestCase):
 
     def disabled_test_signing_with_uid(self):  # pragma: no cover
         "Test that signing with uids works. On hold for now."
-        key = self.generate_key("Andrew", "Able", "alpha.com")
+        self.generate_key('Andrew', 'Able', 'alpha.com')
         uid = self.gpg.list_keys(True)[-1]['uids'][0]
         try:
-            signfile = open(self.test_fn,'rb')
-            signed = self.gpg.sign_file(signfile, keyid=uid,
-                                        passphrase='aable',
+            signfile = open(self.test_fn, 'rb')
+            signed = self.gpg.sign_file(signfile, keyid=uid, passphrase='aable',
                                         detach=True)
         finally:
             signfile.close()
-        self.assertEqual(0, signed.returncode, "Non-zero return code")
+        self.assertEqual(0, signed.returncode, 'Non-zero return code')
         self.assertTrue(signed.data)
 
     def test_doctest_import_keys(self):
@@ -1331,40 +1331,42 @@ class GPGTestCase(unittest.TestCase):
         fp1 = result.fingerprint
         inp = gpg.gen_key_input(name_email='user2@test', passphrase='pp2')
         result = gpg.gen_key(inp)
-        self.assertEqual(0, result.returncode, "Non-zero return code")
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
         fp2 = result.fingerprint
         pubkey1 = gpg.export_keys(fp1)
+        self.assertTrue(pubkey1)
         if gpg.version >= (2, 1):
             passphrase = 'pp1'
         else:
             passphrase = None
         seckey1 = gpg.export_keys(fp1, secret=True, passphrase=passphrase)
+        self.assertTrue(seckey1)
         seckeys = gpg.list_keys(secret=True)
-        self.assertEqual(0, seckeys.returncode, "Non-zero return code")
+        self.assertEqual(0, seckeys.returncode, 'Non-zero return code')
         pubkeys = gpg.list_keys()
-        self.assertEqual(0, pubkeys.returncode, "Non-zero return code")
-        # avoid assertIn, etc. as absent in older Python versions
-        self.assertTrue(fp1 in seckeys.fingerprints)
-        self.assertTrue(fp1 in pubkeys.fingerprints)
+        self.assertEqual(0, pubkeys.returncode, 'Non-zero return code')
+        for fp in (fp1, fp2):
+            for keys in (seckeys, pubkeys):
+                self.assertIn(fp, keys.fingerprints)
         result = gpg.delete_keys(fp1)
-        self.assertEqual(2, result.returncode, "Unexpected return code")
+        self.assertEqual(2, result.returncode, 'Unexpected return code')
         self.assertEqual(str(result), 'Must delete secret key first')
         if gpg.version < (2, 1):
             # Doesn't work on 2.1, and can't use SkipTest due to having
             # to support older Pythons
             result = gpg.delete_keys(fp1, secret=True, passphrase=passphrase)
-            self.assertEqual(0, result.returncode, "Non-zero return code")
+            self.assertEqual(0, result.returncode, 'Non-zero return code')
             self.assertEqual(str(result), 'ok')
             result = gpg.delete_keys(fp1)
-            self.assertEqual(0, result.returncode, "Non-zero return code")
+            self.assertEqual(0, result.returncode, 'Non-zero return code')
             self.assertEqual(str(result), 'ok')
             result = gpg.delete_keys('nosuchkey')
-            self.assertEqual(2, result.returncode, "Unexpected return code")
+            self.assertEqual(2, result.returncode, 'Unexpected return code')
             self.assertEqual(str(result), 'No such key')
             seckeys = gpg.list_keys(secret=True)
-            self.assertEqual(0, seckeys.returncode, "Non-zero return code")
+            self.assertEqual(0, seckeys.returncode, 'Non-zero return code')
             pubkeys = gpg.list_keys()
-            self.assertEqual(0, pubkeys.returncode, "Non-zero return code")
+            self.assertEqual(0, pubkeys.returncode, 'Non-zero return code')
             self.assertFalse(fp1 in seckeys.fingerprints)
             self.assertFalse(fp1 in pubkeys.fingerprints)
             result = gpg.import_keys('foo')
@@ -1372,7 +1374,7 @@ class GPGTestCase(unittest.TestCase):
 
     def test_recv_keys_no_server(self):
         result = self.gpg.recv_keys('foo.bar.baz', '92905378')
-        self.assertEqual(2, result.returncode, "Unexpected return code")
+        self.assertEqual(2, result.returncode, 'Unexpected return code')
         self.assertEqual(result.summary(), '0 imported')
 
     def test_invalid_fileobject(self):
@@ -1394,7 +1396,7 @@ class GPGTestCase(unittest.TestCase):
                 os.remove(p)
 
     def test_no_such_key(self):
-        key = self.generate_key("Barbara", "Brown", "beta.com")
+        key = self.generate_key('Barbara', 'Brown', 'beta.com')
         barbara = key.fingerprint
         gpg = self.gpg
         if gnupg._py3k:
@@ -1425,29 +1427,31 @@ class GPGTestCase(unittest.TestCase):
         expected = set((key1.fingerprint[-idlen:], key2.fingerprint[-idlen:]))
         self.assertEqual(expected, ids)
 
+
 TEST_GROUPS = {
-    'sign' : set(['test_signature_verification',
-                  'test_signature_file', 'test_subkey_signature_file']),
-    'crypt' : set(['test_encryption_and_decryption',
-                   'test_file_encryption_and_decryption',
-                   'test_filenames_with_spaces', 'test_invalid_outputs',
-                   'test_no_such_key']),
-    'key' : set(['test_deletion', 'test_import_and_export',
-                 'test_list_keys_after_generation',
-                 'test_list_signatures',
-                 'test_key_generation_with_invalid_key_type',
-                 'test_key_generation_with_escapes',
-                 'test_key_generation_input',
-                 'test_key_generation_with_colons',
-                 'test_search_keys', 'test_scan_keys', 'test_key_trust',
-                 'test_add_subkey', 'test_add_subkey_with_invalid_key_type',
-                 'test_deletion_subkey', 'test_list_subkey_after_generation']),
-    'import' : set(['test_import_only', 'test_doctest_import_keys']),
-    'basic' : set(['test_environment', 'test_list_keys_initial',
-                   'test_nogpg', 'test_make_args',
-                   'test_quote_with_shell']),
+    'sign': set(['test_signature_verification',
+                 'test_signature_file', 'test_subkey_signature_file']),
+    'crypt': set(['test_encryption_and_decryption',
+                  'test_file_encryption_and_decryption',
+                  'test_filenames_with_spaces', 'test_invalid_outputs',
+                  'test_no_such_key']),
+    'key': set(['test_deletion', 'test_import_and_export',
+                'test_list_keys_after_generation',
+                'test_list_signatures',
+                'test_key_generation_with_invalid_key_type',
+                'test_key_generation_with_escapes',
+                'test_key_generation_input',
+                'test_key_generation_with_colons',
+                'test_search_keys', 'test_scan_keys', 'test_key_trust',
+                'test_add_subkey', 'test_add_subkey_with_invalid_key_type',
+                'test_deletion_subkey', 'test_list_subkey_after_generation']),
+    'import': set(['test_import_only', 'test_doctest_import_keys']),
+    'basic': set(['test_environment', 'test_list_keys_initial',
+                  'test_nogpg', 'test_make_args',
+                  'test_quote_with_shell']),
     'test': set(['test_key_generation_failure']),
 }
+
 
 def suite(args=None):
     if args is None:
@@ -1460,13 +1464,17 @@ def suite(args=None):
             if arg in TEST_GROUPS:
                 tests.update(TEST_GROUPS[arg])
             else:
-                print("Ignoring unknown test group %r" % arg)
+                print('Ignoring unknown test group %r' % arg)
         result = unittest.TestSuite(list(map(GPGTestCase, tests)))
     return result
 
+
 def init_logging():
-    logging.basicConfig(level=logging.DEBUG, filename="test_gnupg.log",
-                        filemode="w", format="%(asctime)s %(levelname)-5s %(name)-10s %(threadName)-10s %(lineno)4d %(message)s")
+    logging.basicConfig(level=logging.DEBUG, filename='test_gnupg.log',
+                        filemode='w',
+                        format='%(asctime)s %(levelname)-5s %(name)-10s '
+                               '%(threadName)-10s %(lineno)4d %(message)s')
+
 
 def main():
     init_logging()
@@ -1485,5 +1493,5 @@ def main():
     return failed
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     sys.exit(main())
