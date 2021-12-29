@@ -1,13 +1,25 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
 name: Tests
 
 on:
   push:
     branches: [ master ]
+    paths-ignore:
+      - 'LICENSE.*'
+      - 'README.*'
+      - '.github/ISSUE-TEMPLATE/**'
+      - 'docs/**'
+      - '.hgignore'
+      - '.gitignore'
+
   pull_request:
     branches: [ master ]
+    paths-ignore:
+      - 'LICENSE.*'
+      - 'README.*'
+      - '.github/ISSUE-TEMPLATE/**'
+      - 'docs/**'
+      - '.hgignore'
+      - '.gitignore'
 
 jobs:
   build:
