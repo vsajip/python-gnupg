@@ -1,8 +1,10 @@
-.. image:: https://travis-ci.org/vsajip/python-gnupg.svg
-   :target: https://travis-ci.org/vsajip/python-gnupg
+|badge1| |badge2|
 
-.. image:: https://coveralls.io/repos/vsajip/python-gnupg/badge.svg
-   :target: https://coveralls.io/github/vsajip/python-gnupg
+.. |badge1| image:: https://img.shields.io/github/workflow/status/vsajip/python-gnupg/Tests
+   :alt: GitHub test status
+
+.. |badge2| image:: https://img.shields.io/codecov/c/github/vsajip/python-gnupg
+   :alt: GitHub coverage status
 
 
 What is it?
