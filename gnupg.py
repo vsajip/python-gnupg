@@ -548,7 +548,7 @@ class ListKeys(SearchKeys):
 
     UID_INDEX = 9
     FIELDS = ('type trust length algo keyid date expires dummy ownertrust uid sig'
-              ' cap issuer flag token hash curve compliance updated origin').split()
+              ' cap issuer flag token hash curve compliance updated origin keygrip').split()
 
     def __init__(self, gpg):
         super(ListKeys, self).__init__(gpg)
@@ -577,6 +577,13 @@ class ListKeys(SearchKeys):
         else:
             self.curkey['subkeys'][-1].append(fp)
             self.key_map[fp] = self.curkey
+
+    def grp(self, args):
+        grp = args[9]
+        if not self.in_subkey:
+            self.curkey['keygrip'] = grp
+        else:
+            self.curkey['subkeys'][-1].append(grp)
 
     def _collect_subkey_info(self, curkey, args):
         info_map = curkey.setdefault('subkey_info', {})
@@ -1390,7 +1397,7 @@ class GPG(object):
         result = self.result_map[kind](self)
         self._collect_output(p, result, stdin=p.stdin)
         lines = result.data.decode(self.encoding, self.decode_errors).splitlines()
-        valid_keywords = 'pub uid sec fpr sub ssb sig'.split()
+        valid_keywords = 'pub uid sec fpr sub ssb sig grp'.split()
         for line in lines:
             if self.verbose:  # pragma: no cover
                 print(line)
@@ -1428,7 +1435,7 @@ class GPG(object):
             which = 'secret-keys'
         else:
             which = 'sigs' if sigs else 'keys'
-        args = ['--list-%s' % which, '--fingerprint', '--fingerprint']  # get subkey FPs, too
+        args = ['--list-%s' % which, '--with-keygrip', '--fingerprint', '--fingerprint']  # get subkey FPs, too
         if keys:
             if isinstance(keys, string_types):
                 keys = [keys]
