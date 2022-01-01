@@ -548,7 +548,7 @@ class ListKeys(SearchKeys):
 
     UID_INDEX = 9
     FIELDS = ('type trust length algo keyid date expires dummy ownertrust uid sig'
-              ' cap issuer flag token hash curve compliance updated origin').split()
+              ' cap issuer flag token hash curve compliance updated origin keygrip').split()
 
     def __init__(self, gpg):
         super(ListKeys, self).__init__(gpg)
@@ -575,8 +575,15 @@ class ListKeys(SearchKeys):
             self.fingerprints.append(fp)
             self.key_map[fp] = self.curkey
         else:
-            self.curkey['subkeys'][-1].append(fp)
+            self.curkey['subkeys'][-1][2] = fp
             self.key_map[fp] = self.curkey
+
+    def grp(self, args):
+        grp = args[9]
+        if not self.in_subkey:
+            self.curkey['keygrip'] = grp
+        else:
+            self.curkey['subkeys'][-1][3] = grp
 
     def _collect_subkey_info(self, curkey, args):
         info_map = curkey.setdefault('subkey_info', {})
@@ -588,13 +595,13 @@ class ListKeys(SearchKeys):
         # See issue #81. We create a dict with more information about
         # subkeys, but for backward compatibility reason, have to add it in
         # as a separate entry 'subkey_info'
-        subkey = [args[4], args[11]]  # keyid, type
+        subkey = [args[4], args[11], None, None]  # keyid, type, fp, grp
         self.curkey['subkeys'].append(subkey)
         self._collect_subkey_info(self.curkey, args)
         self.in_subkey = True
 
     def ssb(self, args):
-        subkey = [args[4], None]  # keyid, type
+        subkey = [args[4], None, None, None]  # keyid, type, fp, grp
         self.curkey['subkeys'].append(subkey)
         self._collect_subkey_info(self.curkey, args)
         self.in_subkey = True
@@ -610,7 +617,7 @@ class ScanKeys(ListKeys):
     def sub(self, args):
         # --with-fingerprint --with-colons somehow outputs fewer colons,
         # use the last value args[-1] instead of args[11]
-        subkey = [args[4], args[-1]]
+        subkey = [args[4], args[-1], None, None]
         self.curkey['subkeys'].append(subkey)
         self._collect_subkey_info(self.curkey, args)
         self.in_subkey = True
@@ -1390,7 +1397,7 @@ class GPG(object):
         result = self.result_map[kind](self)
         self._collect_output(p, result, stdin=p.stdin)
         lines = result.data.decode(self.encoding, self.decode_errors).splitlines()
-        valid_keywords = 'pub uid sec fpr sub ssb sig'.split()
+        valid_keywords = 'pub uid sec fpr sub ssb sig grp'.split()
         for line in lines:
             if self.verbose:  # pragma: no cover
                 print(line)
@@ -1429,6 +1436,10 @@ class GPG(object):
         else:
             which = 'sigs' if sigs else 'keys'
         args = ['--list-%s' % which, '--fingerprint', '--fingerprint']  # get subkey FPs, too
+
+        if self.version >= (2, 1):
+            args.append('--with-keygrip')
+
         if keys:
             if isinstance(keys, string_types):
                 keys = [keys]
