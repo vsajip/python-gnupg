@@ -533,7 +533,8 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(0, public_keys.returncode, 'Non-zero return code')
         self.assertTrue(is_list_with_len(public_keys, 1), '1-element list expected')
         key_info = public_keys[0]
-        self.assertIsNotNone(key_info['keygrip'])
+        if self.gpg.version >= (2, 1):
+            self.assertTrue(key_info['keygrip'])
         fp = key_info['fingerprint']
         self.assertTrue(fp in public_keys.key_map)
         self.assertTrue(public_keys.key_map[fp] is key_info)
@@ -553,7 +554,8 @@ class GPGTestCase(unittest.TestCase):
             self.assertEqual(info['type'], 'sub')
             self.assertTrue(sfp in public_keys.key_map)
             self.assertTrue(public_keys.key_map[sfp] is key_info)
-            self.assertIsNotNone(grp)
+            if self.gpg.version >= (2, 1):
+                self.assertTrue(grp)
 
     def test_list_keys_after_generation(self):
         "Test that after key generation, the generated key is available"
@@ -563,7 +565,8 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(0, public_keys.returncode, 'Non-zero return code')
         self.assertTrue(is_list_with_len(public_keys, 1), '1-element list expected')
         key_info = public_keys[0]
-        self.assertIsNotNone(key_info['keygrip'])
+        if self.gpg.version >= (2, 1):
+            self.assertTrue(key_info['keygrip'])
         fp = key_info['fingerprint']
         self.assertTrue(fp in public_keys.key_map)
         self.assertTrue(public_keys.key_map[fp] is key_info)
@@ -576,14 +579,16 @@ class GPGTestCase(unittest.TestCase):
             self.assertEqual(info['type'], 'sub')
             self.assertTrue(sfp in public_keys.key_map)
             self.assertTrue(public_keys.key_map[sfp] is key_info)
-            self.assertIsNotNone(grp)
+            if self.gpg.version >= (2, 1):
+                self.assertTrue(grp)
 
         # now test with sigs=True
         public_keys_sigs = self.gpg.list_keys(sigs=True)
         self.assertEqual(0, public_keys_sigs.returncode, 'Non-zero return code')
         self.assertTrue(is_list_with_len(public_keys_sigs, 1), '1-element list expected')
         key_info = public_keys_sigs[0]
-        self.assertIsNotNone(key_info['keygrip'])
+        if self.gpg.version >= (2, 1):
+            self.assertTrue(key_info['keygrip'])
         fp = key_info['fingerprint']
         self.assertTrue(fp in public_keys_sigs.key_map)
         self.assertTrue(public_keys_sigs.key_map[fp] is key_info)
@@ -599,14 +604,16 @@ class GPGTestCase(unittest.TestCase):
             self.assertEqual(info['type'], 'sub')
             self.assertTrue(sfp in public_keys_sigs.key_map)
             self.assertTrue(public_keys_sigs.key_map[sfp] is key_info)
-            self.assertIsNotNone(grp)
+            if self.gpg.version >= (2, 1):
+                self.assertTrue(grp)
 
         private_keys = self.gpg.list_keys(secret=True)
         self.assertEqual(0, private_keys.returncode, 'Non-zero return code')
         self.assertTrue(is_list_with_len(private_keys, 1), '1-element list expected')
         self.assertEqual(len(private_keys.fingerprints), 1)
         key_info = private_keys[0]
-        self.assertIsNotNone(key_info['keygrip'])
+        if self.gpg.version >= (2, 1):
+            self.assertTrue(key_info['keygrip'])
         self.assertTrue('subkey_info' in key_info)
         skinfo = key_info['subkey_info']
         self.assertTrue(skid in skinfo)

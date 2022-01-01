@@ -491,7 +491,7 @@ understanding is possible of the information returned by ``gpg``.
 +-------------+--------------------------------------------------------------------------------+
 | date        | The creation date of the key in UTC as a Unix timestamp                        |
 +-------------+--------------------------------------------------------------------------------+
-| expires     |                                                                                |
+| expires     | The expiry date of the key in UTC as a timestamp, if specified                 |
 +-------------+--------------------------------------------------------------------------------+
 | dummy       | Certificate serial number, UID hash or trust signature info                    |
 +-------------+--------------------------------------------------------------------------------+
@@ -519,7 +519,7 @@ understanding is possible of the information returned by ``gpg``.
 +-------------+--------------------------------------------------------------------------------+
 | origin      | Origin of keys                                                                 |
 +-------------+--------------------------------------------------------------------------------+
-| keygrip     | Keygrip of keys                                                                |
+| keygrip     | Keygrip of keys (Note that you'll need GnuPG >= 2.1 for this to work.)         |
 +-------------+--------------------------------------------------------------------------------+
 | subkeys     | A list containing [keyid, type, fingerprint, keygrip] elements for each subkey |
 +-------------+--------------------------------------------------------------------------------+
@@ -603,6 +603,7 @@ user-friendly, but nevertheless it should be usable.)
 .. versionadded:: 0.4.9
    Information on keys returned by :meth:`list_keys` now includes the ``keygrip`` attribute.
    The ``subkeys`` attribute now also consist of 4 values with the ``keygrip`` being the 4th.
+   Note that you'll need GnuPG >= 2.1 for this to work.
 
 .. _RFC-4880: https://tools.ietf.org/html/rfc4880#section-5.2.1
 

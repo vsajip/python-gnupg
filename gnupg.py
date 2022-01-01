@@ -575,7 +575,7 @@ class ListKeys(SearchKeys):
             self.fingerprints.append(fp)
             self.key_map[fp] = self.curkey
         else:
-            self.curkey['subkeys'][-1].append(fp)
+            self.curkey['subkeys'][-1][2] = fp
             self.key_map[fp] = self.curkey
 
     def grp(self, args):
@@ -583,7 +583,7 @@ class ListKeys(SearchKeys):
         if not self.in_subkey:
             self.curkey['keygrip'] = grp
         else:
-            self.curkey['subkeys'][-1].append(grp)
+            self.curkey['subkeys'][-1][3] = grp
 
     def _collect_subkey_info(self, curkey, args):
         info_map = curkey.setdefault('subkey_info', {})
@@ -595,13 +595,13 @@ class ListKeys(SearchKeys):
         # See issue #81. We create a dict with more information about
         # subkeys, but for backward compatibility reason, have to add it in
         # as a separate entry 'subkey_info'
-        subkey = [args[4], args[11]]  # keyid, type
+        subkey = [args[4], args[11], None, None]  # keyid, type, fp, grp
         self.curkey['subkeys'].append(subkey)
         self._collect_subkey_info(self.curkey, args)
         self.in_subkey = True
 
     def ssb(self, args):
-        subkey = [args[4], None]  # keyid, type
+        subkey = [args[4], None, None, None]  # keyid, type, fp, grp
         self.curkey['subkeys'].append(subkey)
         self._collect_subkey_info(self.curkey, args)
         self.in_subkey = True
@@ -617,7 +617,7 @@ class ScanKeys(ListKeys):
     def sub(self, args):
         # --with-fingerprint --with-colons somehow outputs fewer colons,
         # use the last value args[-1] instead of args[11]
-        subkey = [args[4], args[-1]]
+        subkey = [args[4], args[-1], None, None]
         self.curkey['subkeys'].append(subkey)
         self._collect_subkey_info(self.curkey, args)
         self.in_subkey = True
@@ -1435,7 +1435,11 @@ class GPG(object):
             which = 'secret-keys'
         else:
             which = 'sigs' if sigs else 'keys'
-        args = ['--list-%s' % which, '--with-keygrip', '--fingerprint', '--fingerprint']  # get subkey FPs, too
+        args = ['--list-%s' % which, '--fingerprint', '--fingerprint']  # get subkey FPs, too
+
+        if self.version >= (2, 1):
+            args.append('--with-keygrip')
+
         if keys:
             if isinstance(keys, string_types):
                 keys = [keys]
