@@ -78,6 +78,9 @@ Released: Not yet.
 * Fixed #164: Provided the ability to add subkeys. Thanks to Daniel Kilimnik for the
   feature request and patch.
 
+* Fixed #166: Added keygrip values to the information collected when keys are listed.
+  Thanks to Daniel Kilimnik for the feature request and patch.
+
 
 0.4.8
 -----
