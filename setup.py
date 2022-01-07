@@ -31,7 +31,7 @@ The archives should be the same as those uploaded to PyPI.
     author_email="vinay_sajip@yahoo.co.uk",
     maintainer="Vinay Sajip",
     maintainer_email="vinay_sajip@yahoo.co.uk",
-    url="https://docs.red-dove.com/python-gnupg/",
+    url="https://github.com/vsajip/python-gnupg",
     py_modules=["gnupg"],
     platforms="No particular restrictions",
     download_url="https://pypi.io/packages/source/p/python-gnupg/python-gnupg-%s.tar.gz" % version,
