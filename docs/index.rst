@@ -1132,13 +1132,13 @@ Test Harness
 ============
 
 The distribution includes a test harness, ``test_gnupg.py``, which contains unit tests
-(with integrated doctests) covering the functionality described above. You can invoke
-``test_gnupg.py`` with one or more optional command-line arguments. If no arguments
-are provided, all tests are run. If arguments are provided, they collectively
-determine which of the tests will be run:
+covering the functionality described above. You can invoke ``test_gnupg.py`` with one
+or more optional command-line arguments. If no arguments are provided, all tests are
+run. If arguments are provided, they collectively determine which of the tests will be
+run:
 
-doc
-    Run doctests only (they cover most of the functionality of the module)
+import
+    Run tests relating to key import
 crypt
     Run tests relating to encryption and decryption
 sign
