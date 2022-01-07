@@ -674,7 +674,7 @@ The ``delete_keys`` method has some additional keyword arguments:
   specify ``expect_passphrase=False`` in that case. If you don't do that, and don't
   pass a passphrase, a ``ValueError`` will be raised.
 * ``exclamation_mode`` - defaults to ``False`` for backward compatibility. If the exclamation
-  mode is set, and a fingerprint of a subkey is passed only that subkey will be deleted. If the 
+  mode is set, and a fingerprint of a subkey is passed only that subkey will be deleted. If the
   fingerprint is of a primary key the entire key will be deleted.
 
 .. versionadded:: 0.4.0
@@ -1152,9 +1152,11 @@ basic
 Download
 ========
 
-The latest version is available from the PyPI_ page.
+The latest version is available from the `PyPI
+<https://pypi.python.org/pypi/python-gnupg>`_ page.
 
-.. _PyPI: https://pypi.python.org/pypi/python-gnupg
+The source code repository can be found `here
+<https://github.com/vsajip/python-gnupg/>`__.
 
 Status and Further Work
 =======================
@@ -1175,9 +1177,11 @@ for key editing) is not available. This is because it requires essentially a sta
 machine which manages the interaction - moreover, a state machine which varies
 according to the specific version of the ``gpg`` executable being used.
 
-If you find bugs and want to raise issues, please do so via the `project issue tracker <https://github.com/vsajip/python-gnupg/issues/new/choose>`_.
+If you find bugs and want to raise issues, please do so via the `project issue tracker
+<https://github.com/vsajip/python-gnupg/issues/new/choose>`_.
 
-All feedback will be gratefully received; please send it to the `discussion group <https://groups.google.com/group/python-gnupg>`_.
+All feedback will be gratefully received; please send it to the `discussion group
+<https://groups.google.com/group/python-gnupg>`_.
 
 .. cssclass:: hidden
 
