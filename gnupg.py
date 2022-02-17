@@ -160,7 +160,7 @@ def _copy_data(instream, outstream):
 
 def _threaded_copy_data(instream, outstream):
     wr = threading.Thread(target=_copy_data, args=(instream, outstream))
-    wr.setDaemon(True)
+    wr.daemon = True
     logger.debug('data copier: %r, %r, %r', wr, instream, outstream)
     wr.start()
     return wr
@@ -1052,13 +1052,13 @@ class GPG(object):
         """
         stderr = codecs.getreader(self.encoding)(process.stderr)
         rr = threading.Thread(target=self._read_response, args=(stderr, result))
-        rr.setDaemon(True)
+        rr.daemon = True
         logger.debug('stderr reader: %r', rr)
         rr.start()
 
         stdout = process.stdout
         dr = threading.Thread(target=self._read_data, args=(stdout, result, self.on_data))
-        dr.setDaemon(True)
+        dr.daemon = True
         logger.debug('stdout reader: %r', dr)
         dr.start()
 
