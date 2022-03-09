@@ -25,13 +25,14 @@ https://bitbucket.org/vinay.sajip/python-gnupg/downloads/
 
 The archives should be the same as those uploaded to PyPI.
 """,
-    license="""Copyright (C) 2008-2021 by Vinay Sajip. All Rights Reserved. See LICENSE.txt for license.""",
+    license="""Copyright (C) 2008-2022 by Vinay Sajip. All Rights Reserved. See LICENSE.txt for license.""",
     version=version,
     author="Vinay Sajip",
     author_email="vinay_sajip@yahoo.co.uk",
     maintainer="Vinay Sajip",
     maintainer_email="vinay_sajip@yahoo.co.uk",
     url="https://docs.red-dove.com/python-gnupg/",
+    download_url="https://pypi.io/packages/source/p/python-gnupg/python-gnupg-%s.tar.gz" % version,
     project_urls={
         "Documentation": "https://docs.red-dove.com/python-gnupg/",
         "Source": "https://github.com/vsajip/python-gnupg",
@@ -39,7 +40,6 @@ The archives should be the same as those uploaded to PyPI.
     },
     py_modules=["gnupg"],
     platforms="No particular restrictions",
-    download_url="https://pypi.io/packages/source/p/python-gnupg/python-gnupg-%s.tar.gz" % version,
     classifiers=[
         'Development Status :: 5 - Production/Stable', "Intended Audience :: Developers",
         'License :: OSI Approved :: BSD License', "Programming Language :: Python",

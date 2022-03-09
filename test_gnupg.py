@@ -2,7 +2,7 @@
 """
 A test harness for gnupg.py.
 
-Copyright (C) 2008-2021 Vinay Sajip. All rights reserved.
+Copyright (C) 2008-2022 Vinay Sajip. All rights reserved.
 """
 import argparse
 import json

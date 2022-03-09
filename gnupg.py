@@ -27,7 +27,7 @@ Vinay Sajip to make use of the subprocess module (Steve's version uses os.fork()
 and so does not work on Windows). Renamed to gnupg.py to avoid confusion with
 the previous versions.
 
-Modifications Copyright (C) 2008-2021 Vinay Sajip. All rights reserved.
+Modifications Copyright (C) 2008-2022 Vinay Sajip. All rights reserved.
 
 A unittest harness (test_gnupg.py) has also been added.
 """
@@ -1253,7 +1253,7 @@ class GPG(object):
         data.close()
         return result
 
-    def recv_keys(self, keyserver, *keyids):
+    def recv_keys(self, keyserver, *keyids, **kwargs):
         """Import a key from a keyserver
 
         >>> import shutil
@@ -1269,14 +1269,17 @@ class GPG(object):
         result = self.result_map['import'](self)
         logger.debug('recv_keys: %r', keyids)
         data = _make_binary_stream('', self.encoding)
-        args = ['--keyserver', no_quote(keyserver), '--recv-keys']
+        args = ['--keyserver', no_quote(keyserver)]
+        if 'extra_args' in kwargs:
+            args.extend(kwargs['extra_args'])
+        args.append('--recv-keys')
         args.extend([no_quote(k) for k in keyids])
         self._handle_io(args, data, result, binary=True)
         logger.debug('recv_keys result: %r', result.__dict__)
         data.close()
         return result
 
-    def send_keys(self, keyserver, *keyids):
+    def send_keys(self, keyserver, *keyids, **kwargs):
         """Send a key to a keyserver.
 
         Note: it's not practical to test this function without sending
@@ -1285,7 +1288,10 @@ class GPG(object):
         result = self.result_map['send'](self)
         logger.debug('send_keys: %r', keyids)
         data = _make_binary_stream('', self.encoding)
-        args = ['--keyserver', no_quote(keyserver), '--send-keys']
+        args = ['--keyserver', no_quote(keyserver)]
+        if 'extra_args' in kwargs:
+            args.extend(kwargs['extra_args'])
+        args.append('--send-keys')
         args.extend([no_quote(k) for k in keyids])
         self._handle_io(args, data, result, binary=True)
         logger.debug('send_keys result: %r', result.__dict__)
@@ -1470,7 +1476,7 @@ class GPG(object):
         p = self._open_subprocess(args)
         return self._get_list_output(p, 'scan')
 
-    def search_keys(self, query, keyserver='pgp.mit.edu'):
+    def search_keys(self, query, keyserver='pgp.mit.edu', extra_args=None):
         """ search keyserver by query (using --search-keys option)
 
         >>> import shutil
@@ -1489,11 +1495,10 @@ class GPG(object):
         query = query.strip()
         if HEX_DIGITS_RE.match(query):
             query = '0x' + query
-        args = [
-            '--fingerprint', '--keyserver',
-            no_quote(keyserver), '--search-keys',
-            no_quote(query)
-        ]
+        args = ['--fingerprint', '--keyserver', no_quote(keyserver)]
+        if extra_args:
+            args.extend(extra_args)
+        args.extend(['--search-keys', no_quote(query)])
         p = self._open_subprocess(args)
 
         # Get the response information
