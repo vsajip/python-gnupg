@@ -81,6 +81,8 @@ Released: Not yet.
 * Fixed #166: Added keygrip values to the information collected when keys are listed.
   Thanks to Daniel Kilimnik for the feature request and patch.
 
+* Fixed #173: Added extra_args to send_keys(), recv_keys() and search_keys() to allow
+  passing options relating to key servers.
 
 0.4.8
 -----
