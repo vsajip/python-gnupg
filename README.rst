@@ -66,10 +66,16 @@ Change log
 .. note:: GCnn refers to an issue nn on Google Code.
 
 
-0.4.9 (future)
+0.5.0 (future)
 --------------
 
 Released: Not yet.
+
+
+0.4.9
+-----
+
+Released: 2022-05-20
 
 * Fixed #161: Added a status attribute to the returned object from gen_key() which
   is set to 'ok' if a key was successfully created, or 'key not created' if that
