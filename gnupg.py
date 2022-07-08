@@ -332,7 +332,8 @@ class Verify(object):
             update_sig_info(status=self.status, keyid=self.key_id)
         elif key in ('UNEXPECTED', 'FAILURE'):  # pragma: no cover
             self.valid = False
-            self.key_id = value
+            if not self.key_id: # don't corrupt the key id with 'gpg-exit nnnnn'
+                self.key_id = value
             if key == 'UNEXPECTED':
                 self.status = 'unexpected data'
             else:
