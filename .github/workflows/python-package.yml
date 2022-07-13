@@ -61,8 +61,7 @@ jobs:
       env:
         NO_EXTERNAL_TESTS: 1
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
       with:
         flags: unittests
         files: coverage.xml
-        fail_ci_if_error: false
