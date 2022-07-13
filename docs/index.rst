@@ -434,10 +434,19 @@ provided, ``extra_args`` is treated as a list of additional arguments to pass to
 an imported secret key has a passphrase.
 
 .. versionadded:: 0.4.5
-   The ``extra_args`` keyword argument was added.
+   The ``extra_args`` keyword argument.
 
 .. versionadded:: 0.4.7
-   The ``passphrase`` keyword argument was added.
+   The ``passphrase`` keyword argument.
+
+To import keys from a file, use::
+
+    >>> import_result = gpg.import_keys_file(key_path)
+
+This also takes the keyword arguments specified for :meth:`~gnupg.GPG.import_keys`.
+
+.. versionadded:: 0.5.0
+   The :meth:`~GPG.import_keys_file` method.
 
 To receive keys from a keyserver, use::
 
@@ -735,7 +744,7 @@ To encrypt a message, use the following approach::
 
 If you want to encrypt data in a file (or file-like object), use::
 
-    >>> encrypted_ascii_data = gpg.encrypt_file(stream, recipients) # e.g. after stream = open(filename, "rb")
+    >>> encrypted_ascii_data = gpg.encrypt_file(stream, recipients) # e.g. after stream = open(filename, 'rb')
 
 These methods both return an object such that:
 
@@ -796,6 +805,17 @@ output (defaults to ``None``)
    to the console, but does not provide a specific error indication that the Python
    wrapper can use.
 
+.. versionchanged:: 0.5.0
+   The `stream` argument to :meth:`encrypt_file` can be a pathname to an existing file
+   as well as text or a file-like object. In the pathname case, ``python-gnupg`` will
+   open and close the file for you.
+
+.. note::
+   ``python-gnupg`` assumes that any object with a :attr:`read` attribute is a
+   file-like object. Otherwise, if it corresponds to an existing file, then it is taken
+   as a filename, and otherwise it must be the actual data to be processed.
+
+
 .. index:: Decryption
 
 Decryption
@@ -837,6 +857,11 @@ The ``decrypt_file`` method takes the following additional keyword argument:
 output (defaults to ``None``)
     The name of an output file to write to. If a name is specified, the decrypted
     output is written directly to the file.
+
+.. versionchanged:: 0.5.0
+   The `stream` argument to :meth:`decrypt_file` can be a pathname to an existing file
+   as well as text or a file-like object. In the pathname case, ``python-gnupg`` will
+   open and close the file for you.
 
 .. _caching-warning:
 
@@ -899,6 +924,11 @@ or, with a file or file-like object:
 
 .. versionadded:: 0.4.8
    The ``get_recipients`` and ``get_recipients_file`` methods were added.
+
+.. versionchanged:: 0.5.0
+   The `stream` argument to :meth:`get_recipients_file` can be a pathname to an
+   existing file as well as text or a file-like object. In the pathname case,
+   ``python-gnupg`` will open and close the file for you.
 
 
 Signing and Verification
@@ -969,6 +999,11 @@ The hash algorihm used when creating the signature can be found in the
    The keyid and username of the signing key are stored in the ``key_id`` and
    ``username`` attributes of the result, if this information is provided by ``gpg``
    (which should happen if you specify ``extra_args=['--verbose']``).
+
+.. versionchanged:: 0.5.0
+   The `stream` argument to :meth:`sign_file` can be a pathname to an existing file as
+   well as text or a file-like object. In the pathname case, ``python-gnupg`` will
+   open and close the file for you.
 
 
 .. index:: Verification
@@ -1068,6 +1103,12 @@ key, the ``key_status`` attribute will be ``None``.
 .. versionadded:: 0.4.2
    The keyid and username of the signing key are stored in the ``key_id`` and
    ``username`` attributes of the result, if this information is provided by ``gpg``.
+
+.. versionchanged:: 0.5.0
+   The `stream` argument to :meth:`verify_file` can be a pathname to an existing file
+   as well as text or a file-like object. In the pathname case, ``python-gnupg`` will
+   open and close the file for you.
+
 
 
 Verifying detached signatures in memory

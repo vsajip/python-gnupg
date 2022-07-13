@@ -71,6 +71,8 @@ Change log
 
 Released: Not yet.
 
+* Fixed #181: Added the ability to pass file paths to encrypt_file, decrypt_file,
+  sign_file, verify_file, get_recipients_file and added import_keys_file.
 
 0.4.9
 -----

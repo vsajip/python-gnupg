@@ -58,10 +58,12 @@ try:
     _py3k = False
     string_types = basestring
     text_type = unicode
+    path_types = (bytes, str)
 except NameError:
     _py3k = True
     string_types = str
     text_type = str
+    path_types = (str,)
 
 logger = logging.getLogger(__name__)
 if not logger.handlers:
@@ -135,7 +137,7 @@ def _copy_data(instream, outstream):
         # for what is actually a binary file
         try:
             data = instream.read(1024)
-        except UnicodeError:
+        except Exception:
             logger.warning('Exception occurred while reading', exc_info=1)
             break
         if not data:
@@ -1086,23 +1088,36 @@ class GPG(object):
         """
         return hasattr(fileobj, 'read')
 
-    def _handle_io(self, args, fileobj, result, passphrase=None, binary=False):
+    def _get_fileobj(self, fileobj_or_path):
+        if self.is_valid_file(fileobj_or_path):
+            result = fileobj_or_path
+        elif not isinstance(fileobj_or_path, path_types):
+            raise TypeError('Not a valid file or path: %s' % fileobj_or_path)
+        elif not os.path.exists(fileobj_or_path):
+            raise ValueError('No such file: %s' % fileobj_or_path)
+        else:
+            result = open(fileobj_or_path, 'rb')
+        return result
+
+    def _handle_io(self, args, fileobj_or_path, result, passphrase=None, binary=False):
         "Handle a call to GPG - pass input data, collect output data"
         # Handle a basic data call - pass data to GPG, handle the output
         # including status information. Garbage In, Garbage Out :)
-        if not self.is_valid_file(fileobj):
-            raise TypeError('Not a valid file: %s' % fileobj)
-        p = self._open_subprocess(args, passphrase is not None)
-        if not binary:  # pragma: no cover
-            stdin = codecs.getwriter(self.encoding)(p.stdin)
-        else:
-            stdin = p.stdin
-        if passphrase:
-            _write_passphrase(stdin, passphrase, self.encoding)
-        writer = _threaded_copy_data(fileobj, stdin)
-        self._collect_output(p, result, writer, stdin)
-        return result
-
+        fileobj = self._get_fileobj(fileobj_or_path)
+        try:
+            p = self._open_subprocess(args, passphrase is not None)
+            if not binary:  # pragma: no cover
+                stdin = codecs.getwriter(self.encoding)(p.stdin)
+            else:
+                stdin = p.stdin
+            if passphrase:
+                _write_passphrase(stdin, passphrase, self.encoding)
+            writer = _threaded_copy_data(fileobj, stdin)
+            self._collect_output(p, result, writer, stdin)
+            return result
+        finally:
+            if fileobj is not fileobj_or_path:
+                fileobj.close()
     #
     # SIGNATURE METHODS
     #
@@ -1129,7 +1144,7 @@ class GPG(object):
         return ('\n' not in passphrase and '\r' not in passphrase and '\x00' not in passphrase)
 
     def sign_file(self,
-                  file,
+                  fileobj_or_path,
                   keyid=None,
                   passphrase=None,
                   clearsign=True,
@@ -1140,7 +1155,7 @@ class GPG(object):
         """sign file"""
         if passphrase and not self.is_valid_passphrase(passphrase):
             raise ValueError('Invalid passphrase')
-        logger.debug('sign_file: %s', file)
+        logger.debug('sign_file: %s', fileobj_or_path)
         if binary:  # pragma: no cover
             args = ['-s']
         else:
@@ -1161,15 +1176,19 @@ class GPG(object):
         result = self.result_map['sign'](self)
         # We could use _handle_io here except for the fact that if the
         # passphrase is bad, gpg bails and you can't write the message.
+        fileobj = self._get_fileobj(fileobj_or_path)
         p = self._open_subprocess(args, passphrase is not None)
         try:
             stdin = p.stdin
             if passphrase:
                 _write_passphrase(stdin, passphrase, self.encoding)
-            writer = _threaded_copy_data(file, stdin)
+            writer = _threaded_copy_data(fileobj, stdin)
         except IOError:  # pragma: no cover
             logging.exception('error writing message')
             writer = None
+        finally:
+            if fileobj is not fileobj_or_path:
+                fileobj.close()
         self._collect_output(p, result, writer, stdin)
         return result
 
@@ -1195,22 +1214,22 @@ class GPG(object):
         f.close()
         return result
 
-    def verify_file(self, file, data_filename=None, close_file=True, extra_args=None):
+    def verify_file(self, fileobj_or_path, data_filename=None, close_file=True, extra_args=None):
         "Verify the signature on the contents of the file-like object 'file'"
-        logger.debug('verify_file: %r, %r', file, data_filename)
+        logger.debug('verify_file: %r, %r', fileobj_or_path, data_filename)
         result = self.result_map['verify'](self)
         args = ['--verify']
         if extra_args:
             args.extend(extra_args)
         if data_filename is None:
-            self._handle_io(args, file, result, binary=True)
+            self._handle_io(args, fileobj_or_path, result, binary=True)
         else:
             logger.debug('Handling detached verification')
             import tempfile
-            fd, fn = tempfile.mkstemp(prefix='pygpg')
-            s = file.read()
+            fd, fn = tempfile.mkstemp(prefix='pygpg-')
+            s = fileobj_or_path.read()
             if close_file:
-                file.close()
+                fileobj_or_path.close()
             logger.debug('Wrote to temp file: %r', s)
             os.write(fd, s)
             os.close(fd)
@@ -1220,7 +1239,7 @@ class GPG(object):
                 p = self._open_subprocess(args)
                 self._collect_output(p, result, stdin=p.stdin)
             finally:
-                os.unlink(fn)
+                os.remove(fn)
         return result
 
     def verify_data(self, sig_filename, data, extra_args=None):
@@ -1253,6 +1272,13 @@ class GPG(object):
         logger.debug('import_keys result: %r', result.__dict__)
         data.close()
         return result
+
+    def import_keys_file(self, key_path, **kwargs):
+        """
+        Import the key data in key_path into our keyring.
+        """
+        with open(key_path, 'rb') as f:
+            return self.import_keys(f.read(), **kwargs)
 
     def recv_keys(self, keyserver, *keyids, **kwargs):
         """Import a key from a keyserver
@@ -1618,7 +1644,7 @@ class GPG(object):
     # ENCRYPTION
     #
     def encrypt_file(self,
-                     file,
+                     fileobj_or_path,
                      recipients,
                      sign=None,
                      always_trust=False,
@@ -1659,7 +1685,7 @@ class GPG(object):
         if extra_args:
             args.extend(extra_args)
         result = self.result_map['crypt'](self)
-        self._handle_io(args, file, result, passphrase=passphrase, binary=True)
+        self._handle_io(args, fileobj_or_path, result, passphrase=passphrase, binary=True)
         logger.debug('encrypt result[:100]: %r', result.data[:100])
         return result
 
@@ -1718,7 +1744,7 @@ class GPG(object):
         return result
 
     def decrypt_file(self,
-                     file,
+                     fileobj_or_path,
                      always_trust=False,
                      passphrase=None,
                      output=None,
@@ -1733,7 +1759,7 @@ class GPG(object):
         if extra_args:
             args.extend(extra_args)
         result = self.result_map['crypt'](self)
-        self._handle_io(args, file, result, passphrase, binary=True)
+        self._handle_io(args, fileobj_or_path, result, passphrase, binary=True)
         logger.debug('decrypt result[:100]: %r', result.data[:100])
         return result
 
@@ -1743,12 +1769,12 @@ class GPG(object):
         data.close()
         return result
 
-    def get_recipients_file(self, file, extra_args=None):
+    def get_recipients_file(self, fileobj_or_path, extra_args=None):
         args = ['--decrypt', '--list-only', '-v']
         if extra_args:
             args.extend(extra_args)
         result = self.result_map['crypt'](self)
-        self._handle_io(args, file, result, binary=True)
+        self._handle_io(args, fileobj_or_path, result, binary=True)
         ids = []
         for m in PUBLIC_KEY_RE.finditer(result.stderr):
             ids.append(m.group(1))
@@ -1762,7 +1788,7 @@ class GPG(object):
         trustlevel = levels[trustlevel] + 2
         import tempfile
         try:
-            fd, fn = tempfile.mkstemp()
+            fd, fn = tempfile.mkstemp(prefix='pygpg-')
             lines = []
             if isinstance(fingerprints, string_types):
                 fingerprints = [fingerprints]

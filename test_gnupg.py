@@ -979,8 +979,8 @@ class GPGTestCase(unittest.TestCase):
         self.assertTrue(sig, 'File signing should succeed')
         self.assertTrue(sig.hash_algo)
         try:
-            file = gnupg._make_binary_stream(sig.data, self.gpg.encoding)
-            verified = self.gpg.verify_file(file)
+            stream = gnupg._make_binary_stream(sig.data, self.gpg.encoding)
+            verified = self.gpg.verify_file(stream)
         except UnicodeDecodeError:  # pragma: no cover
             # sometimes happens in Python 2.6
             from io import BytesIO
@@ -1012,13 +1012,13 @@ class GPGTestCase(unittest.TestCase):
         data_file = open(self.test_fn, 'rb')
         data = data_file.read()
         data_file.close()
-        fd, fn = tempfile.mkstemp()
+        fd, fn = tempfile.mkstemp(prefix='pygpg-test-')
         os.write(fd, sig.data)
         os.close(fd)
         try:
             verified = self.gpg.verify_data(fn, data)
         finally:
-            os.unlink(fn)
+            os.remove(fn)
         self.assertEqual(0, verified.returncode, 'Non-zero return code')
         if key.fingerprint != verified.fingerprint:  # pragma: no cover
             logger.debug('key: %r', key.fingerprint)
@@ -1049,7 +1049,7 @@ class GPGTestCase(unittest.TestCase):
             self.assertTrue(verified.username.startswith('Andrew Able'))
             self.assertTrue(key.fingerprint.endswith(verified.key_id))
         finally:
-            os.unlink(sig_file)
+            os.remove(sig_file)
         self.assertEqual(0, verified.returncode, 'Non-zero return code')
         if key.fingerprint != verified.fingerprint:
             logger.debug('key: %r', key.fingerprint)
@@ -1096,7 +1096,7 @@ class GPGTestCase(unittest.TestCase):
             self.assertTrue(verified.username.startswith('Charlie Clark'))
             self.assertTrue(subkey.fingerprint.endswith(verified.key_id))
         finally:
-            os.unlink(sig_file)
+            os.remove(sig_file)
         self.assertEqual(0, verified.returncode, 'Non-zero return code')
         if subkey.fingerprint != verified.fingerprint:
             logger.debug('key: %r', subkey.fingerprint)
@@ -1157,8 +1157,8 @@ class GPGTestCase(unittest.TestCase):
             self.assertEqual(0, key.returncode, 'Non-zero return code')
             barbara = key.fingerprint
             data = 'Hello, world!'
-            file = gnupg._make_binary_stream(data, self.gpg.encoding)
-            edata = self.gpg.encrypt_file(file, [andrew, barbara], armor=False, output=encfname)
+            stream = gnupg._make_binary_stream(data, self.gpg.encoding)
+            edata = self.gpg.encrypt_file(stream, [andrew, barbara], armor=False, output=encfname)
             self.assertEqual(0, edata.returncode, 'Non-zero return code')
             efile = open(encfname, 'rb')
             ddata = self.gpg.decrypt_file(efile, passphrase='bbrown', output=decfname)
@@ -1196,8 +1196,8 @@ class GPGTestCase(unittest.TestCase):
 
     def test_file_encryption_and_decryption(self):
         "Test that encryption/decryption to/from file works"
-        encfno, encfname = tempfile.mkstemp()
-        decfno, decfname = tempfile.mkstemp()
+        encfno, encfname = tempfile.mkstemp(prefix='pygpg-test-')
+        decfno, decfname = tempfile.mkstemp(prefix='pygpg-test-')
         # On Windows, if the handles aren't closed, the files can't be deleted
         os.close(encfno)
         os.close(decfno)
@@ -1206,7 +1206,7 @@ class GPGTestCase(unittest.TestCase):
     @skipIf(os.name == 'nt', 'Test not suitable for Windows')
     def test_invalid_outputs(self):
         "Test encrypting to invalid output files"
-        encfno, encfname = tempfile.mkstemp()
+        encfno, encfname = tempfile.mkstemp(prefix='pygpg-test-')
         os.close(encfno)
         os.chmod(encfname, 0o400)
         cases = (
@@ -1235,7 +1235,7 @@ class GPGTestCase(unittest.TestCase):
 
             self.gpg.error_map = messages
 
-            encfno, encfname = tempfile.mkstemp()
+            encfno, encfname = tempfile.mkstemp(prefix='pygpg-test-')
             os.close(encfno)
             os.chmod(encfname, 0o400)
 
@@ -1421,9 +1421,14 @@ class GPGTestCase(unittest.TestCase):
 
     def test_invalid_fileobject(self):
         # accidentally on purpose pass in a filename rather than the file itself
-        with self.assertRaises(TypeError) as ec:
-            self.gpg.decrypt_file('foobar.txt', passphrase='', output='/tmp/decrypted.txt')
-        self.assertEqual(str(ec.exception), 'Not a valid file: foobar.txt')
+        bad = b'foobar.txt'
+        with self.assertRaises((TypeError, ValueError)) as ec:
+            self.gpg.decrypt_file(bad, passphrase='', output='/tmp/decrypted.txt')
+        if gnupg._py3k:
+            expected = 'Not a valid file or path: %s' % bad
+        else:
+            expected = 'No such file: %s' % bad
+        self.assertEqual(str(ec.exception), expected)
 
     def remove_all_existing_keys(self):
         for root, dirs, files in os.walk(self.homedir):
@@ -1468,6 +1473,58 @@ class GPGTestCase(unittest.TestCase):
         expected = set((key1.fingerprint[-idlen:], key2.fingerprint[-idlen:]))
         self.assertEqual(expected, ids)
 
+    def test_passing_paths(self):
+        key1 = self.generate_key('Andrew', 'Able', 'alpha.com', passphrase='andy')
+        self.assertEqual(0, key1.returncode, 'Non-zero return code')
+        andrew = key1.fingerprint
+        key2 = self.generate_key('Barbara', 'Brown', 'beta.com')
+        self.assertEqual(0, key2.returncode, 'Non-zero return code')
+        barbara = key2.fingerprint
+        data = b'Hello, world!'
+        fd, fn = tempfile.mkstemp(prefix='pygpg-test-')
+        os.write(fd, data)
+        os.close(fd)
+        gpg = self.gpg
+        try:
+            # Check encryption
+            edata = gpg.encrypt_file(fn, [andrew, barbara], armor=False)
+            self.assertEqual(0, edata.returncode, 'Non-zero return code')
+            self.assertEqual(edata.status, 'encryption ok')
+            with open(fn, 'wb') as f:
+                f.write(edata.data)
+            # Check getting recipients
+            ids = gpg.get_recipients_file(fn)
+            idlen = len(ids[0])
+            keys = gpg.list_keys()
+            expected = set(d['subkeys'][0][0][-idlen:] for d in keys)
+            self.assertEqual(set(ids), expected)
+            # Check decryption
+            ddata = gpg.decrypt_file(fn, passphrase='andy')
+            self.assertEqual(0, ddata.returncode, 'Non-zero return code')
+            self.assertEqual(ddata.status, 'decryption ok')
+            self.assertEqual(ddata.data, data)
+            # Check signing
+            with open(fn, 'wb') as f:
+                f.write(data)
+            sig = gpg.sign_file(fn, keyid=andrew, passphrase='andy', binary=True)
+            self.assertEqual(0, sig.returncode, 'Non-zero return code')
+            self.assertEqual(sig.status, 'signature created')
+            # Check verification
+            with open(fn, 'wb') as f:
+                f.write(sig.data)
+            verified = gpg.verify_file(fn)
+            self.assertEqual(0, verified.returncode, 'Non-zero return code')
+            self.assertEqual(verified.status, 'signature valid')
+            self.assertTrue(verified.valid)
+            # Check importing keys
+            with open(fn, 'wb') as f:
+                f.write(KEYS_TO_IMPORT.encode('ascii'))
+            result = gpg.import_keys_file(fn)
+            self.assertEqual(0, result.returncode, 'Non-zero return code')
+            self.assertEqual(result.imported, 2)
+        finally:
+            os.remove(fn)
+
 
 TEST_GROUPS = {
     'sign':
@@ -1494,7 +1551,7 @@ TEST_GROUPS = {
         'test_quote_with_shell'
     ]),
     'test':
-    set(['test_key_generation_failure']),
+    set(['test_passing_paths']),
 }
 
 
