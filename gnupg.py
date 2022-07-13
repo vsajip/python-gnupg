@@ -1068,7 +1068,7 @@ class GPG(object):
         dr.join()
         rr.join()
         if writer is not None:
-            writer.join()
+            writer.join(0.01)
         process.wait()
         result.returncode = rc = process.returncode
         if rc != 0:
@@ -1116,6 +1116,7 @@ class GPG(object):
             self._collect_output(p, result, writer, stdin)
             return result
         finally:
+            writer.join(0.01)
             if fileobj is not fileobj_or_path:
                 fileobj.close()
     #
@@ -1187,6 +1188,8 @@ class GPG(object):
             logging.exception('error writing message')
             writer = None
         finally:
+            if writer:
+                writer.join(0.01)
             if fileobj is not fileobj_or_path:
                 fileobj.close()
         self._collect_output(p, result, writer, stdin)
