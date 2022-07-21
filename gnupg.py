@@ -310,10 +310,6 @@ class Verify(object):
             self.sig_info[sig_id] = {'creation_date': creation_date, 'timestamp': timestamp}
             (self.signature_id, self.creation_date, self.timestamp) = (sig_id, creation_date,
                                                                        timestamp)
-        elif key == 'DECRYPTION_FAILED':  # pragma: no cover
-            self.valid = False
-            self.key_id = value
-            self.status = 'decryption failed'
         elif key == 'NO_PUBKEY':  # pragma: no cover
             self.valid = False
             self.key_id = value
