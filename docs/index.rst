@@ -179,6 +179,8 @@ secret_keyring (defaults to ``None``)
     If specified, the value is used as the name of the secret keyring file. A list of
     paths to secret keyring files can also be specified. *Note that these files are
     not used by GnuPG >= 2.1.*
+env  (defaults to ``None``)
+    If specified, the value is used as the environment variables used when calling the GPG
 
 .. versionchanged:: 0.3.4
    The ``keyring`` argument can now also be a list of keyring filenames.

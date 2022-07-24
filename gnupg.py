@@ -883,7 +883,8 @@ class GPG(object):
                  use_agent=False,
                  keyring=None,
                  options=None,
-                 secret_keyring=None):
+                 secret_keyring=None,
+                 env=None):
         """Initialize a GPG process wrapper.  Options are:
 
         gpgbinary -- full pathname for GPG binary.
@@ -895,9 +896,11 @@ class GPG(object):
         options =-- a list of additional options to pass to the GPG binary.
         secret_keyring -- name of alternative secret keyring file to use, or
         list of such keyrings.
+        env -- a dict of environment variables
         """
         self.gpgbinary = gpgbinary
         self.gnupghome = gnupghome
+        self.env = env
         # issue 112: fail if the specified value isn't a directory
         if gnupghome and not os.path.isdir(gnupghome):
             raise ValueError('gnupghome should be a directory (it isn\'t): %s' % gnupghome)
@@ -993,7 +996,7 @@ class GPG(object):
             si = STARTUPINFO()
             si.dwFlags = STARTF_USESHOWWINDOW
             si.wShowWindow = SW_HIDE
-        result = Popen(cmd, shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE, startupinfo=si)
+        result = Popen(cmd, shell=False, stdin=PIPE, stdout=PIPE, stderr=PIPE, startupinfo=si, env=self.env)
         logger.debug('%s: %s', result.pid, debug_print(cmd))
         return result
 
