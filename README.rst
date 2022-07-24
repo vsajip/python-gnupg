@@ -4,6 +4,7 @@
    :alt: GitHub test status
 
 .. |badge2| image:: https://img.shields.io/codecov/c/github/vsajip/python-gnupg
+   :target: https://app.codecov.io/gh/vsajip/python-gnupg
    :alt: GitHub coverage status
 
 

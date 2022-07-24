@@ -137,7 +137,7 @@ def _copy_data(instream, outstream):
         # for what is actually a binary file
         try:
             data = instream.read(1024)
-        except Exception:
+        except Exception:  # pragma: no cover
             logger.warning('Exception occurred while reading', exc_info=1)
             break
         if not data:
@@ -148,7 +148,7 @@ def _copy_data(instream, outstream):
             outstream.write(data)
         except UnicodeError:  # pragma: no cover
             outstream.write(data.encode(enc))
-        except Exception:
+        except Exception:  # pragma: no cover
             # Can sometimes get 'broken pipe' errors even when the data has all
             # been sent
             logger.exception('Error sending data')
@@ -379,7 +379,7 @@ class ImportResult(object):
             setattr(self, result, 0)
 
     def __nonzero__(self):
-        if self.not_imported or not self.fingerprints:
+        if self.not_imported or not self.fingerprints:  # pragma: no cover
             return False
         return True
 
@@ -403,7 +403,7 @@ class ImportResult(object):
     }
 
     def handle_status(self, key, value):
-        if key in ('WARNING', 'ERROR'):
+        if key in ('WARNING', 'ERROR'):  # pragma: no cover
             logger.warning('potential problem: %s: %s', key, value)
         elif key in ('IMPORTED', 'KEY_CONSIDERED'):
             # this duplicates info we already see in import_ok & import_problem
