@@ -85,6 +85,8 @@ Released: Not yet.
 
 * Fixed #190: Handle KEY_CREATED more robustly.
 
+* Fixed #191: Handle NODATA messages during verification.
+
 * Added the ability to pass an environment to the gpg executable. Thanks to Edvard
   Rejthar for the patch.
 
