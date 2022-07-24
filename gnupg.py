@@ -293,11 +293,13 @@ class Verify(object):
             self.key_id, self.username = value.split(None, 1)
             update_sig_info(keyid=self.key_id, username=self.username, status=self.status)
         elif key == 'VALIDSIG':
-            fingerprint, creation_date, sig_ts, expire_ts = value.split()[:4]
+            parts = value.split()
+            fingerprint, creation_date, sig_ts, expire_ts = parts[:4]
             (self.fingerprint, self.creation_date, self.sig_timestamp,
              self.expire_timestamp) = (fingerprint, creation_date, sig_ts, expire_ts)
             # may be different if signature is made with a subkey
-            self.pubkey_fingerprint = value.split()[-1]
+            if len(parts) >= 10:
+                self.pubkey_fingerprint = parts[9]
             self.status = 'signature valid'
             update_sig_info(fingerprint=fingerprint,
                             creation_date=creation_date,
