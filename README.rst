@@ -83,6 +83,8 @@ Released: Not yet.
 * Fixed #188: Remove handling of DECRYPTION_FAILED from Verify code, as not required
   there. Thanks to sebbASF for the patch.
 
+* Fixed #190: Handle KEY_CREATED more robustly.
+
 * Added the ability to pass an environment to the gpg executable. Thanks to Edvard
   Rejthar for the patch.
 

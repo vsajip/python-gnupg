@@ -717,7 +717,8 @@ class GenKey(object):
         if key in ('WARNING', 'ERROR'):  # pragma: no cover
             logger.warning('potential problem: %s: %s', key, value)
         elif key == 'KEY_CREATED':
-            (self.type, self.fingerprint) = value.split()
+            parts = value.split()
+            (self.type, self.fingerprint) = parts[:2]
             self.status = 'ok'
         elif key == 'KEY_NOT_CREATED':
             self.status = key.replace('_', ' ').lower()
