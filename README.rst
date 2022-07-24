@@ -75,6 +75,18 @@ Released: Not yet.
 * Fixed #181: Added the ability to pass file paths to encrypt_file, decrypt_file,
   sign_file, verify_file, get_recipients_file and added import_keys_file.
 
+* Fixed #183: Handle FAILURE and UNEXPECTED conditions correctly. Thanks to sebbASF for
+  the patch.
+
+* Fixed #185: Handle VALIDSIG arguments more robustly.
+
+* Fixed #188: Remove handling of DECRYPTION_FAILED from Verify code, as not required
+  there. Thanks to sebbASF for the patch.
+
+* Added the ability to pass an environment to the gpg executable. Thanks to Edvard
+  Rejthar for the patch.
+
+
 0.4.9
 -----
 
