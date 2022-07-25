@@ -359,11 +359,9 @@ class Verify(object):
                 if not self.status:
                     self.status = message
         elif key == 'NODATA':
+            # See issue GH-191
             self.valid = False
-            if value == '3':
-                self.status = 'invalid packet found'
-            elif value == '4':
-                self.status = 'signature expected but not found'
+            self.status = 'signature expected but not found'
         elif key in ('DECRYPTION_INFO', 'PLAINTEXT', 'PLAINTEXT_LENGTH', 'BEGIN_SIGNING'):
             pass
         else:  # pragma: no cover
