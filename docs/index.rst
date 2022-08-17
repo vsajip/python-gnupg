@@ -362,6 +362,18 @@ The parameters are explained with every possible value in `this GnuPG documentat
 <https://www.gnupg.org/documentation/manuals/gnupg/OpenPGP-Key-Management.html>`_
 under ``quick-add-key``.
 
+If you use the default algorithm, you'll get the default key size, which  is dependent
+upon the version of GnuPG that's used. If you want to specify the key size explicitly,
+you can use values for ``algorithm`` incorporating both the algorithm itself and the
+key size, as in the following examples.
+
+.. code-block:: python
+
+    gpg.add_subkey(..., algorithm='rsa2048')
+    gpg.add_subkey(..., algorithm='rsa3072')
+    gpg.add_subkey(..., algorithm='rsa4096')
+
+
 .. versionadded:: 0.4.9
    The ``add_subkey`` method was added.
 
