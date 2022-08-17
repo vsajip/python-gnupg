@@ -301,6 +301,9 @@ supply the following additional parameters:
 |               |                  |                                | non-empty passphrase is being supplied.     |
 +---------------+------------------+--------------------------------+---------------------------------------------+
 
+A complete list of key generation parameters can be found in the GnuPG documentation
+`here <https://www.gnupg.org/documentation/manuals/gnupg/Unattended-GPG-key-generation.html>`__.
+
 .. versionadded:: 0.4.7
    The ``no_protection`` keyword argument was added.
 
@@ -355,11 +358,34 @@ The ``add_subkey`` method has some additional keyword arguments:
 * ``usage`` (defaulting to ``encrypt``)
 * ``expire`` (defaulting to ``-``)
 
-The parameters are explained with every possible value in `this GnuPG documentation <https://www.gnupg.org/documentation/manuals/gnupg/OpenPGP-Key-Management.html>`_ under ``quick-add-key``.
+The parameters are explained with every possible value in `this GnuPG documentation
+<https://www.gnupg.org/documentation/manuals/gnupg/OpenPGP-Key-Management.html>`_
+under ``quick-add-key``.
 
 .. versionadded:: 0.4.9
    The ``add_subkey`` method was added.
 
+Specifying key usages
+^^^^^^^^^^^^^^^^^^^^^
+
+Keys can be used for some or all of encryption, signing or authentication. These
+usages map onto flags assigned to a key - one or more of 'encrypt', 'sign' and 'auth'.
+By default, nothing is specified, which assigns all flags to a key. But sometimes you
+may want to depart from this behaviour. For example, if you create a subkey for
+encryption, then you probably don't want encryption to be enabled for the master key.
+You can specify the flags associated with a key by passing a ``key_usage`` keyword
+argument which provides one or more of the above flags in a space or comma-separated
+string, as in these example:
+
+.. code-block:: python
+
+    gpg.gen_key_input(..., key_usage='sign')
+    gpg.gen_key_input(..., key_usage='sign encrypt')
+    gpg.gen_key_input(..., key_usage='sign, auth')
+
+This corresponds to the ``usage`` parameter of :meth:`add_subkey`, described earlier.
+Note that you still need to ensure that the key type of the key being created is
+appropriate for the usages.
 
 Performance Issues
 ^^^^^^^^^^^^^^^^^^
