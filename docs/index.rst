@@ -341,9 +341,16 @@ To generate keys with elliptic curves, pass a `key_curve` keyword parameter to
 <https://wiki.gnupg.org/ECC>`_ to see which options are supported. Note that you'll
 need GnuPG >= 2.1 for this to work.
 
-.. index::
-    single: Key; performance issues
-    single: Entropy
+Supplemental information on the aliases used for key types and curves is given `here
+<https://www.gnupg.org/documentation/manuals/gcrypt/ECC-key-parameters.html>`__. You
+can use the curve type alias in the ``algorithm`` argument to :meth:`add_subkey`, as
+in the following example.
+
+.. code-block:: python
+
+    input_data = gpg.gen_key_input(key_type='EDDSA', key_curve='ed25519' ...)
+    master_key = gpg.gen_key(input_data)
+    subkey = gpg.add_subkey(master_key.fingerprint, algorithm='cv25519' ...)
 
 Generating subkeys
 ^^^^^^^^^^^^^^^^^^
@@ -398,6 +405,10 @@ string, as in these example:
 This corresponds to the ``usage`` parameter of :meth:`add_subkey`, described earlier.
 Note that you still need to ensure that the key type of the key being created is
 appropriate for the usages.
+
+.. index::
+    single: Key; performance issues
+    single: Entropy
 
 Performance Issues
 ^^^^^^^^^^^^^^^^^^
