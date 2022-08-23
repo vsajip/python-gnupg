@@ -69,6 +69,13 @@ logger = logging.getLogger(__name__)
 if not logger.handlers:
     logger.addHandler(logging.NullHandler())
 
+# See gh-196: Logging could show sensitive data. It also produces some voluminous
+# output. Hence, split into two tiers - stuff that's always logged, and stuff that's
+# only logged if log_everything is True. (This is set by the test script.)
+#
+# For now, only debug logging of chunks falls into the optionally-logged category.
+log_everything = False
+
 # We use the test below because it works for Jython as well as CPython
 if os.path.__name__ == 'ntpath':  # pragma: no cover
     # On Windows, we don't need shell quoting, other than worrying about
@@ -1038,7 +1045,8 @@ class GPG(object):
                 if on_data:
                     on_data(data)
                 break
-            logger.debug('chunk: %r' % data[:256])
+            if log_everything:
+                logger.debug('chunk: %r' % data[:256])
             append = True
             if on_data:
                 append = on_data(data) is not False

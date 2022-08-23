@@ -34,6 +34,8 @@ __date__ = '$20-May-2022 09:02:15$'
 
 ALL_TESTS = True
 
+gnupg.log_everything = True
+
 logger = logging.getLogger(__name__)
 
 GPGBINARY = os.environ.get('GPGBINARY', 'gpg')
