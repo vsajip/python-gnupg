@@ -87,6 +87,9 @@ Released: Not yet.
 
 * Fixed #191: Handle NODATA messages during verification.
 
+* Fixed #196: Don't log chunk data by default, as it could contain sensitive
+  information (during decryption, for example).
+
 * Added the ability to pass an environment to the gpg executable. Thanks to Edvard
   Rejthar for the patch.
 
