@@ -45,7 +45,8 @@ To install this package from a source distribution archive, do the following:
 
 1. Extract all the files in the distribution archive to some directory on your
    system.
-2. In that directory, run ``python setup.py install``.
+2. In that directory, run ``pip install .``, referencing a suitable ``pip`` (e.g. one
+   from a specific venv which you want to install to).
 3. Optionally, run ``python test_gnupg.py`` to ensure that the package is
    working as expected.
 
