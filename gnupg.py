@@ -41,6 +41,7 @@ import socket
 from subprocess import Popen, PIPE
 import sys
 import threading
+import datetime
 
 __version__ = '0.5.1.dev0'
 __author__ = 'Vinay Sajip'
@@ -252,6 +253,7 @@ class Verify(object):
         self.trust_text = None
         self.trust_level = None
         self.sig_info = {}
+        self.sigs_info = {}
 
     def __nonzero__(self):
         return self.valid
@@ -259,16 +261,24 @@ class Verify(object):
     __bool__ = __nonzero__
 
     def handle_status(self, key, value):
-
         def update_sig_info(**kwargs):
             sig_id = self.signature_id
             if sig_id:
                 info = self.sig_info[sig_id]
                 info.update(kwargs)
 
+        def update_sigs_info(**kwargs):
+            key_id = self.key_id
+            if key_id:
+                if key_id not in self.sigs_info.keys():
+                    self.sigs_info[self.key_id] = {}
+                info = self.sigs_info[key_id]
+                info.update(kwargs)
+
         if key in self.TRUST_LEVELS:
             self.trust_text = key
             self.trust_level = self.TRUST_LEVELS[key]
+            update_sigs_info(trust_level=self.trust_level, trust_text=self.trust_text)
             update_sig_info(trust_level=self.trust_level, trust_text=self.trust_text)
         elif key in ('WARNING', 'ERROR'):
             logger.warning('potential problem: %s: %s', key, value)
@@ -277,6 +287,7 @@ class Verify(object):
             self.status = 'signature bad'
             self.key_id, self.username = value.split(None, 1)
             update_sig_info(keyid=self.key_id, username=self.username, status=self.status)
+            update_sigs_info(keyid=self.key_id, username=self.username, status=self.status)
         elif key == 'ERRSIG':  # pragma: no cover
             self.valid = False
             parts = value.split()
@@ -289,11 +300,19 @@ class Verify(object):
                             timestamp=self.timestamp,
                             fingerprint=self.fingerprint,
                             status=self.status)
+            datetimes = datetime.datetime.fromtimestamp(int(self.timestamp))
+            update_sigs_info(keyid=self.key_id,
+                             timestamp=self.timestamp,
+                             fingerprint=self.fingerprint,
+                             status=self.status,
+                             creation_date=f"{datetimes}")
         elif key == 'EXPSIG':  # pragma: no cover
             self.valid = False
             self.status = 'signature expired'
+            update_sigs_info(status=self.status)
             self.key_id, self.username = value.split(None, 1)
             update_sig_info(keyid=self.key_id, username=self.username, status=self.status)
+            update_sigs_info(keyid=self.key_id, username=self.username, status=self.status)
         elif key == 'GOODSIG':
             self.valid = True
             self.status = 'signature good'
@@ -314,19 +333,30 @@ class Verify(object):
                             expiry=expire_ts,
                             pubkey_fingerprint=self.pubkey_fingerprint,
                             status=self.status)
+            datetimes = datetime.datetime.fromtimestamp(int(sig_ts))
+            update_sigs_info(fingerprint=fingerprint,
+                             creation_date=f"{datetimes}",
+                             timestamp=sig_ts,
+                             expiry=expire_ts,
+                             pubkey_fingerprint=self.pubkey_fingerprint,
+                             status=self.status,
+                             username=self.username,
+                             keyid=self.key_id)
         elif key == 'SIG_ID':
             sig_id, creation_date, timestamp = value.split()
             self.sig_info[sig_id] = {'creation_date': creation_date, 'timestamp': timestamp}
-            (self.signature_id, self.creation_date, self.timestamp) = (sig_id, creation_date,
-                                                                       timestamp)
+            (self.signature_id, self.creation_date, self.timestamp) = (sig_id, creation_date, timestamp)
         elif key == 'NO_PUBKEY':  # pragma: no cover
             self.valid = False
             self.key_id = value
             self.status = 'no public key'
+            update_sigs_info(status=self.status)
         elif key == 'NO_SECKEY':  # pragma: no cover
             self.valid = False
             self.key_id = value
             self.status = 'no secret key'
+            update_sigs_info(status=self.status)
+            print(self.status)
         elif key in ('EXPKEYSIG', 'REVKEYSIG'):  # pragma: no cover
             # signed with expired or revoked key
             self.valid = False
@@ -337,6 +367,7 @@ class Verify(object):
                 self.key_status = 'signing key was revoked'
             self.status = self.key_status
             update_sig_info(status=self.status, keyid=self.key_id)
+            update_sigs_info(status=self.status, keyid=self.key_id)
         elif key in ('UNEXPECTED', 'FAILURE'):  # pragma: no cover
             self.valid = False
             if key == 'UNEXPECTED':
@@ -373,7 +404,6 @@ class Verify(object):
             pass
         else:  # pragma: no cover
             logger.debug('message ignored: %s, %s', key, value)
-
 
 class ImportResult(object):
     "Handle status messages for --import"
