@@ -1527,6 +1527,29 @@ class GPGTestCase(unittest.TestCase):
         finally:
             os.remove(fn)
 
+    def test_multiple_signatures(self):
+        gpg = self.gpg
+        key1 = self.generate_key('Andrew', 'Able', 'alpha.com')
+        key2 = self.generate_key('Barbara', 'Brown', 'beta.com')
+        data = b'signed data'
+        sig1 = gpg.sign(data, keyid=key1.fingerprint, passphrase='aable', detach=True)
+        sig2 = gpg.sign(data, keyid=key2.fingerprint, passphrase='bbrown', detach=True)
+        # Combine the signatures, then verify
+        fd, fn = tempfile.mkstemp(prefix='pygpg-test-')
+        os.write(fd, sig1.data)
+        os.write(fd, sig2.data)
+        os.close(fd)
+        try:
+            verified = self.gpg.verify_data(fn, data)
+            sig_info = verified.sig_info
+            self.assertEqual(len(sig_info), 2)
+            actual = set(d['fingerprint'] for d in sig_info.values())
+            expected = set((key1.fingerprint, key2.fingerprint))
+            self.assertEqual(actual, expected)
+        finally:
+            os.remove(fn)
+
+
 
 TEST_GROUPS = {
     'sign':
@@ -1553,7 +1576,7 @@ TEST_GROUPS = {
         'test_quote_with_shell'
     ]),
     'test':
-    set(['test_passing_paths']),
+    set(['test_multiple_signatures']),
 }
 
 
