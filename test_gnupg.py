@@ -702,6 +702,7 @@ class GPGTestCase(unittest.TestCase):
             ('TRUST_FULLY', 'f'),
             ('TRUST_ULTIMATE', 'u'),
             ('TRUST_UNDEFINED', 'q'),
+            ('TRUST_EXPIRED', 'e'),
         )
         for param, expected in cases:
             gpg.trust_keys(fingerprints, param)
