@@ -71,9 +71,12 @@ Change log
 0.5.1 (future)
 --------------
 
+Released: Not yet
+
 * Added TRUST_EXPIRED to trust_keys. Thanks to Leif Liddy for the patch.
 
-* Fix #194: Remove deprecated --always-trust in favour of --trust-model always
+* Fix #206: Remove deprecated --always-trust in favour of --trust-model always
+
 
 0.5.0
 -----
