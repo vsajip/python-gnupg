@@ -682,7 +682,7 @@ You can set the trust level for imported keys as follows::
     >>> gpg.trust_keys(fingerprints, trustlevel)
 
 where the ``fingerprints`` are a list of fingerprints of keys for which the trust
-level is to be set, and ``trustlevel`` is one of the string values
+level is to be set, and ``trustlevel`` is one of the string values ``'TRUST_EXPIRED'``,
 ``'TRUST_UNDEFINED'``, ``'TRUST_NEVER'``, ``'TRUST_MARGINAL'``, ``'TRUST_FULLY'`` or
 ``'TRUST_ULTIMATE'``.
 

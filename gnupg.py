@@ -1698,7 +1698,7 @@ class GPG(object):
         elif sign:  # pragma: no cover
             args.extend(['--sign', '--default-key', no_quote(sign)])
         if always_trust:  # pragma: no cover
-            args.append('--always-trust')
+            args.extend(['--trust-model', 'always'])
         if extra_args:
             args.extend(extra_args)
         result = self.result_map['crypt'](self)

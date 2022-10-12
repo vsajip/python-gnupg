@@ -68,10 +68,17 @@ Change log
 .. note:: GCnn refers to an issue nn on Google Code.
 
 
-0.5.0 (future)
+0.5.1 (future)
 --------------
 
-Released: Not yet.
+* Added TRUST_EXPIRED to trust_keys. Thanks to Leif Liddy for the patch.
+
+* Fix #194: Remove deprecated --always-trust in favour of --trust-model always
+
+0.5.0
+-----
+
+Released: 2022-08-23
 
 * Fixed #181: Added the ability to pass file paths to encrypt_file, decrypt_file,
   sign_file, verify_file, get_recipients_file and added import_keys_file.
