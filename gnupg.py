@@ -208,13 +208,15 @@ def _make_binary_stream(s, encoding):
 class Verify(object):
     "Handle status messages for --verify"
 
-    TRUST_UNDEFINED = 0
-    TRUST_NEVER = 1
-    TRUST_MARGINAL = 2
-    TRUST_FULLY = 3
-    TRUST_ULTIMATE = 4
+    TRUST_EXPIRED = 0
+    TRUST_UNDEFINED = 1
+    TRUST_NEVER = 2
+    TRUST_MARGINAL = 3
+    TRUST_FULLY = 4
+    TRUST_ULTIMATE = 5
 
     TRUST_LEVELS = {
+        'TRUST_EXPIRED': TRUST_EXPIRED,
         'TRUST_UNDEFINED': TRUST_UNDEFINED,
         'TRUST_NEVER': TRUST_NEVER,
         'TRUST_MARGINAL': TRUST_MARGINAL,
@@ -1800,7 +1802,7 @@ class GPG(object):
         if trustlevel not in levels:
             poss = ', '.join(sorted(levels))
             raise ValueError('Invalid trust level: "%s" (must be one of %s)' % (trustlevel, poss))
-        trustlevel = levels[trustlevel] + 2
+        trustlevel = levels[trustlevel] + 1
         import tempfile
         try:
             fd, fn = tempfile.mkstemp(prefix='pygpg-')
