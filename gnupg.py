@@ -104,9 +104,9 @@ else:
         """
         if not isinstance(s, string_types):  # pragma: no cover
             raise TypeError('Expected string type, got %s' % type(s))
-        if not s:
+        if not s:  # pragma: no cover
             result = "''"
-        elif not UNSAFE.search(s):
+        elif not UNSAFE.search(s):  # pragma: no cover
             result = s
         else:
             result = "'%s'" % s.replace("'", r"'\''")
@@ -255,7 +255,7 @@ class Verify(object):
         self.trust_level = None
         self.sig_info = {}
 
-    def __nonzero__(self):
+    def __nonzero__(self):  # pragma: no cover
         return self.valid
 
     __bool__ = __nonzero__
@@ -272,7 +272,7 @@ class Verify(object):
             self.trust_text = key
             self.trust_level = self.TRUST_LEVELS[key]
             update_sig_info(trust_level=self.trust_level, trust_text=self.trust_text)
-        elif key in ('WARNING', 'ERROR'):
+        elif key in ('WARNING', 'ERROR'):  # pragma: no cover
             logger.warning('potential problem: %s: %s', key, value)
         elif key == 'BADSIG':  # pragma: no cover
             self.valid = False
@@ -367,7 +367,7 @@ class Verify(object):
                             message = '%s: %s' % (operation, mapping[code])
                 if not self.status:
                     self.status = message
-        elif key == 'NODATA':
+        elif key == 'NODATA':  # pragma: no cover
             # See issue GH-191
             self.valid = False
             self.status = 'signature expected but not found'
@@ -394,9 +394,7 @@ class ImportResult(object):
             setattr(self, result, 0)
 
     def __nonzero__(self):
-        if self.not_imported or not self.fingerprints:  # pragma: no cover
-            return False
-        return True
+        return bool(not self.not_imported and self.fingerprints)
 
     __bool__ = __nonzero__
 
@@ -671,9 +669,9 @@ class Crypt(Verify, TextHandler):
             if self.status not in ('decryption failed', ):
                 self.status = 'no data was provided'
         elif key in ('NEED_PASSPHRASE', 'BAD_PASSPHRASE', 'GOOD_PASSPHRASE', 'MISSING_PASSPHRASE',
-                     'KEY_NOT_CREATED', 'NEED_PASSPHRASE_PIN'):
+                     'KEY_NOT_CREATED', 'NEED_PASSPHRASE_PIN'):  # pragma: no cover
             self.status = key.replace('_', ' ').lower()
-        elif key == 'DECRYPTION_FAILED':
+        elif key == 'DECRYPTION_FAILED':  # pragma: no cover
             if self.status != 'no secret key':  # don't overwrite more useful message
                 self.status = 'decryption failed'
         elif key == 'NEED_PASSPHRASE_SYM':
@@ -718,12 +716,12 @@ class GenKey(object):
         self.fingerprint = ''
         self.status = None
 
-    def __nonzero__(self):
+    def __nonzero__(self):  # pragma: no cover
         return bool(self.fingerprint)
 
     __bool__ = __nonzero__
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return self.fingerprint
 
     def handle_status(self, key, value):
@@ -735,7 +733,7 @@ class GenKey(object):
             self.status = 'ok'
         elif key == 'KEY_NOT_CREATED':
             self.status = key.replace('_', ' ').lower()
-        elif key in ('PROGRESS', 'GOOD_PASSPHRASE'):
+        elif key in ('PROGRESS', 'GOOD_PASSPHRASE'):  # pragma: no cover
             pass
         else:  # pragma: no cover
             logger.debug('message ignored: %s, %s', key, value)
@@ -752,7 +750,7 @@ class AddSubkey(object):
         self.fingerprint = ''
         self.status = None
 
-    def __nonzero__(self):
+    def __nonzero__(self):  # pragma: no cover
         return bool(self.fingerprint)
 
     __bool__ = __nonzero__
@@ -808,7 +806,7 @@ class DeleteResult(object):
         else:  # pragma: no cover
             logger.debug('message ignored: %s, %s', key, value)
 
-    def __nonzero__(self):
+    def __nonzero__(self):  # pragma: no cover
         return self.status == 'ok'
 
     __bool__ = __nonzero__
@@ -850,7 +848,7 @@ class Sign(TextHandler):
             self.status = 'signature created'
         elif key == 'USERID_HINT':  # pragma: no cover
             self.key_id, self.username = value.split(' ', 1)
-        elif key == 'BAD_PASSPHRASE':
+        elif key == 'BAD_PASSPHRASE':  # pragma: no cover
             self.status = 'bad passphrase'
         elif key in ('NEED_PASSPHRASE', 'GOOD_PASSPHRASE', 'BEGIN_SIGNING'):
             pass
@@ -920,7 +918,7 @@ class GPG(object):
             if isinstance(keyring, string_types):
                 keyring = [keyring]
         self.keyring = keyring
-        if secret_keyring:
+        if secret_keyring:  # pragma: no cover
             # Allow passing a string or another iterable. Make it uniformly
             # a list of keyring filenames
             if isinstance(secret_keyring, string_types):
@@ -937,7 +935,7 @@ class GPG(object):
         # falling back to utf-8, because gpg itself uses latin-1 as the default
         # encoding.
         self.encoding = 'latin-1'
-        if gnupghome and not os.path.isdir(self.gnupghome):
+        if gnupghome and not os.path.isdir(self.gnupghome):  # pragma: no cover
             os.makedirs(self.gnupghome, 0o700)
         try:
             p = self._open_subprocess(['--version'])
@@ -967,7 +965,7 @@ class GPG(object):
         a passphrase will be sent to GPG, else False.
         """
         cmd = [self.gpgbinary, '--status-fd', '2', '--no-tty', '--no-verbose']
-        if 'DEBUG_IPC' in os.environ:
+        if 'DEBUG_IPC' in os.environ:  # pragma: no cover
             cmd.extend(['--debug', 'ipc'])
         if passphrase and hasattr(self, 'version'):
             if self.version >= (2, 1):
@@ -979,7 +977,7 @@ class GPG(object):
             cmd.append('--no-default-keyring')
             for fn in self.keyring:
                 cmd.extend(['--keyring', no_quote(fn)])
-        if self.secret_keyring:
+        if self.secret_keyring:  # pragma: no cover
             for fn in self.secret_keyring:
                 cmd.extend(['--secret-keyring', no_quote(fn)])
         if passphrase:
@@ -1186,7 +1184,7 @@ class GPG(object):
         if output:  # write the output to a file with the specified name
             self.set_output_without_confirmation(args, output)
 
-        if extra_args:
+        if extra_args:  # pragma: no cover
             args.extend(extra_args)
         result = self.result_map['sign'](self)
         # We could use _handle_io here except for the fact that if the
@@ -1283,7 +1281,7 @@ class GPG(object):
         logger.debug('import_keys: %r', key_data[:256])
         data = _make_binary_stream(key_data, self.encoding)
         args = ['--import']
-        if extra_args:
+        if extra_args:  # pragma: no cover
             args.extend(extra_args)
         self._handle_io(args, data, result, passphrase=passphrase, binary=True)
         logger.debug('import_keys result: %r', result.__dict__)
@@ -1314,7 +1312,7 @@ class GPG(object):
         logger.debug('recv_keys: %r', keyids)
         data = _make_binary_stream('', self.encoding)
         args = ['--keyserver', no_quote(keyserver)]
-        if 'extra_args' in kwargs:
+        if 'extra_args' in kwargs:  # pragma: no cover
             args.extend(kwargs['extra_args'])
         args.append('--recv-keys')
         args.extend([no_quote(k) for k in keyids])
@@ -1356,7 +1354,7 @@ class GPG(object):
         via pinentry, you should specify expect_passphrase=False. (It's only
         checked for GnuPG >= 2.1).
         """
-        if passphrase and not self.is_valid_passphrase(passphrase):
+        if passphrase and not self.is_valid_passphrase(passphrase):  # pragma: no cover
             raise ValueError('Invalid passphrase')
         which = 'key'
         if secret:  # pragma: no cover
@@ -1404,12 +1402,12 @@ class GPG(object):
         via pinentry, you should specify expect_passphrase=False. (It's only
         checked for GnuPG >= 2.1).
         """
-        if passphrase and not self.is_valid_passphrase(passphrase):
+        if passphrase and not self.is_valid_passphrase(passphrase):  # pragma: no cover
             raise ValueError('Invalid passphrase')
         which = ''
         if secret:
             which = '-secret-key'
-            if self.version >= (2, 1) and passphrase is None and expect_passphrase:
+            if self.version >= (2, 1) and passphrase is None and expect_passphrase:  # pragma: no cover
                 raise ValueError('For GnuPG >= 2.1, exporting secret keys '
                                  'needs a passphrase to be provided')
         if _is_sequence(keyids):
@@ -1605,7 +1603,7 @@ class GPG(object):
         out = 'Key-Type: %s\n' % parms.pop('Key-Type')
         for key, val in list(parms.items()):
             out += '%s: %s\n' % (key, val)
-        if no_protection:
+        if no_protection:  # pragma: no cover
             out += '%no-protection\n'
         out += '%commit\n'
         return out
@@ -1643,10 +1641,10 @@ class GPG(object):
         """
         if self.version[0] < 2:
             raise NotImplementedError('Not available in GnuPG 1.x')
-        if not master_key:
+        if not master_key:  # pragma: no cover
             raise ValueError('No master key fingerprint specified')
 
-        if master_passphrase and not self.is_valid_passphrase(master_passphrase):
+        if master_passphrase and not self.is_valid_passphrase(master_passphrase):  # pragma: no cover
             raise ValueError('Invalid passphrase')
 
         args = ['--quick-add-key', master_key, algorithm, usage, str(expire)]
@@ -1773,7 +1771,7 @@ class GPG(object):
             self.set_output_without_confirmation(args, output)
         if always_trust:  # pragma: no cover
             args.append('--always-trust')
-        if extra_args:
+        if extra_args:  # pragma: no cover
             args.extend(extra_args)
         result = self.result_map['crypt'](self)
         self._handle_io(args, fileobj_or_path, result, passphrase, binary=True)
@@ -1788,7 +1786,7 @@ class GPG(object):
 
     def get_recipients_file(self, fileobj_or_path, extra_args=None):
         args = ['--decrypt', '--list-only', '-v']
-        if extra_args:
+        if extra_args:  # pragma: no cover
             args.extend(extra_args)
         result = self.result_map['crypt'](self)
         self._handle_io(args, fileobj_or_path, result, binary=True)
