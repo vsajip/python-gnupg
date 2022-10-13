@@ -77,6 +77,9 @@ Released: Not yet
 
 * Fix #206: Remove deprecated --always-trust in favour of --trust-model always
 
+* Fix #208: Add ``status_detail`` attribute to result objects which is populated when
+  the status is ``'invalid recipient'`` (encryption/decryption) or ``'invalid signer'``
+  (signing).
 
 0.5.0
 -----

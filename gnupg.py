@@ -647,6 +647,36 @@ class TextHandler(object):
             return self.data
 
 
+_INVALID_KEY_REASONS = {
+     0: 'no specific reason given',
+     1: 'not found',
+     2: 'ambiguous specification',
+     3: 'wrong key usage',
+     4: 'key revoked',
+     5: 'key expired',
+     6: 'no crl known',
+     7: 'crl too old',
+     8: 'policy mismatch',
+     9: 'not a secret key',
+     10: 'key not trusted',
+     11: 'missing certificate',
+     12: 'missing issuer certificate',
+     13: 'key disabled',
+     14: 'syntax error in specification',
+}
+
+
+def _determine_invalid_recipient_or_signer(s):
+    code, ident = s.split()
+    unexpected = 'unexpected return code %r' % code
+    try:
+        key = int(s)
+        result = _INVALID_KEY_REASONS.get(key, unexpected)
+    except ValueError:
+        result = unexpected
+    return '%s: %s' % (result, ident)
+
+
 class Crypt(Verify, TextHandler):
     "Handle status messages for --encrypt and --decrypt"
 
@@ -655,6 +685,7 @@ class Crypt(Verify, TextHandler):
         self.data = ''
         self.ok = False
         self.status = ''
+        self.status_detail = ''
         self.key_id = None
 
     def __nonzero__(self):
@@ -689,6 +720,7 @@ class Crypt(Verify, TextHandler):
             self.ok = True
         elif key == 'INV_RECP':  # pragma: no cover
             self.status = 'invalid recipient'
+            self.status_detail = _determine_invalid_recipient_or_signer(value)
         elif key == 'KEYEXPIRED':  # pragma: no cover
             self.status = 'key expired'
         elif key == 'SIG_CREATED':  # pragma: no cover
@@ -827,6 +859,7 @@ class Sign(TextHandler):
         self.hash_algo = None
         self.fingerprint = None
         self.status = None
+        self.status_detail = None
         self.key_id = None
         self.username = None
 
@@ -850,6 +883,9 @@ class Sign(TextHandler):
             self.key_id, self.username = value.split(' ', 1)
         elif key == 'BAD_PASSPHRASE':  # pragma: no cover
             self.status = 'bad passphrase'
+        elif key in ('INV_SGNR', 'INV_RECP'):  # latter returned in older versions
+            self.status = 'invalid signer'
+            self.status_detail = _determine_invalid_recipient_or_signer(value)
         elif key in ('NEED_PASSPHRASE', 'GOOD_PASSPHRASE', 'BEGIN_SIGNING'):
             pass
         else:  # pragma: no cover
@@ -1134,6 +1170,7 @@ class GPG(object):
     #
     # SIGNATURE METHODS
     #
+
     def sign(self, message, **kwargs):
         """sign message"""
         f = _make_binary_stream(message, self.encoding)

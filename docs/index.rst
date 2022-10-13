@@ -847,6 +847,14 @@ symmetric (defaults to ``False``)
 .. versionadded:: 0.4.1
    The ``extra_args`` keyword argument was added.
 
+.. versionadded:: 0.5.1
+   The ``status_detail`` attribute was added to the result object. This attribute will
+   be set when the result object's ``status`` attribute is set to ``invalid recipient``
+   and will contain more information about the failure in the form of ``reason:ident``
+   where ``reason`` is a text description of the reason, and ``ident`` identifies the
+   recipient key.
+
+
 The ``encrypt_file`` method takes the following additional keyword arguments:
 
 armor (defaults to ``True``)
@@ -1056,10 +1064,16 @@ The hash algorihm used when creating the signature can be found in the
    (which should happen if you specify ``extra_args=['--verbose']``).
 
 .. versionchanged:: 0.5.0
-   The `stream` argument to :meth:`sign_file` can be a pathname to an existing file as
-   well as text or a file-like object. In the pathname case, ``python-gnupg`` will
+   The *stream* argument to :meth:`sign_file` can be a pathname to an existing file
+   as well as text or a file-like object. In the pathname case, ``python-gnupg`` will
    open and close the file for you.
 
+.. versionadded:: 0.5.1
+   The ``status_detail`` attribute was added to the result object. This attribute will
+   be set when the result object's ``status`` attribute is set to ``invalid signer``
+   and will contain more information about the failure in the form of ``reason:ident``
+   where ``reason`` is a text description of the reason, and ``ident`` identifies the
+   signing key.
 
 .. index:: Verification
 

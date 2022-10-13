@@ -762,7 +762,7 @@ class GPGTestCase(unittest.TestCase):
         gpg = self.gpg
         if gnupg._py3k:
             data = 'Hello, André!'
-        else:
+        else:  # pragma: no cover
             data = unicode('Hello, André', gpg.encoding)
         data = data.encode(gpg.encoding)
         result = gpg.encrypt(data, barbara)
@@ -937,7 +937,7 @@ class GPGTestCase(unittest.TestCase):
         key = self.generate_key('Andrew', 'Able', 'alpha.com')
         if gnupg._py3k:
             data = 'Hello, André!'
-        else:
+        else:  # pragma: no cover
             data = unicode('Hello, André', self.gpg.encoding)
         data = data.encode(self.gpg.encoding)
         self.assertRaises(ValueError,
@@ -1450,7 +1450,7 @@ class GPGTestCase(unittest.TestCase):
         gpg = self.gpg
         if gnupg._py3k:
             data = 'Hello, André!'
-        else:
+        else:  # pragma: no cover
             data = unicode('Hello, André', gpg.encoding)
         data = data.encode(gpg.encoding)
         encrypted = gpg.encrypt(data, barbara)
@@ -1549,7 +1549,6 @@ class GPGTestCase(unittest.TestCase):
             self.assertEqual(actual, expected)
         finally:
             os.remove(fn)
-
 
 
 TEST_GROUPS = {
