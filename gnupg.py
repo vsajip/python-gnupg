@@ -667,14 +667,19 @@ _INVALID_KEY_REASONS = {
 
 
 def _determine_invalid_recipient_or_signer(s):
-    code, ident = s.split()
+    parts = s.split()
+    if len(parts) >= 2:
+        code, ident = parts[:2]
+    else:
+        code = parts[0]
+        ident = '<no ident>'
     unexpected = 'unexpected return code %r' % code
     try:
-        key = int(s)
+        key = int(code)
         result = _INVALID_KEY_REASONS.get(key, unexpected)
     except ValueError:
         result = unexpected
-    return '%s: %s' % (result, ident)
+    return '%s:%s' % (result, ident)
 
 
 class Crypt(Verify, TextHandler):
@@ -719,7 +724,10 @@ class Crypt(Verify, TextHandler):
             self.status = 'encryption ok'
             self.ok = True
         elif key == 'INV_RECP':  # pragma: no cover
-            self.status = 'invalid recipient'
+            if not self.status:
+                self.status = 'invalid recipient'
+            else:
+                self.status = 'invalid recipient: %s' % self.status
             self.status_detail = _determine_invalid_recipient_or_signer(value)
         elif key == 'KEYEXPIRED':  # pragma: no cover
             self.status = 'key expired'
@@ -884,7 +892,10 @@ class Sign(TextHandler):
         elif key == 'BAD_PASSPHRASE':  # pragma: no cover
             self.status = 'bad passphrase'
         elif key in ('INV_SGNR', 'INV_RECP'):  # latter returned in older versions
-            self.status = 'invalid signer'
+            if not self.status:
+                self.status = 'invalid signer'
+            else:
+                self.status = 'invalid signer: %s' % self.status
             self.status_detail = _determine_invalid_recipient_or_signer(value)
         elif key in ('NEED_PASSPHRASE', 'GOOD_PASSPHRASE', 'BEGIN_SIGNING'):
             pass
