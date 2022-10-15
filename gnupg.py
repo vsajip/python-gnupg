@@ -1,4 +1,4 @@
-""" A wrapper for the 'gpg' command::
+""" A wrapper for the GnuPG `gpg` command.
 
 Portions of this module are derived from A.M. Kuchling's well-designed
 GPG.py, using Richard Jones' updated version 1.3, which can be found
@@ -29,7 +29,8 @@ the previous versions.
 
 Modifications Copyright (C) 2008-2022 Vinay Sajip. All rights reserved.
 
-A unittest harness (test_gnupg.py) has also been added.
+For the full documentation, see https://docs.red-dove.com/python-gnupg/ or
+https://gnupg.readthedocs.io/
 """
 
 import codecs
@@ -2021,7 +2022,7 @@ class GPG(object):
         :param sign (str): If specified, the key id of a signer to sign the encrypted
                            data.
 
-        :param always_trust (bool): Whether to always trust.
+        :param always_trust (bool): Whether to always trust keys.
 
         :param passphrase (str): The passphrase to use.
 
@@ -2109,7 +2110,7 @@ class GPG(object):
         :param fileobj_or_path (str|file): A path to a file or a file-like object
                                            containing the data to be decrypted.
 
-        :param always_trust: Whether to always trust.
+        :param always_trust: Whether to always trust keys.
 
         :param passphrase (str): The passphrase to use.
 
@@ -2123,7 +2124,7 @@ class GPG(object):
         if output:  # write the output to a file with the specified name
             self.set_output_without_confirmation(args, output)
         if always_trust:  # pragma: no cover
-            args.append('--always-trust')
+            args.extend(['--trust-model', 'always'])
         if extra_args:  # pragma: no cover
             args.extend(extra_args)
         result = self.result_map['crypt'](self)
