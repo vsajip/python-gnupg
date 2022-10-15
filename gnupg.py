@@ -2087,7 +2087,7 @@ class GPG(object):
 
     def decrypt(self, message, **kwargs):
         """
-        Decrypt the data in *message*. Thsi method delegates most of the work to
+        Decrypt the data in *message*. This method delegates most of the work to
         :meth:`decrypt_file`.
 
         :param message (str|bytes): The data to decrypt. A default key will be used
