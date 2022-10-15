@@ -64,7 +64,7 @@ except NameError:
     _py3k = True
     string_types = str
     text_type = str
-    path_types = (str,)
+    path_types = (str, )
 
 logger = logging.getLogger(__name__)
 if not logger.handlers:
@@ -282,6 +282,7 @@ class Verify(object):
         :param key (str): Identifies what the status message is.
         :param value (str): Identifies additional data, which differs depending on the key.
         """
+
         def update_sig_info(**kwargs):
             sig_id = self.signature_id
             if sig_id:
@@ -339,8 +340,7 @@ class Verify(object):
         elif key == 'SIG_ID':
             sig_id, creation_date, timestamp = value.split()
             self.sig_info[sig_id] = {'creation_date': creation_date, 'timestamp': timestamp}
-            (self.signature_id, self.creation_date, self.timestamp) = (sig_id, creation_date,
-                                                                       timestamp)
+            (self.signature_id, self.creation_date, self.timestamp) = (sig_id, creation_date, timestamp)
         elif key == 'NO_PUBKEY':  # pragma: no cover
             self.valid = False
             self.key_id = value
@@ -459,11 +459,7 @@ class ImportResult(object):
             # this duplicates info we already see in import_ok & import_problem
             pass
         elif key == 'NODATA':  # pragma: no cover
-            self.results.append({
-                'fingerprint': None,
-                'problem': '0',
-                'text': 'No valid data found'
-            })
+            self.results.append({'fingerprint': None, 'problem': '0', 'text': 'No valid data found'})
         elif key == 'IMPORT_OK':
             reason, fingerprint = value.split()
             reasons = []
@@ -479,11 +475,7 @@ class ImportResult(object):
             except Exception:
                 reason = value
                 fingerprint = '<unknown>'
-            self.results.append({
-                'fingerprint': fingerprint,
-                'problem': reason,
-                'text': self.problem_reason[reason]
-            })
+            self.results.append({'fingerprint': fingerprint, 'problem': reason, 'text': self.problem_reason[reason]})
         elif key == 'IMPORT_RES':
             import_res = value.split()
             for i, count in enumerate(self.counts):
@@ -761,21 +753,21 @@ class TextHandler(object):
 
 
 _INVALID_KEY_REASONS = {
-     0: 'no specific reason given',
-     1: 'not found',
-     2: 'ambiguous specification',
-     3: 'wrong key usage',
-     4: 'key revoked',
-     5: 'key expired',
-     6: 'no crl known',
-     7: 'crl too old',
-     8: 'policy mismatch',
-     9: 'not a secret key',
-     10: 'key not trusted',
-     11: 'missing certificate',
-     12: 'missing issuer certificate',
-     13: 'key disabled',
-     14: 'syntax error in specification',
+    0: 'no specific reason given',
+    1: 'not found',
+    2: 'ambiguous specification',
+    3: 'wrong key usage',
+    4: 'key revoked',
+    5: 'key expired',
+    6: 'no crl known',
+    7: 'crl too old',
+    8: 'policy mismatch',
+    9: 'not a secret key',
+    10: 'key not trusted',
+    11: 'missing certificate',
+    12: 'missing issuer certificate',
+    13: 'key disabled',
+    14: 'syntax error in specification',
 }
 
 
@@ -834,8 +826,8 @@ class Crypt(Verify, TextHandler):
         elif key == 'NODATA':
             if self.status not in ('decryption failed', ):
                 self.status = 'no data was provided'
-        elif key in ('NEED_PASSPHRASE', 'BAD_PASSPHRASE', 'GOOD_PASSPHRASE', 'MISSING_PASSPHRASE',
-                     'KEY_NOT_CREATED', 'NEED_PASSPHRASE_PIN'):  # pragma: no cover
+        elif key in ('NEED_PASSPHRASE', 'BAD_PASSPHRASE', 'GOOD_PASSPHRASE', 'MISSING_PASSPHRASE', 'KEY_NOT_CREATED',
+                     'NEED_PASSPHRASE_PIN'):  # pragma: no cover
             self.status = key.replace('_', ' ').lower()
         elif key == 'DECRYPTION_FAILED':  # pragma: no cover
             if self.status != 'no secret key':  # don't overwrite more useful message
@@ -868,8 +860,8 @@ class Crypt(Verify, TextHandler):
         elif key == 'ENC_TO':  # pragma: no cover
             # ENC_TO <long_keyid> <keytype> <keylength>
             self.key_id = value.split(' ', 1)[0]
-        elif key in ('USERID_HINT', 'GOODMDC', 'END_DECRYPTION', 'CARDCTRL', 'BADMDC',
-                     'SC_OP_FAILURE', 'SC_OP_SUCCESS', 'PINENTRY_LAUNCHED', 'KEY_CONSIDERED'):
+        elif key in ('USERID_HINT', 'GOODMDC', 'END_DECRYPTION', 'CARDCTRL', 'BADMDC', 'SC_OP_FAILURE',
+                     'SC_OP_SUCCESS', 'PINENTRY_LAUNCHED', 'KEY_CONSIDERED'):
             pass
         else:
             Verify.handle_status(self, key, value)
@@ -976,6 +968,7 @@ class ExportResult(GenKey):
     """
     This class handles status messages during key export.
     """
+
     # For now, just use an existing class to base it on - if needed, we
     # can override handle_status for more specific message handling.
 
@@ -1094,8 +1087,7 @@ class Sign(TextHandler):
         elif key == 'KEYREVOKED':  # pragma: no cover
             self.status = 'key revoked'
         elif key == 'SIG_CREATED':
-            (self.type, algo, self.hash_algo, cls, self.timestamp,
-             self.fingerprint) = value.split()
+            (self.type, algo, self.hash_algo, cls, self.timestamp, self.fingerprint) = value.split()
             self.status = 'signature created'
         elif key == 'USERID_HINT':  # pragma: no cover
             self.key_id, self.username = value.split(' ', 1)
@@ -1397,6 +1389,7 @@ class GPG(object):
             writer.join(0.01)
             if fileobj is not fileobj_or_path:
                 fileobj.close()
+
     #
     # SIGNATURE METHODS
     #
@@ -1654,12 +1647,7 @@ class GPG(object):
         data.close()
         return result
 
-    def delete_keys(self,
-                    fingerprints,
-                    secret=False,
-                    passphrase=None,
-                    expect_passphrase=True,
-                    exclamation_mode=False):
+    def delete_keys(self, fingerprints, secret=False, passphrase=None, expect_passphrase=True, exclamation_mode=False):
         """
         Delete the indicated keys.
 
@@ -1715,13 +1703,7 @@ class GPG(object):
                 f.close()
         return result
 
-    def export_keys(self,
-                    keyids,
-                    secret=False,
-                    armor=True,
-                    minimal=False,
-                    passphrase=None,
-                    expect_passphrase=True):
+    def export_keys(self, keyids, secret=False, armor=True, minimal=False, passphrase=None, expect_passphrase=True):
         """
         Export the indicated keys. A 'keyid' is anything gpg accepts.
 
@@ -1961,12 +1943,7 @@ class GPG(object):
         # %secring foo.sec
         # %commit
 
-    def add_subkey(self,
-                   master_key,
-                   master_passphrase=None,
-                   algorithm='rsa',
-                   usage='encrypt',
-                   expire='-'):
+    def add_subkey(self, master_key, master_passphrase=None, algorithm='rsa', usage='encrypt', expire='-'):
         """
         Add subkeys to a master key,
 
@@ -2098,12 +2075,7 @@ class GPG(object):
         data.close()
         return result
 
-    def decrypt_file(self,
-                     fileobj_or_path,
-                     always_trust=False,
-                     passphrase=None,
-                     output=None,
-                     extra_args=None):
+    def decrypt_file(self, fileobj_or_path, always_trust=False, passphrase=None, output=None, extra_args=None):
         """
         Decrypt data in a file or file-like object.
 

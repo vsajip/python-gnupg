@@ -261,8 +261,7 @@ class GPGTestCase(unittest.TestCase):
     def test_environment(self):
         "Test the environment by ensuring that setup worked"
         hd = self.homedir
-        self.assertTrue(
-            os.path.exists(hd) and os.path.isdir(hd), 'Not an existing directory: %s' % hd)
+        self.assertTrue(os.path.exists(hd) and os.path.isdir(hd), 'Not an existing directory: %s' % hd)
 
     def test_list_keys_initial(self):
         "Test that initially there are no keys"
@@ -341,9 +340,8 @@ class GPGTestCase(unittest.TestCase):
         uids = key['uids']
         self.assertEqual(len(uids), 1)
         uid = uids[0]
-        self.assertEqual(
-            uid, 'urn:uuid:731c22c4-830f-422f-80dc-14a9fdae8c19 '
-            '(dummy comment) <test.name@example.com>')
+        self.assertEqual(uid, 'urn:uuid:731c22c4-830f-422f-80dc-14a9fdae8c19 '
+                         '(dummy comment) <test.name@example.com>')
 
     def test_key_generation_with_escapes(self):
         "Test that key generation handles escape characters"
@@ -364,9 +362,8 @@ class GPGTestCase(unittest.TestCase):
         uids = key['uids']
         self.assertEqual(len(uids), 1)
         uid = uids[0]
-        self.assertEqual(
-            uid, 'Test Name (Funny chars: '
-            '\r\n\x0c\x0b\x00\x08) <test.name@example.com>')
+        self.assertEqual(uid, 'Test Name (Funny chars: '
+                         '\r\n\x0c\x0b\x00\x08) <test.name@example.com>')
 
     @unittest.skipIf(os.name == 'nt', 'Test requires POSIX-style permissions')
     def test_key_generation_failure(self):
@@ -410,8 +407,8 @@ class GPGTestCase(unittest.TestCase):
             'name_comment': 'NIST P-384',
         }
         cmd = self.gpg.gen_key_input(**params)
-        for s in ('Key-Type: ECDSA', 'Key-Curve: nistp384', 'Subkey-Type: ECDH',
-                  'Subkey-Curve: nistp384', 'Name-Comment: NIST P-384'):
+        for s in ('Key-Type: ECDSA', 'Key-Curve: nistp384', 'Subkey-Type: ECDH', 'Subkey-Curve: nistp384',
+                  'Name-Comment: NIST P-384'):
             self.assertTrue('%s\n' % s in cmd)
         self.assertFalse('Key-Length: ' in cmd)
 
@@ -419,11 +416,7 @@ class GPGTestCase(unittest.TestCase):
         "Test that subkeys can be added"
         if self.gpg.version[0] < 2:
             raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
-        master_key = self.generate_key('Charlie',
-                                       'Clark',
-                                       'gamma.com',
-                                       passphrase='123',
-                                       with_subkey=False)
+        master_key = self.generate_key('Charlie', 'Clark', 'gamma.com', passphrase='123', with_subkey=False)
         self.assertEqual(0, master_key.returncode, 'Non-zero return code')
 
         result = self.gpg.add_subkey(master_key=master_key.fingerprint,
@@ -437,11 +430,7 @@ class GPGTestCase(unittest.TestCase):
         "Test that subkey generation handles invalid key type"
         if self.gpg.version[0] < 2:
             raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
-        master_key = self.generate_key('Charlie',
-                                       'Clark',
-                                       'gamma.com',
-                                       passphrase='123',
-                                       with_subkey=False)
+        master_key = self.generate_key('Charlie', 'Clark', 'gamma.com', passphrase='123', with_subkey=False)
         self.assertEqual(0, master_key.returncode, 'Non-zero return code')
 
         result = self.gpg.add_subkey(master_key=master_key.fingerprint,
@@ -458,11 +447,7 @@ class GPGTestCase(unittest.TestCase):
         "Test that subkey deletion works"
         if self.gpg.version[0] < 2:
             raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
-        master_key = self.generate_key('Charlie',
-                                       'Clark',
-                                       'gamma.com',
-                                       passphrase='123',
-                                       with_subkey=False)
+        master_key = self.generate_key('Charlie', 'Clark', 'gamma.com', passphrase='123', with_subkey=False)
         self.assertEqual(0, master_key.returncode, 'Non-zero return code')
 
         subkey = self.gpg.add_subkey(master_key=master_key.fingerprint,
@@ -484,10 +469,7 @@ class GPGTestCase(unittest.TestCase):
 
         self.assertTrue(is_list_with_len(private_keys, 1), '1-element list expected')
         self.assertEqual(len(secret_key_info['subkeys']), 1, '1-element list expected')
-        result = self.gpg.delete_keys(subkey.fingerprint,
-                                      secret=True,
-                                      passphrase='123',
-                                      exclamation_mode=True)
+        result = self.gpg.delete_keys(subkey.fingerprint, secret=True, passphrase='123', exclamation_mode=True)
         result = self.gpg.delete_keys(subkey.fingerprint, exclamation_mode=True)
         self.assertEqual(0, result.returncode, 'Non-zero return code')
 
@@ -510,11 +492,7 @@ class GPGTestCase(unittest.TestCase):
             raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
         self.test_list_keys_initial()
 
-        master_key = self.generate_key('Charlie',
-                                       'Clark',
-                                       'gamma.com',
-                                       passphrase='123',
-                                       with_subkey=False)
+        master_key = self.generate_key('Charlie', 'Clark', 'gamma.com', passphrase='123', with_subkey=False)
         self.assertEqual(0, master_key.returncode, 'Non-zero return code')
 
         subkey_sign = self.gpg.add_subkey(master_key=master_key.fingerprint,
@@ -681,8 +659,7 @@ class GPGTestCase(unittest.TestCase):
         public_keys = gpg.list_keys(keys=['Donna', 'Barbara'])
         self.assertEqual(0, public_keys.returncode, 'Non-zero return code')
         actual = get_names(public_keys.key_map)
-        expected = set(
-            ['Barbara Brown <barbara.brown@beta.com>', 'Donna Davis <donna.davis@delta.com>'])
+        expected = set(['Barbara Brown <barbara.brown@beta.com>', 'Donna Davis <donna.davis@delta.com>'])
         self.assertEqual(actual, expected)
 
     def test_key_trust(self):
@@ -724,14 +701,11 @@ class GPGTestCase(unittest.TestCase):
         self.assertTrue(is_list_with_len(keys, 1), 'importing test signed key')
         sigs = self.gpg.list_keys(keys=['18897CA2'], sigs=True)[0]['sigs']
         logger.debug('testing self-signature')
-        self.assertTrue(('BC6F350FB3D04076', 'Joshua Calvert (A test user) <jc@example.com>',
-                         '13x') in sigs)
+        self.assertTrue(('BC6F350FB3D04076', 'Joshua Calvert (A test user) <jc@example.com>', '13x') in sigs)
         logger.debug('testing subkey self-signature')
-        self.assertTrue(('BC6F350FB3D04076', 'Joshua Calvert (A test user) <jc@example.com>',
-                         '18x') in sigs)
+        self.assertTrue(('BC6F350FB3D04076', 'Joshua Calvert (A test user) <jc@example.com>', '18x') in sigs)
         logger.debug('testing other signature')
-        self.assertTrue(('057CCF658C074FDA', 'Winston Smith (A test user) <winston@example.com>',
-                         '10x') in sigs)
+        self.assertTrue(('057CCF658C074FDA', 'Winston Smith (A test user) <winston@example.com>', '10x') in sigs)
 
     def test_scan_keys(self):
         "Test that external key files can be scanned"
@@ -789,24 +763,9 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(data, ddata.data, 'Round-trip must work')
         # Test symmetric encryption
         data = 'chippy was here'
-        self.assertRaises(ValueError,
-                          gpg.encrypt,
-                          data,
-                          None,
-                          passphrase='bbr\x00own',
-                          symmetric=True)
-        self.assertRaises(ValueError,
-                          gpg.encrypt,
-                          data,
-                          None,
-                          passphrase='bbr\rown',
-                          symmetric=True)
-        self.assertRaises(ValueError,
-                          gpg.encrypt,
-                          data,
-                          None,
-                          passphrase='bbr\nown',
-                          symmetric=True)
+        self.assertRaises(ValueError, gpg.encrypt, data, None, passphrase='bbr\x00own', symmetric=True)
+        self.assertRaises(ValueError, gpg.encrypt, data, None, passphrase='bbr\rown', symmetric=True)
+        self.assertRaises(ValueError, gpg.encrypt, data, None, passphrase='bbr\nown', symmetric=True)
         result = gpg.encrypt(data, None, passphrase='bbrown', symmetric=True)
         self.assertEqual(0, result.returncode, 'Non-zero return code')
         edata = str(result)
@@ -940,21 +899,9 @@ class GPGTestCase(unittest.TestCase):
         else:  # pragma: no cover
             data = unicode('Hello, André', self.gpg.encoding)
         data = data.encode(self.gpg.encoding)
-        self.assertRaises(ValueError,
-                          self.gpg.sign,
-                          data,
-                          keyid=key.fingerprint,
-                          passphrase='bbr\x00own')
-        self.assertRaises(ValueError,
-                          self.gpg.sign,
-                          data,
-                          keyid=key.fingerprint,
-                          passphrase='bbr\rown')
-        self.assertRaises(ValueError,
-                          self.gpg.sign,
-                          data,
-                          keyid=key.fingerprint,
-                          passphrase='bbr\nown')
+        self.assertRaises(ValueError, self.gpg.sign, data, keyid=key.fingerprint, passphrase='bbr\x00own')
+        self.assertRaises(ValueError, self.gpg.sign, data, keyid=key.fingerprint, passphrase='bbr\rown')
+        self.assertRaises(ValueError, self.gpg.sign, data, keyid=key.fingerprint, passphrase='bbr\nown')
         sig = self.gpg.sign(data, keyid=key.fingerprint, passphrase='bbrown')
         self.assertFalse(sig, 'Bad passphrase should fail')
         sig = self.gpg.sign(data, keyid=key.fingerprint, passphrase='aable')
@@ -1033,11 +980,7 @@ class GPGTestCase(unittest.TestCase):
         key = self.generate_key('Andrew', 'Able', 'alpha.com')
         data_file = open(self.test_fn, 'rb')
         sig_file = self.test_fn + '.asc'
-        sig = self.gpg.sign_file(data_file,
-                                 keyid=key.fingerprint,
-                                 passphrase='aable',
-                                 detach=True,
-                                 output=sig_file)
+        sig = self.gpg.sign_file(data_file, keyid=key.fingerprint, passphrase='aable', detach=True, output=sig_file)
         self.assertEqual(0, sig.returncode, 'Non-zero return code')
         data_file.close()
         self.assertTrue(sig, 'File signing should succeed')
@@ -1063,11 +1006,7 @@ class GPGTestCase(unittest.TestCase):
         "Test that signing and verification works via the GPG output for subkeys"
         if self.gpg.version[0] < 2:
             raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
-        master_key = self.generate_key('Charlie',
-                                       'Clark',
-                                       'gamma.com',
-                                       passphrase='123',
-                                       with_subkey=False)
+        master_key = self.generate_key('Charlie', 'Clark', 'gamma.com', passphrase='123', with_subkey=False)
         self.assertEqual(0, master_key.returncode, 'Non-zero return code')
 
         subkey = self.gpg.add_subkey(master_key=master_key.fingerprint,
@@ -1079,11 +1018,7 @@ class GPGTestCase(unittest.TestCase):
 
         data_file = open(self.test_fn, 'rb')
         sig_file = self.test_fn + '.asc'
-        sig = self.gpg.sign_file(data_file,
-                                 keyid=subkey.fingerprint,
-                                 passphrase='123',
-                                 detach=True,
-                                 output=sig_file)
+        sig = self.gpg.sign_file(data_file, keyid=subkey.fingerprint, passphrase='123', detach=True, output=sig_file)
 
         self.assertEqual(0, sig.returncode, 'Non-zero return code')
         data_file.close()
@@ -1556,25 +1491,20 @@ TEST_GROUPS = {
     set(['test_signature_verification', 'test_signature_file', 'test_subkey_signature_file']),
     'crypt':
     set([
-        'test_encryption_and_decryption', 'test_file_encryption_and_decryption',
-        'test_filenames_with_spaces', 'test_invalid_outputs', 'test_no_such_key'
+        'test_encryption_and_decryption', 'test_file_encryption_and_decryption', 'test_filenames_with_spaces',
+        'test_invalid_outputs', 'test_no_such_key'
     ]),
     'key':
     set([
-        'test_deletion', 'test_import_and_export', 'test_list_keys_after_generation',
-        'test_list_signatures', 'test_key_generation_with_invalid_key_type',
-        'test_key_generation_with_escapes', 'test_key_generation_input',
-        'test_key_generation_with_colons', 'test_search_keys', 'test_scan_keys', 'test_key_trust',
-        'test_add_subkey', 'test_add_subkey_with_invalid_key_type', 'test_deletion_subkey',
-        'test_list_subkey_after_generation'
+        'test_deletion', 'test_import_and_export', 'test_list_keys_after_generation', 'test_list_signatures',
+        'test_key_generation_with_invalid_key_type', 'test_key_generation_with_escapes', 'test_key_generation_input',
+        'test_key_generation_with_colons', 'test_search_keys', 'test_scan_keys', 'test_key_trust', 'test_add_subkey',
+        'test_add_subkey_with_invalid_key_type', 'test_deletion_subkey', 'test_list_subkey_after_generation'
     ]),
     'import':
     set(['test_import_only', 'test_doctest_import_keys']),
     'basic':
-    set([
-        'test_environment', 'test_list_keys_initial', 'test_nogpg', 'test_make_args',
-        'test_quote_with_shell'
-    ]),
+    set(['test_environment', 'test_list_keys_initial', 'test_nogpg', 'test_make_args', 'test_quote_with_shell']),
     'test':
     set(['test_multiple_signatures']),
 }

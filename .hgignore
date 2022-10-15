@@ -1,4 +1,4 @@
-(build|dist|keys|apidocs|\.(tox|egg-info))/
+(build|dist|keys|\.(tox|egg-info))/
 (DETAILS|MANIFEST|random_binary_data|watcher.conf)$
 \.(pyc|log|dict-validwords|yapf)$
 local.*\.(sh|cmd)
