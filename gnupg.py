@@ -94,8 +94,7 @@ else:
         """
         Quote text so that it is safe for Posix command shells.
 
-        For example, "*.py" would be converted to "'*.py'". If the text is
-        considered safe it is returned unquoted.
+        For example, "*.py" would be converted to "'*.py'". If the text is considered safe it is returned unquoted.
 
         :param s: The value to quote
         :type s: str (or unicode on 2.x)
@@ -273,15 +272,6 @@ class Verify(object):
     __bool__ = __nonzero__
 
     def handle_status(self, key, value):
-        """
-        Handle status messages from the `gpg` child process. These are lines of the
-        format
-
-            [GNUPG:] <key> <value>
-
-        :param key (str): Identifies what the status message is.
-        :param value (str): Identifies additional data, which differs depending on the key.
-        """
 
         def update_sig_info(**kwargs):
             sig_id = self.signature_id
@@ -402,8 +392,7 @@ class ImportResult(object):
     This class handles status messages during key import.
     """
 
-    counts = '''count no_user_id imported imported_rsa unchanged
-            n_uids n_subk n_sigs n_revoc sec_read sec_imported
+    counts = '''count no_user_id imported imported_rsa unchanged n_uids n_subk n_sigs n_revoc sec_read sec_imported
             sec_dups not_imported'''.split()
 
     returncode = None
@@ -445,8 +434,7 @@ class ImportResult(object):
 
     def handle_status(self, key, value):
         """
-        Handle status messages from the `gpg` child process. These are lines of the
-        format
+        Handle status messages from the `gpg` child process. These are lines of the format
 
             [GNUPG:] <key> <value>
 
@@ -491,8 +479,7 @@ class ImportResult(object):
 
     def summary(self):
         """
-        Return a summary indicating how many keys were imported and how many were
-        not imported.
+        Return a summary indicating how many keys were imported and how many were not imported.
         """
         result = []
         result.append('%d imported' % self.imported)
@@ -530,8 +517,7 @@ class SendResult(object):
 
     def handle_status(self, key, value):
         """
-        Handle status messages from the `gpg` child process. These are lines of the
-        format
+        Handle status messages from the `gpg` child process. These are lines of the format
 
             [GNUPG:] <key> <value>
 
@@ -603,8 +589,7 @@ class SearchKeys(list):
 
     def handle_status(self, key, value):  # pragma: no cover
         """
-        Handle status messages from the `gpg` child process. These are lines of the
-        format
+        Handle status messages from the `gpg` child process. These are lines of the format
 
             [GNUPG:] <key> <value>
 
@@ -813,8 +798,7 @@ class Crypt(Verify, TextHandler):
 
     def handle_status(self, key, value):
         """
-        Handle status messages from the `gpg` child process. These are lines of the
-        format
+        Handle status messages from the `gpg` child process. These are lines of the format
 
             [GNUPG:] <key> <value>
 
@@ -896,8 +880,7 @@ class GenKey(object):
 
     def handle_status(self, key, value):
         """
-        Handle status messages from the `gpg` child process. These are lines of the
-        format
+        Handle status messages from the `gpg` child process. These are lines of the format
 
             [GNUPG:] <key> <value>
 
@@ -947,8 +930,7 @@ class AddSubkey(object):
 
     def handle_status(self, key, value):
         """
-        Handle status messages from the `gpg` child process. These are lines of the
-        format
+        Handle status messages from the `gpg` child process. These are lines of the format
 
             [GNUPG:] <key> <value>
 
@@ -974,8 +956,7 @@ class ExportResult(GenKey):
 
     def handle_status(self, key, value):
         """
-        Handle status messages from the `gpg` child process. These are lines of the
-        format
+        Handle status messages from the `gpg` child process. These are lines of the format
 
             [GNUPG:] <key> <value>
 
@@ -1016,8 +997,7 @@ class DeleteResult(object):
 
     def handle_status(self, key, value):
         """
-        Handle status messages from the `gpg` child process. These are lines of the
-        format
+        Handle status messages from the `gpg` child process. These are lines of the format
 
             [GNUPG:] <key> <value>
 
@@ -1072,8 +1052,7 @@ class Sign(TextHandler):
 
     def handle_status(self, key, value):
         """
-        Handle status messages from the `gpg` child process. These are lines of the
-        format
+        Handle status messages from the `gpg` child process. These are lines of the format
 
             [GNUPG:] <key> <value>
 
@@ -1148,21 +1127,18 @@ class GPG(object):
 
         :param gpgbinary (str): A pathname for the GPG binary to use.
 
-        :param gnupghome (str): A pathname to where we can find the public and
-                                private keyrings. The default is whatever gpg
-                                defaults to.
+        :param gnupghome (str): A pathname to where we can find the public and private keyrings. The default is
+                                whatever gpg defaults to.
 
-        :param keyring (str|list): The name of alternative keyring file to use, or a
-                                   list of such keyring files. If specified, the
-                                   default keyring is not used.
+        :param keyring (str|list): The name of alternative keyring file to use, or a list of such keyring files. If
+                                   specified, the default keyring is not used.
 
         :param options (list): A list of additional options to pass to the GPG binary.
 
-        :param secret_keyring (str|list): The name of an alternative secret keyring
-                                          file to use, or a list of such keyring files.
+        :param secret_keyring (str|list): The name of an alternative secret keyring file to use, or a list of such
+                                          keyring files.
 
-        :param env (dict): A dict of environment variables to be used for the GPG
-                           subprocess.
+        :param env (dict): A dict of environment variables to be used for the GPG subprocess.
         """
         self.gpgbinary = gpgbinary
         self.gnupghome = gnupghome
@@ -1221,6 +1197,10 @@ class GPG(object):
         Make a list of command line elements for GPG. The value of ``args``
         will be appended. The ``passphrase`` argument needs to be True if
         a passphrase will be sent to GPG, else False.
+
+        :param args (list): A list of arguments.
+
+        :param passphrase (str): The passphrase to use.
         """
         cmd = [self.gpgbinary, '--status-fd', '2', '--no-tty', '--no-verbose']
         if 'DEBUG_IPC' in os.environ:  # pragma: no cover
@@ -1318,10 +1298,9 @@ class GPG(object):
 
     def _collect_output(self, process, result, writer=None, stdin=None):
         """
-        Drain the subprocesses output streams, writing the collected output
-        to the result. If a writer thread (writing to the subprocess) is given,
-        make sure it's joined before returning. If a stdin stream is given,
-        close it before returning.
+        Drain the subprocesses output streams, writing the collected output to the result. If a writer thread (writing
+        to the subprocess) is given, make sure it's joined before returning. If a stdin stream is given, close it
+        before returning.
         """
         stderr = codecs.getreader(self.encoding)(process.stderr)
         rr = threading.Thread(target=self._read_response, args=(stderr, result))
@@ -1416,9 +1395,8 @@ class GPG(object):
 
     def is_valid_passphrase(self, passphrase):
         """
-        Confirm that the passphrase doesn't contain newline-type characters -
-        it is passed in a pipe to gpg, and so not checking could lead to
-        spoofing attacks by passing arbitrary text after passphrase and newline.
+        Confirm that the passphrase doesn't contain newline-type characters - it is passed in a pipe to gpg, and so not
+        checking could lead to spoofing attacks by passing arbitrary text after passphrase and newline.
         """
         return ('\n' not in passphrase and '\r' not in passphrase and '\x00' not in passphrase)
 
@@ -1494,8 +1472,8 @@ class GPG(object):
 
     def verify(self, data, **kwargs):
         """
-        Verify the signature on the contents of the string *data*. This method
-        delegates most of the work to :meth:`verify_file`.
+        Verify the signature on the contents of the string *data*. This method delegates most of the work to
+        :meth:`verify_file`.
 
         :param data (str|bytes): The data to verify.
         """
@@ -1508,11 +1486,9 @@ class GPG(object):
         """
         Verify a signature.
 
-        :param fileobj_or_path(str|file): A path to a signature, or a file-like object
-                                          containing one.
+        :param fileobj_or_path(str|file): A path to a signature, or a file-like object containing one.
 
-        :param data_filename (str): If the signature is a detached one, the path to the
-                                    data that was signed.
+        :param data_filename (str): If the signature is a detached one, the path to the data that was signed.
 
         :param close_file: If a file-like object is passed in, whether to close it.
 
@@ -1659,16 +1635,14 @@ class GPG(object):
 
         :param expect_passphrase (bool): Whether a passphrase is expected.
 
-        :param exclamation_mode: If specified, a `'!'` is appended to each fingerprint.
-                                 This deletes only a subkey or an entire key, depending
-                                 on what the fingerprint refers to.
+        :param exclamation_mode: If specified, a `'!'` is appended to each fingerprint. This deletes only a subkey or
+                                 an entire key, depending on what the fingerprint refers to.
 
         .. note:: Passphrases
 
-           Since GnuPG 2.1, you can't delete secret keys without providing a
-           passphrase. However, if you're expecting the passphrase to go to gpg
-           via pinentry, you should specify expect_passphrase=False. (It's only
-           checked for GnuPG >= 2.1).
+           Since GnuPG 2.1, you can't delete secret keys without providing a passphrase. However, if you're expecting
+           the passphrase to go to gpg via pinentry, you should specify expect_passphrase=False. (It's only checked
+           for GnuPG >= 2.1).
         """
         if passphrase and not self.is_valid_passphrase(passphrase):  # pragma: no cover
             raise ValueError('Invalid passphrase')
@@ -1713,8 +1687,7 @@ class GPG(object):
 
         :param armor (bool): Whether to ASCII-armor the output.
 
-        :param minimal (bool): Whether to pass `--export-options export-minimal` to
-                               `gpg`.
+        :param minimal (bool): Whether to pass `--export-options export-minimal` to `gpg`.
 
         :param passphrase (str): The passphrase to use.
 
@@ -1722,9 +1695,8 @@ class GPG(object):
 
         .. note:: Passphrases
 
-           Since GnuPG 2.1, you can't export secret keys without providing a
-           passphrase. However, if you're expecting the passphrase to go to gpg via
-           pinentry, you should specify expect_passphrase=False. (It's only checked
+           Since GnuPG 2.1, you can't export secret keys without providing a passphrase. However, if you're expecting
+           the passphrase to go to gpg via pinentry, you should specify expect_passphrase=False. (It's only checked
            for GnuPG >= 2.1).
 
         """
@@ -1817,8 +1789,7 @@ class GPG(object):
 
     def scan_keys(self, filename):
         """
-        List details of an ascii armored or binary key file
-        without first importing it to the local keyring.
+        List details of an ascii armored or binary key file without first importing it to the local keyring.
 
         :param filename: The path to the file containing the key(s).
 
@@ -1990,14 +1961,11 @@ class GPG(object):
         """
         Encrypt data in a file or file-like object.
 
-        :param fileobj_or_path (str|file): A path to a file or a file-like object
-                                           containing the data to be encrypted.
+        :param fileobj_or_path (str|file): A path to a file or a file-like object containing the data to be encrypted.
 
-        :param recipients (str|list): A key id of a recipient of the encrypted data,
-                                      or a list of such key ids.
+        :param recipients (str|list): A key id of a recipient of the encrypted data, or a list of such key ids.
 
-        :param sign (str): If specified, the key id of a signer to sign the encrypted
-                           data.
+        :param sign (str): If specified, the key id of a signer to sign the encrypted data.
 
         :param always_trust (bool): Whether to always trust keys.
 
@@ -2048,13 +2016,12 @@ class GPG(object):
 
     def encrypt(self, data, recipients, **kwargs):
         """
-        Encrypt the message contained in the string *data* for *recipients*. This
-        method delegates most of the work to :meth:`encrypt_file`.
+        Encrypt the message contained in the string *data* for *recipients*. This method delegates most of the work to
+        :meth:`encrypt_file`.
 
         :param data (str|bytes): The data to encrypt.
 
-        :param recipients (str|list): A key id of a recipient of the encrypted data,
-                                      or a list of such key ids.
+        :param recipients (str|list): A key id of a recipient of the encrypted data, or a list of such key ids.
 
         """
         data = _make_binary_stream(data, self.encoding)
@@ -2067,8 +2034,7 @@ class GPG(object):
         Decrypt the data in *message*. Thsi method delegates most of the work to
         :meth:`decrypt_file`.
 
-        :param message (str|bytes): The data to decrypt. A default key will be used
-                                    for decryption.
+        :param message (str|bytes): The data to decrypt. A default key will be used for decryption.
         """
         data = _make_binary_stream(message, self.encoding)
         result = self.decrypt_file(data, **kwargs)
@@ -2079,8 +2045,7 @@ class GPG(object):
         """
         Decrypt data in a file or file-like object.
 
-        :param fileobj_or_path (str|file): A path to a file or a file-like object
-                                           containing the data to be decrypted.
+        :param fileobj_or_path (str|file): A path to a file or a file-like object containing the data to be decrypted.
 
         :param always_trust: Whether to always trust keys.
 
@@ -2105,9 +2070,8 @@ class GPG(object):
         return result
 
     def get_recipients(self, message, **kwargs):
-        """
-        Get the list of recipients for an encrypted message. This method delegates most
-        of the work to :meth:`get_recipients_file`.
+        """ Get the list of recipients for an encrypted message. This method delegates most of the work to
+        :meth:`get_recipients_file`.
 
         :param message (str|bytes): The encrypted message.
         """
@@ -2118,11 +2082,9 @@ class GPG(object):
 
     def get_recipients_file(self, fileobj_or_path, extra_args=None):
         """
-        Get the list of recipients for an encrypted message in a file or file-like
-        object.
+        Get the list of recipients for an encrypted message in a file or file-like object.
 
-        :param fileobj_or_path (str|file): A path to a file or file-like object
-                                           containing the encrypted data.
+        :param fileobj_or_path (str|file): A path to a file or file-like object containing the encrypted data.
 
         :param extra_args (list): A list of extra arguments to pass to `gpg`.
         """
@@ -2140,8 +2102,7 @@ class GPG(object):
         """
         Set the trust level for one or more keys.
 
-        :param fingerprints (str|list): A key id for which to set the trust level, or
-                                        a list of such key ids.
+        :param fingerprints (str|list): A key id for which to set the trust level, or a list of such key ids.
 
         :param trustlevel (str): The trust level. This is one of the following.
 
