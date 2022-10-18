@@ -152,21 +152,26 @@ def _copy_data(instream, outstream):
             break
         if not data:
             break
-        sent += len(data)
+        if outstream.closed:
+            break
         # logger.debug('sending chunk (%d): %r', sent, data[:256])
         try:
             outstream.write(data)
+            sent += len(data)
         except UnicodeError:  # pragma: no cover
-            outstream.write(data.encode(enc))
+            encoded_data = data.encode(enc)
+            outstream.write(encoded_data)
+            sent += len(encoded_data)
         except Exception:  # pragma: no cover
             # Can sometimes get 'broken pipe' errors even when the data has all
             # been sent
             logger.exception('Error sending data')
             break
-    try:
-        outstream.close()
-    except IOError:  # pragma: no cover
-        logger.warning('Exception occurred while closing: ignored', exc_info=1)
+    if not outstream.closed:
+        try:
+            outstream.close()
+        except IOError:  # pragma: no cover
+            logger.warning('Exception occurred while closing: ignored', exc_info=1)
     logger.debug('closed output, %d bytes sent', sent)
 
 
