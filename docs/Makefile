@@ -38,9 +38,11 @@ clean:
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
-	pdoc -o _build/html/apidocs --no-show-source --logo https://www.red-dove.com/assets/img/rdclogo.gif gnupg.py
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+
+apidocs: html $(BUILDDIR)/html/apidocs
+	pdoc -o _build/html/apidocs --no-show-source --logo https://www.red-dove.com/assets/img/rdclogo.gif ../gnupg.py
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
