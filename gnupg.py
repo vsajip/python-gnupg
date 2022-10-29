@@ -2051,7 +2051,7 @@ class GPG(object):
 
         :param passphrase (str): The passphrase to use.
 
-        :oaram output (str): If specified, the path to write the decrypted data to.
+        :param output (str): If specified, the path to write the decrypted data to.
 
         :param extra_args (list): A list of extra arguments to pass to `gpg`.
         """
