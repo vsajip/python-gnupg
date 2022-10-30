@@ -1677,7 +1677,7 @@ class GPG(object):
                 f.close()
         return result
 
-    def export_keys(self, keyids, secret=False, armor=True, minimal=False, passphrase=None, expect_passphrase=True):
+    def export_keys(self, keyids, secret=False, armor=True, minimal=False, passphrase=None, expect_passphrase=True, output=None):
         """
         Export the indicated keys. A 'keyid' is anything gpg accepts.
 
@@ -1692,6 +1692,8 @@ class GPG(object):
         :param passphrase (str): The passphrase to use.
 
         :param expect_passphrase (bool): Whether a passphrase is expected.
+
+        :param output (str): If specified, the path to write the exported key(s) to.
 
         .. note:: Passphrases
 
@@ -1717,6 +1719,8 @@ class GPG(object):
             args.append('--armor')
         if minimal:  # pragma: no cover
             args.extend(['--export-options', 'export-minimal'])
+        if output:  # write the output to a file with the specified name
+            self.set_output_without_confirmation(args, output)
         args.extend(keyids)
         # gpg --export produces no status-fd output; stdout will be
         # empty in case of failure
