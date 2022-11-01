@@ -1742,10 +1742,7 @@ class GPG(object):
             result = result.decode(self.encoding, self.decode_errors)
         return result
 
-    def _get_list_output(self, p, kind):
-        # Get the response information
-        result = self.result_map[kind](self)
-        self._collect_output(p, result, stdin=p.stdin)
+    def _decode_result(self, result):
         lines = result.data.decode(self.encoding, self.decode_errors).splitlines()
         valid_keywords = 'pub uid sec fpr sub ssb sig grp'.split()
         for line in lines:
@@ -1761,6 +1758,12 @@ class GPG(object):
             if keyword in valid_keywords:
                 getattr(result, keyword)(L)
         return result
+
+    def _get_list_output(self, p, kind):
+        # Get the response information
+        result = self.result_map[kind](self)
+        self._collect_output(p, result, stdin=p.stdin)
+        return self._decode_result(result)
 
     def list_keys(self, secret=False, keys=None, sigs=False):
         """
@@ -1791,7 +1794,7 @@ class GPG(object):
         p = self._open_subprocess(args)
         return self._get_list_output(p, 'list')
 
-    def scan_keys(self, filename):
+    def scan_keys_file(self, filename):
         """
         List details of an ascii armored or binary key file without first importing it to the local keyring.
 
@@ -1817,6 +1820,39 @@ class GPG(object):
         args.append(no_quote(filename))
         p = self._open_subprocess(args)
         return self._get_list_output(p, 'scan')
+
+    def scan_keys(self, key_data):
+        """
+        List details of an ascii armored or binary key without first importing it to the local keyring.
+
+        :param key_data (str|bytes): The key data to import.
+
+        .. warning:: Care needed.
+
+           The function works on modern GnuPG by running:
+
+               $ gpg --dry-run --import-options import-show --import filename
+
+           On older versions, it does the *much* riskier:
+
+               $ gpg --with-fingerprint --with-colons filename
+
+        """
+        result = self.result_map['scan'](self)
+        logger.debug('scan_keys: %r', key_data[:256])
+        data = _make_binary_stream(key_data, self.encoding)
+        if self.version >= (2, 1):
+            args = ['--dry-run', '--import-options', 'import-show', '--import']
+        else:
+            logger.warning('Trying to list packets, but if the file is not a '
+                           'keyring, might accidentally decrypt')
+            args = ['--with-fingerprint', '--with-colons', '--fixed-list-mode']
+        self._handle_io(args, data, result, binary=True)
+        logger.debug('scan_keys result: %r', result.__dict__)
+        data.close()
+        return self._decode_result(result)
+
+        # return result
 
     def search_keys(self, query, keyserver='pgp.mit.edu', extra_args=None):
         """

@@ -707,7 +707,7 @@ class GPGTestCase(unittest.TestCase):
         logger.debug('testing other signature')
         self.assertTrue(('057CCF658C074FDA', 'Winston Smith (A test user) <winston@example.com>', '10x') in sigs)
 
-    def test_scan_keys(self):
+    def test_scan_keys_file(self):
         "Test that external key files can be scanned"
         # Don't use SkipTest for now, as not available for Python < 2.7
         if self.gpg.version < (2, 1):
@@ -718,7 +718,7 @@ class GPGTestCase(unittest.TestCase):
             ])
             for fn in ('test_pubring.gpg', 'test_secring.gpg'):
                 logger.debug('scanning keys in %s', fn)
-                data = self.gpg.scan_keys(fn)
+                data = self.gpg.scan_keys_file(fn)
                 self.assertEqual(0, data.returncode, 'Non-zero return code')
                 uids = set()
                 for d in data:
