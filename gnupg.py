@@ -1794,7 +1794,7 @@ class GPG(object):
         p = self._open_subprocess(args)
         return self._get_list_output(p, 'list')
 
-    def scan_keys_file(self, filename):
+    def scan_keys(self, filename):
         """
         List details of an ascii armored or binary key file without first importing it to the local keyring.
 
@@ -1821,7 +1821,7 @@ class GPG(object):
         p = self._open_subprocess(args)
         return self._get_list_output(p, 'scan')
 
-    def scan_keys(self, key_data):
+    def scan_keys_mem(self, key_data):
         """
         List details of an ascii armored or binary key without first importing it to the local keyring.
 
@@ -1851,8 +1851,6 @@ class GPG(object):
         logger.debug('scan_keys result: %r', result.__dict__)
         data.close()
         return self._decode_result(result)
-
-        # return result
 
     def search_keys(self, query, keyserver='pgp.mit.edu', extra_args=None):
         """
