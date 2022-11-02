@@ -701,10 +701,23 @@ follows::
 
     >>> keys = gpg.scan_keys(key_file_name)
 
-The returned value from :meth:`scan_keys` has the same format as for :meth:`list_keys`.
+The returned value from :meth:`scan_keys` has the same format as for
+:meth:`list_keys`.
 
 .. versionadded:: 0.3.7
    The ``scan_keys`` method was added.
+
+To scan keys in a sting, we can do this::
+
+    >>> keys = gpg.scan_keys_mem(key_text)
+
+For reasons of safety, this method is not available for GnuPG versions under
+2.1, and will raise a ``ValueError`` if it's called for the older versions. For
+GnuPG versions 2.1 and greater, the result will be the same as for
+:meth:`scan_keys`.
+
+.. versionadded:: 0.5.1
+   The ``scan_keys_mem`` method was added.
 
 .. index:: Key; deleting
 

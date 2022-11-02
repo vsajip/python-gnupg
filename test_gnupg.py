@@ -727,13 +727,12 @@ class GPGTestCase(unittest.TestCase):
 
     def test_scan_keys_mem(self):
         "Test that external keys in memory can be scanned"
-        # Don't use SkipTest for now, as not available for Python < 2.7
-        if self.gpg.version < (2, 1):
+        if self.gpg.version >= (2, 1):
             expected = set([
                 'Gary Gross (A test user) <gary.gross@gamma.com>',
                 'Danny Davis (A test user) <danny.davis@delta.com>',
             ])
-            for key in (KEYS_TO_IMPORT):
+            for key in (KEYS_TO_IMPORT,):
                 logger.debug('testing scan_keys')
                 data = self.gpg.scan_keys_mem(key)
                 self.assertEqual(0, data.returncode, 'Non-zero return code')
@@ -1523,7 +1522,7 @@ TEST_GROUPS = {
     'basic':
     set(['test_environment', 'test_list_keys_initial', 'test_nogpg', 'test_make_args', 'test_quote_with_shell']),
     'test':
-    set(['test_multiple_signatures']),
+    set(['test_scan_keys_mem']),
 }
 
 
