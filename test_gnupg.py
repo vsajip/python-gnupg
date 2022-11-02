@@ -716,7 +716,19 @@ class GPGTestCase(unittest.TestCase):
                 'Barbara Brown (A test user) <barbara.brown@beta.com>',
                 'Charlie Clark (A test user) <charlie.clark@gamma.com>',
             ])
-            for fn in ('test_pubring.gpg', 'test_secring.gpg'):
+            test_files = ('test_pubring.gpg', 'test_secring.gpg')
+            key_fn = None
+        else:
+            expected = set([
+                'Gary Gross (A test user) <gary.gross@gamma.com>',
+                'Danny Davis (A test user) <danny.davis@delta.com>',
+            ])
+            fd, key_fn = tempfile.mkstemp(prefix='pygpg-test-')
+            os.write(fd, KEYS_TO_IMPORT.encode('ascii'))
+            os.close(fd)
+            test_files = (key_fn,)
+        try:
+            for fn in test_files:
                 logger.debug('scanning keys in %s', fn)
                 data = self.gpg.scan_keys(fn)
                 self.assertEqual(0, data.returncode, 'Non-zero return code')
@@ -724,6 +736,9 @@ class GPGTestCase(unittest.TestCase):
                 for d in data:
                     uids.add(d['uids'][0])
                 self.assertEqual(uids, expected)
+        finally:
+            if key_fn:
+                os.remove(key_fn)
 
     def test_scan_keys_mem(self):
         "Test that external keys in memory can be scanned"
