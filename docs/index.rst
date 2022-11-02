@@ -707,7 +707,7 @@ The returned value from :meth:`scan_keys` has the same format as for
 .. versionadded:: 0.3.7
    The ``scan_keys`` method was added.
 
-To scan keys in a sting, we can do this::
+To scan keys in a string, we can do this::
 
     >>> keys = gpg.scan_keys_mem(key_text)
 
