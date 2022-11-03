@@ -1445,7 +1445,8 @@ class GPG(object):
             args.append('--clearsign')
         if keyid:
             args.extend(['--default-key', no_quote(keyid)])
-        if output:  # write the output to a file with the specified name
+        if output:  # pragma: no cover
+            # write the output to a file with the specified name
             self.set_output_without_confirmation(args, output)
 
         if extra_args:  # pragma: no cover
@@ -1722,7 +1723,8 @@ class GPG(object):
             args.append('--armor')
         if minimal:  # pragma: no cover
             args.extend(['--export-options', 'export-minimal'])
-        if output:  # write the output to a file with the specified name
+        if output:  # pragma: no cover
+            # write the output to a file with the specified name
             self.set_output_without_confirmation(args, output)
         args.extend(keyids)
         # gpg --export produces no status-fd output; stdout will be
@@ -2041,7 +2043,8 @@ class GPG(object):
                 args.extend(['--recipient', no_quote(recipient)])
         if armor:  # create ascii-armored output - False for binary output
             args.append('--armor')
-        if output:  # write the output to a file with the specified name
+        if output:  # pragma: no cover
+            # write the output to a file with the specified name
             self.set_output_without_confirmation(args, output)
         if sign is True:  # pragma: no cover
             args.append('--sign')
@@ -2100,7 +2103,8 @@ class GPG(object):
         if passphrase and not self.is_valid_passphrase(passphrase):
             raise ValueError('Invalid passphrase')
         args = ['--decrypt']
-        if output:  # write the output to a file with the specified name
+        if output:  # pragma: no cover
+            # write the output to a file with the specified name
             self.set_output_without_confirmation(args, output)
         if always_trust:  # pragma: no cover
             args.extend(['--trust-model', 'always'])

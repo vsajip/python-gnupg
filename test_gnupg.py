@@ -18,7 +18,7 @@ import unittest
 
 try:
     from unittest import skipIf
-except ImportError:
+except ImportError:  # pragma: no cover
     # For now, for Python < 2.7
     def skipIf(condition, message):
         if not condition:
@@ -208,18 +208,18 @@ debug ipc
 
 ENABLE_TOFU = 'ENABLE_TOFU' in os.environ
 
-if ENABLE_TOFU:
+if ENABLE_TOFU:  # pragma: no cover
     GPG_CONFIG = 'trust-model tofu+pgp\ntofu-default-policy unknown\n'
 
 
 def prepare_homedir(hd):
-    if not os.path.isdir(hd):
+    if not os.path.isdir(hd):  # pragma: no cover
         os.makedirs(hd)
     os.chmod(hd, 0x1C0)
     fn = os.path.join(hd, 'gpg-agent.conf')
     with open(fn, 'w') as f:
         f.write(AGENT_CONFIG)
-    if ENABLE_TOFU:
+    if ENABLE_TOFU:  # pragma: no cover
         fn = os.path.join(hd, 'gpg.conf')
         with open(fn, 'w') as f:
             f.write(GPG_CONFIG)
@@ -232,7 +232,7 @@ class GPGTestCase(unittest.TestCase):
         logger.debug('-- %s starting ---------------------------' % ident)
         if 'STATIC_TEST_HOMEDIR' not in os.environ:
             hd = tempfile.mkdtemp(prefix='keys-')
-        else:
+        else:  # pragma: no cover
             hd = os.path.join(os.getcwd(), 'keys')
             if os.path.exists(hd):
                 self.assertTrue(os.path.isdir(hd), 'Not a directory: %s' % hd)
@@ -367,9 +367,9 @@ class GPGTestCase(unittest.TestCase):
 
     @unittest.skipIf(os.name == 'nt', 'Test requires POSIX-style permissions')
     def test_key_generation_failure(self):
-        if self.gpg.version < (2, 0):
+        if self.gpg.version < (2, 0):  # pragma: no cover
             raise unittest.SkipTest('gpg 1.x hangs in this test')
-        if not os.path.exists('rokeys'):
+        if not os.path.exists('rokeys'):  # pragma: no cover
             os.mkdir('rokeys')
         os.chmod('rokeys', 0o400)  # no one can write/search this directory
         gpg = gnupg.GPG(gnupghome='rokeys', gpgbinary=GPGBINARY)
@@ -414,7 +414,7 @@ class GPGTestCase(unittest.TestCase):
 
     def test_add_subkey(self):
         "Test that subkeys can be added"
-        if self.gpg.version[0] < 2:
+        if self.gpg.version[0] < 2:  # pragma: no cover
             raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
         master_key = self.generate_key('Charlie', 'Clark', 'gamma.com', passphrase='123', with_subkey=False)
         self.assertEqual(0, master_key.returncode, 'Non-zero return code')
@@ -428,7 +428,7 @@ class GPGTestCase(unittest.TestCase):
 
     def test_add_subkey_with_invalid_key_type(self):
         "Test that subkey generation handles invalid key type"
-        if self.gpg.version[0] < 2:
+        if self.gpg.version[0] < 2:  # pragma: no cover
             raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
         master_key = self.generate_key('Charlie', 'Clark', 'gamma.com', passphrase='123', with_subkey=False)
         self.assertEqual(0, master_key.returncode, 'Non-zero return code')
@@ -445,7 +445,7 @@ class GPGTestCase(unittest.TestCase):
 
     def test_deletion_subkey(self):
         "Test that subkey deletion works"
-        if self.gpg.version[0] < 2:
+        if self.gpg.version[0] < 2:  # pragma: no cover
             raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
         master_key = self.generate_key('Charlie', 'Clark', 'gamma.com', passphrase='123', with_subkey=False)
         self.assertEqual(0, master_key.returncode, 'Non-zero return code')
@@ -488,7 +488,7 @@ class GPGTestCase(unittest.TestCase):
 
     def test_list_subkey_after_generation(self):
         "Test that after subkey generation, the generated subkey is available"
-        if self.gpg.version[0] < 2:
+        if self.gpg.version[0] < 2:  # pragma: no cover
             raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
         self.test_list_keys_initial()
 
@@ -602,7 +602,7 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(info['type'], 'ssb')
 
         # Now do the same test, but using keyring and secret_keyring arguments
-        if self.gpg.version < (2, 1):
+        if self.gpg.version < (2, 1):  # pragma: no cover
             pkn = 'pubring.gpg'
             skn = 'secring.gpg'
         else:
@@ -613,7 +613,7 @@ class GPGTestCase(unittest.TestCase):
         hd = self.homedir
         if os.name == 'posix':
             pkn = os.path.join(hd, pkn)
-            if skn:
+            if skn:  # pragma: no cover
                 skn = os.path.join(hd, skn)
         gpg = gnupg.GPG(gnupghome=hd, gpgbinary=GPGBINARY, keyring=pkn, secret_keyring=skn)
         logger.debug('Using keyring and secret_keyring arguments')
@@ -710,7 +710,7 @@ class GPGTestCase(unittest.TestCase):
     def test_scan_keys(self):
         "Test that external key files can be scanned"
         # Don't use SkipTest for now, as not available for Python < 2.7
-        if self.gpg.version < (2, 1):
+        if self.gpg.version < (2, 1):  # pragma: no cover
             expected = set([
                 'Andrew Able (A test user) <andrew.able@alpha.com>',
                 'Barbara Brown (A test user) <barbara.brown@beta.com>',
@@ -879,7 +879,7 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(0, match, 'Keys must match')
         # Generate a key so we can test exporting private keys
         key = self.do_key_generation()
-        if self.gpg.version < (2, 1):
+        if self.gpg.version < (2, 1):  # pragma: no cover
             passphrase = None
         else:
             passphrase = 'bbrown'
@@ -939,9 +939,10 @@ class GPGTestCase(unittest.TestCase):
         sig = self.gpg.sign(data, keyid=key.fingerprint, passphrase='aable')
         self.assertEqual(0, sig.returncode, 'Non-zero return code')
         self.assertTrue(sig, 'Good passphrase should succeed')
-        if sig.username:  # not set in recent versions of GnuPG e.g. 2.2.5
+        if sig.username:  # pragma: no cover
+            # not set in recent versions of GnuPG e.g. 2.2.5
             self.assertTrue(sig.username.startswith('Andrew Able'))
-        if sig.key_id:
+        if sig.key_id:  # pragma: no cover
             self.assertTrue(key.fingerprint.endswith(sig.key_id))
         self.assertTrue(sig.hash_algo)
         logger.debug('verification start')
@@ -1029,14 +1030,14 @@ class GPGTestCase(unittest.TestCase):
         finally:
             os.remove(sig_file)
         self.assertEqual(0, verified.returncode, 'Non-zero return code')
-        if key.fingerprint != verified.fingerprint:
+        if key.fingerprint != verified.fingerprint:  # pragma: no cover
             logger.debug('key: %r', key.fingerprint)
             logger.debug('ver: %r', verified.fingerprint)
         self.assertEqual(key.fingerprint, verified.fingerprint, 'Fingerprints must match')
 
     def test_subkey_signature_file(self):
         "Test that signing and verification works via the GPG output for subkeys"
-        if self.gpg.version[0] < 2:
+        if self.gpg.version[0] < 2:  # pragma: no cover
             raise unittest.SkipTest('Feature unavailable in GnuPG 1.x')
         master_key = self.generate_key('Charlie', 'Clark', 'gamma.com', passphrase='123', with_subkey=False)
         self.assertEqual(0, master_key.returncode, 'Non-zero return code')
@@ -1068,7 +1069,7 @@ class GPGTestCase(unittest.TestCase):
         finally:
             os.remove(sig_file)
         self.assertEqual(0, verified.returncode, 'Non-zero return code')
-        if subkey.fingerprint != verified.fingerprint:
+        if subkey.fingerprint != verified.fingerprint:  # pragma: no cover
             logger.debug('key: %r', subkey.fingerprint)
             logger.debug('ver: %r', verified.fingerprint)
         self.assertEqual(subkey.fingerprint, verified.fingerprint, 'Fingerprints must match')
@@ -1351,7 +1352,7 @@ class GPGTestCase(unittest.TestCase):
         self.assertTrue(pubkey1)
         if gpg.version >= (2, 1):
             passphrase = 'pp1'
-        else:
+        else:  # pragma: no cover
             passphrase = None
         seckey1 = gpg.export_keys(fp1, secret=True, passphrase=passphrase)
         self.assertTrue(seckey1)
@@ -1365,7 +1366,7 @@ class GPGTestCase(unittest.TestCase):
         result = gpg.delete_keys(fp1)
         self.assertEqual(2, result.returncode, 'Unexpected return code')
         self.assertEqual(str(result), 'Must delete secret key first')
-        if gpg.version < (2, 1):
+        if gpg.version < (2, 1):  # pragma: no cover
             # Doesn't work on 2.1, and can't use SkipTest due to having
             # to support older Pythons
             result = gpg.delete_keys(fp1, secret=True, passphrase=passphrase)
@@ -1545,7 +1546,7 @@ TEST_GROUPS = {
 
 
 def suite(args=None):
-    if args is None:
+    if args is None:  # pragma: no cover
         args = sys.argv[1:]
     if not args:
         result = unittest.TestLoader().loadTestsFromTestCase(GPGTestCase)
@@ -1580,7 +1581,7 @@ def main():
     verbosity = 2 if options.verbose else 1
     results = unittest.TextTestRunner(verbosity=verbosity).run(tests)
     failed = not results.wasSuccessful()
-    if failed and 'TOXENV' in os.environ and os.name != 'posix':
+    if failed and 'TOXENV' in os.environ and os.name != 'posix':  # pragma: no cover
         os.system('type test_gnupg.log')
     return failed
 
