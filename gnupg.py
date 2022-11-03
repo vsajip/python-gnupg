@@ -1849,10 +1849,9 @@ class GPG(object):
         if self.version >= (2, 1):
             args = ['--dry-run', '--import-options', 'import-show', '--import']
         else:
-            raise ValueError('scan_keys_mem() not supported for GnuPG < 2.1')
-            # logger.warning('Trying to list packets, but if the file is not a '
-                           # 'keyring, might accidentally decrypt')
-            # args = ['--with-fingerprint', '--with-colons', '--fixed-list-mode']
+            logger.warning('Trying to list packets, but if the file is not a '
+                           'keyring, might accidentally decrypt')
+            args = ['--with-fingerprint', '--with-colons', '--fixed-list-mode']
         self._handle_io(args, data, result, binary=True)
         logger.debug('scan_keys result: %r', result.__dict__)
         data.close()

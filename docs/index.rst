@@ -711,10 +711,7 @@ To scan keys in a string, we can do this::
 
     >>> keys = gpg.scan_keys_mem(key_text)
 
-For reasons of safety, this method is not available for GnuPG versions under
-2.1, and will raise a ``ValueError`` if it's called for the older versions. For
-GnuPG versions 2.1 and greater, the result will be the same as for
-:meth:`scan_keys`.
+The result will be the same as for :meth:`scan_keys`.
 
 .. versionadded:: 0.5.1
    The ``scan_keys_mem`` method was added.

@@ -742,19 +742,18 @@ class GPGTestCase(unittest.TestCase):
 
     def test_scan_keys_mem(self):
         "Test that external keys in memory can be scanned"
-        if self.gpg.version >= (2, 1):
-            expected = set([
-                'Gary Gross (A test user) <gary.gross@gamma.com>',
-                'Danny Davis (A test user) <danny.davis@delta.com>',
-            ])
-            for key in (KEYS_TO_IMPORT,):
-                logger.debug('testing scan_keys')
-                data = self.gpg.scan_keys_mem(key)
-                self.assertEqual(0, data.returncode, 'Non-zero return code')
-                uids = set()
-                for d in data:
-                    uids.add(d['uids'][0])
-                self.assertEqual(uids, expected)
+        expected = set([
+            'Gary Gross (A test user) <gary.gross@gamma.com>',
+            'Danny Davis (A test user) <danny.davis@delta.com>',
+        ])
+        for key in (KEYS_TO_IMPORT,):
+            logger.debug('testing scan_keys')
+            data = self.gpg.scan_keys_mem(key)
+            self.assertEqual(0, data.returncode, 'Non-zero return code')
+            uids = set()
+            for d in data:
+                uids.add(d['uids'][0])
+            self.assertEqual(uids, expected)
 
     def test_encryption_and_decryption(self):
         "Test that encryption and decryption works"
