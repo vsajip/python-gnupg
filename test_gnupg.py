@@ -861,6 +861,7 @@ class GPGTestCase(unittest.TestCase):
         gpg = self.gpg
         result = gpg.import_keys(KEYS_TO_IMPORT)
         self.assertEqual(0, result.returncode, 'Non-zero return code')
+        self.assertTrue(bool(result))
         self.assertEqual(result.summary(), '2 imported')
         public_keys = gpg.list_keys()
         self.assertEqual(0, public_keys.returncode, 'Non-zero return code')
@@ -1236,9 +1237,11 @@ class GPGTestCase(unittest.TestCase):
         finally:
             shutil.rmtree(d, ignore_errors=True)
 
-    # @skipIf(os.name == 'nt', 'Test not suitable for Windows')
-    def test_search_keys(self):
+    # This test does nothing on CI because it often leads to failures due to
+    # external servers being down
+    def test_search_keys(self):  # pragma: no cover
         "Test that searching for keys works"
+
         if 'NO_EXTERNAL_TESTS' not in os.environ:
             r = self.gpg.search_keys('<vinay_sajip@hotmail.com>')
             self.assertEqual(0, r.returncode, 'Non-zero return code')

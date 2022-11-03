@@ -637,7 +637,7 @@ class ListKeys(SearchKeys):
         Internal method used to update the instance from a `gpg` status message.
         """
         self.curkey = curkey = self.get_fields(args)
-        if curkey['uid']:
+        if curkey['uid']:  # pragma: no cover
             curkey['uids'].append(curkey['uid'])
         del curkey['uid']
         curkey['subkeys'] = []
@@ -756,7 +756,7 @@ _INVALID_KEY_REASONS = {
 }
 
 
-def _determine_invalid_recipient_or_signer(s):
+def _determine_invalid_recipient_or_signer(s):  # pragma: no cover
     parts = s.split()
     if len(parts) >= 2:
         code, ident = parts[:2]
@@ -1072,7 +1072,8 @@ class Sign(TextHandler):
             self.key_id, self.username = value.split(' ', 1)
         elif key == 'BAD_PASSPHRASE':  # pragma: no cover
             self.status = 'bad passphrase'
-        elif key in ('INV_SGNR', 'INV_RECP'):  # latter returned in older versions
+        elif key in ('INV_SGNR', 'INV_RECP'):  # pragma: no cover
+            # INV_RECP is returned in older versions
             if not self.status:
                 self.status = 'invalid signer'
             else:
@@ -1498,7 +1499,7 @@ class GPG(object):
         logger.debug('verify_file: %r, %r', fileobj_or_path, data_filename)
         result = self.result_map['verify'](self)
         args = ['--verify']
-        if extra_args:
+        if extra_args:  # pragma: no cover
             args.extend(extra_args)
         if data_filename is None:
             self._handle_io(args, fileobj_or_path, result, binary=True)
@@ -1535,7 +1536,7 @@ class GPG(object):
         logger.debug('verify_data: %r, %r ...', sig_filename, data[:16])
         result = self.result_map['verify'](self)
         args = ['--verify']
-        if extra_args:
+        if extra_args:  # pragma: no cover
             args.extend(extra_args)
         args.extend([no_quote(sig_filename), '-'])
         stream = _make_memory_stream(data)
@@ -1598,7 +1599,9 @@ class GPG(object):
         data.close()
         return result
 
-    def send_keys(self, keyserver, *keyids, **kwargs):
+    # This function isn't exercised by tests, to avoid polluting external
+    # key servers with test keys
+    def send_keys(self, keyserver, *keyids, **kwargs):  # pragma: no cover
         """
         Send one or more keys to a keyserver.
 
@@ -1868,7 +1871,7 @@ class GPG(object):
         if HEX_DIGITS_RE.match(query):
             query = '0x' + query
         args = ['--fingerprint', '--keyserver', no_quote(keyserver)]
-        if extra_args:
+        if extra_args:  # pragma: no cover
             args.extend(extra_args)
         args.extend(['--search-keys', no_quote(query)])
         p = self._open_subprocess(args)
@@ -2046,7 +2049,7 @@ class GPG(object):
             args.extend(['--sign', '--default-key', no_quote(sign)])
         if always_trust:  # pragma: no cover
             args.extend(['--trust-model', 'always'])
-        if extra_args:
+        if extra_args:  # pragma: no cover
             args.extend(extra_args)
         result = self.result_map['crypt'](self)
         self._handle_io(args, fileobj_or_path, result, passphrase=passphrase, binary=True)
