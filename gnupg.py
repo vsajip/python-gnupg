@@ -272,6 +272,14 @@ class Verify(object):
     __bool__ = __nonzero__
 
     def handle_status(self, key, value):
+        """
+        Handle status messages from the `gpg` child process. These are lines of the format
+
+            [GNUPG:] <key> <value>
+
+        :param key (str): Identifies what the status message is.
+        :param value (str): Identifies additional data, which differs depending on the key.
+        """
 
         def update_sig_info(**kwargs):
             sig_id = self.signature_id
