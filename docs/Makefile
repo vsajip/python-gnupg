@@ -48,6 +48,9 @@ apidocs: html
 remote:
 	rsync -avz _build/html/* vopal:~/apps/rdc_docs/python-gnupg
 
+spelling:
+	$(SPHINXBUILD) -b spelling $(ALLSPHINXOPTS) $(BUILDDIR)
+
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
 	@echo

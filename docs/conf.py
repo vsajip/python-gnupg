@@ -22,9 +22,11 @@ import datetime, os, sys
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.coverage',
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx',
+              'sphinx.ext.todo', 'sphinx.ext.coverage',
               #'sphinx.ext.imgmath',
-              'sphinx.ext.ifconfig', 'sphinx.ext.viewcode']
+              'sphinx.ext.ifconfig', 'sphinx.ext.viewcode',
+              'sphinxcontrib.spelling']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -89,6 +91,8 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
+spelling_lang='en_GB'
+spelling_word_list_filename='spelling_wordlist.txt'
 
 # -- Options for HTML output ---------------------------------------------------
 
