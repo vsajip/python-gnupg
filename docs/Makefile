@@ -46,7 +46,7 @@ apidocs: html
 	pdoc -o $(BUILDDIR)/html/apidocs --no-show-source --logo https://www.red-dove.com/assets/img/rdclogo.gif ../gnupg.py
 
 remote:
-	rsync -avz _build/html/* vopal:~/apps/rdc_docs/python-gnupg
+	rsync -avz $(BUILDDIR)/html/* vopal:~/apps/rdc_docs/python-gnupg
 
 spelling:
 	$(SPHINXBUILD) -b spelling $(ALLSPHINXOPTS) $(BUILDDIR)

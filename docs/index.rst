@@ -675,7 +675,7 @@ user-friendly, but nevertheless it should be usable.)
 
 .. versionadded:: 0.4.9
    Information on keys returned by :meth:`~gnupg.GPG.list_keys` now includes
-   the ``keygrip`` attribute. The ``subkeys`` attribute now also consist of 4
+   the ``keygrip`` attribute. The ``subkeys`` attribute now also consists of four
    values with the ``keygrip`` being the fourth. Note that you'll need GnuPG >=
    2.1 for this to work.
 
