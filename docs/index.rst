@@ -311,11 +311,11 @@ A complete list of key generation parameters can be found in the GnuPG documenta
 .. versionadded:: 0.4.7
    The ``no_protection`` keyword argument was added.
 
-Whatever keyword arguments you pass to :meth:`~gnupg.GPG.gen_key_input` (other
-than ``no_protection``) will be converted to the parameters expected by
-GnuPG by replacing underscores with hyphens and title-casing the
-result. You can of course construct the parameters in your own
-dictionary ``params`` and then pass it as follows::
+Whatever keyword arguments you pass to :hover:`meth:~gnupg.GPG.gen_key_input`
+(other than ``no_protection``) will be converted to the parameters expected by
+GnuPG by replacing underscores with hyphens and title-casing the result. You
+can of course construct the parameters in your own dictionary ``params`` and
+then pass it as follows::
 
     >>> input_data = gpg.gen_key_input(**params)
 
@@ -324,9 +324,9 @@ The ``no_protection`` argument, if `True`, will be used to generate a
 `%no-protection` line which tells GnuPG that no protection with a
 passphrase is desired.
 
-The return value from :meth:`~gnupg.GPG.gen_key` is an object whose `type` and
-`fingerprint` attributes indicate the type and fingerprint of the created key.
-If no key was created, these will be `None`.
+The return value from :hover:`meth:~gnupg.GPG.gen_key` is an object whose
+`type` and `fingerprint` attributes indicate the type and fingerprint of the
+created key. If no key was created, these will be `None`.
 
 .. versionadded:: 0.4.9
    There is now also a `status` attribute to the returned object which will be `'ok'`
@@ -337,12 +337,13 @@ If no key was created, these will be `None`.
     single: Key; Generating subkeys
 
 Generating subkeys ^^^^^^^^^^^^^^^^^^ To generate a subkey for an already
-generated key use the :meth:`~gnupg.GPG.add_subkey` method::
+generated key use the :hover:`meth:~gnupg.GPG.add_subkey` method::
 
     >>> subkey = gpg.add_subkey(master_key) # same as gpg.add_subkey(master_key, None)
     >>> subkey = gpg.add_subkey(master_key, master_key_password)
 
-The ``add_subkey`` method has some additional keyword arguments:
+The :hover:`meth:~gnupg.GPG.add_subkey` method has some additional keyword
+arguments:
 
 * ``algorithm`` (defaulting to ``rsa``)
 * ``usage`` (defaulting to ``encrypt``)
@@ -385,7 +386,7 @@ string, as in these example:
     gpg.gen_key_input(..., key_usage='sign encrypt')
     gpg.gen_key_input(..., key_usage='sign, auth')
 
-This corresponds to the ``usage`` parameter of :meth:`~gnupg.GPG.add_subkey`,
+This corresponds to the ``usage`` parameter of :hover:`meth:~gnupg.GPG.add_subkey`,
 described earlier. Note that you still need to ensure that the key type of the
 key being created is appropriate for the usages.
 
@@ -397,7 +398,7 @@ Generating elliptic curve keys
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To generate keys with elliptic curves, pass a `key_curve` keyword parameter to
-:meth:`~gnupg.GPG.gen_key_input` and omit `key_length`. For example,
+:hover:`meth:~gnupg.GPG.gen_key_input` and omit `key_length`. For example,
 `key_curve='cv25519'` or `key_type='ECDSA', key_curve='nistp384'`. Refer to
 `GnuPG resources <https://wiki.gnupg.org/ECC>`_ to see which options are
 supported. Note that you'll need GnuPG >= 2.1 for this to work.
@@ -406,7 +407,7 @@ Supplemental information on the aliases used for key types and curves is given
 `here
 <https://www.gnupg.org/documentation/manuals/gcrypt/ECC-key-parameters.html>`__.
 You can use the curve type alias in the ``algorithm`` argument to
-:meth:`~gnupg.GPG.add_subkey`, as in the following example.
+:hover:`meth:~gnupg.GPG.add_subkey`, as in the following example.
 
 .. code-block:: python
 
@@ -441,7 +442,7 @@ distributions).
 Exporting keys
 --------------
 
-To export keys, use the :meth:`~gnupg.GPG.export_keys` method::
+To export keys, use the :hover:`meth:~gnupg.GPG.export_keys` method::
 
     >>> ascii_armored_public_keys = gpg.export_keys(keyids) # same as gpg.export_keys(keyids, False)
     >>> ascii_armored_private_keys = gpg.export_keys(keyids, True) # True => private keys
@@ -502,10 +503,10 @@ To import keys from a file, use::
 
     >>> import_result = gpg.import_keys_file(key_path)
 
-This also takes the keyword arguments specified for :meth:`~gnupg.GPG.import_keys`.
+This also takes the keyword arguments specified for :hover:`meth:~gnupg.GPG.import_keys`.
 
 .. versionadded:: 0.5.0
-   The :meth:`~gnupg.GPG.import_keys_file` method.
+   The :hover:`meth:~gnupg.GPG.import_keys_file` method.
 
 To receive keys from a keyserver, use::
 
@@ -534,7 +535,7 @@ which keys we have in our keyrings. This is fairly straightforward::
     >>> public_keys = gpg.list_keys() # same as gpg.list_keys(False)
     >>> private_keys = gpg.list_keys(True) # True => private keys
 
-The returned value from :meth:`~gnupg.GPG.list_keys` is a subclass of Python's
+The returned value from :hover:`meth:~gnupg.GPG.list_keys` is a subclass of Python's
 ``list`` class. Each entry represents one key and is a Python dictionary which
 contains useful information about the corresponding key.
 
@@ -605,7 +606,7 @@ documentation linked above. (Note that that documentation is not terribly
 user-friendly, but nevertheless it should be usable.)
 
 .. versionadded:: 0.3.8
-   The returned value from :meth:`~gnupg.GPG.list_keys` now has a new
+   The returned value from :hover:`meth:~gnupg.GPG.list_keys` now has a new
    attribute, ``key_map``, which is a dictionary mapping key and subkey
    fingerprints to the corresponding key's dictionary. With this change, you
    don't need to iterate over the (potentially large) returned list to search
@@ -615,13 +616,13 @@ user-friendly, but nevertheless it should be usable.)
 
 .. versionadded:: 0.3.8
    You can also list a subset of keys by specifying a ``keys=`` keyword
-   argument to :meth:`~gnupg.GPG.list_keys` whose value is either a single
+   argument to :hover:`meth:~gnupg.GPG.list_keys` whose value is either a single
    string matching a key, or a list of strings matching multiple keys. In this
    case, the return value only includes matching keys.
 
 .. versionadded:: 0.3.9
    A new ``sigs=`` keyword argument has been added to
-   :meth:`~gnupg.GPG.list_keys`, defaulting to ``False``. If you specify true,
+   :hover:`meth:~gnupg.GPG.list_keys`, defaulting to ``False``. If you specify true,
    the ``sigs`` entry in the key information returned will contain a list of
    signatures which apply to the key. Each entry in the list is a 3-tuple of
    (``keyid``, ``user-id``, ``signature-class``) where the ``signature-class``
@@ -640,8 +641,8 @@ user-friendly, but nevertheless it should be usable.)
    the current operation to fail).
 
 .. versionadded:: 0.4.2
-   Information on keys returned by :meth:`~gnupg.GPG.list_keys` or
-   :meth:`~gnupg.GPG.scan_keys` now incudes a ``subkey_info`` dictionary, which
+   Information on keys returned by :hover:`meth:~gnupg.GPG.list_keys` or
+   :hover:`meth:~gnupg.GPG.scan_keys` now incudes a ``subkey_info`` dictionary, which
    contains any returned information on subkeys such as creation and expiry
    dates. The dictionary is keyed on the subkey ID. The following additional
    keys are present in key information dictionaries: ``cap``, ``issuer``,
@@ -674,7 +675,7 @@ user-friendly, but nevertheless it should be usable.)
    keys in the JSON to integers using base 16).
 
 .. versionadded:: 0.4.9
-   Information on keys returned by :meth:`~gnupg.GPG.list_keys` now includes
+   Information on keys returned by :hover:`meth:~gnupg.GPG.list_keys` now includes
    the ``keygrip`` attribute. The ``subkeys`` attribute now also consists of four
    values with the ``keygrip`` being the fourth. Note that you'll need GnuPG >=
    2.1 for this to work.
@@ -711,8 +712,8 @@ follows::
 
     >>> keys = gpg.scan_keys(key_file_name)
 
-The returned value from :meth:`~gnupg.GPG.scan_keys` has the same format as for
-:meth:`list_keys`.
+The returned value from :hover:`meth:~gnupg.GPG.scan_keys` has the same format as for
+:hover:`meth:list_keys`.
 
 .. versionadded:: 0.3.7
    The ``scan_keys`` method was added.
@@ -721,7 +722,7 @@ To scan keys in a string, we can do this::
 
     >>> keys = gpg.scan_keys_mem(key_text)
 
-The result will be the same as for :meth:`~gnupg.GPG.scan_keys`.
+The result will be the same as for :hover:`meth:~gnupg.GPG.scan_keys`.
 
 .. versionadded:: 0.5.1
    The ``scan_keys_mem`` method was added.
@@ -746,10 +747,10 @@ deleted::
     >>> str(gpg.delete_keys("nosuchkey"))
     'No such key'
 
-The argument you pass to :meth:`~gnupg.GPG.delete_keys` can be either a single
+The argument you pass to :hover:`meth:~gnupg.GPG.delete_keys` can be either a single
 key identifier (e.g. keyid or fingerprint) or a sequence of key identifiers.
 
-The ``delete_keys`` method has some additional keyword arguments:
+The :hover:`meth:~gnupg.GPG.delete_keys` method has some additional keyword arguments:
 
 * ``passphrase`` - if specified, sends the specified passphrase to ``gpg``. For GnuPG
   >= 2.1, exporting secret keys requires a passphrase to be provided.
@@ -784,7 +785,7 @@ keys that were found is returned (this list could be empty). For example::
     [{'keyid': u'92905378', 'uids': [u'Vinay Sajip <vinay_sajip@hotmail.com>'], 'expires': u'', 'length': u'1024', 'algo': u'17', 'date': u'1221156445', 'type': u'pub'}]
 
 .. versionadded:: 0.3.5
-   The ``search_keys`` method was added.
+   The :hover:`meth:~gnupg.GPG.search_keys` method was added.
 
 .. index:: Key; sending
 
@@ -798,7 +799,7 @@ example::
     <gnupg.SendResult object at 0xb74d55ac>
 
 .. versionadded:: 0.3.5
-   The ``send_keys`` method was added.
+   The :hover:`meth:~gnupg.GPG.send_keys` method was added.
 
 
 Encryption and Decryption
@@ -889,7 +890,7 @@ output (defaults to ``None``)
    wrapper can use.
 
 .. versionchanged:: 0.5.0
-   The `stream` argument to :meth:`~gnupg.GPG.encrypt_file` can be a pathname
+   The `stream` argument to :hover:`meth:~gnupg.GPG.encrypt_file` can be a pathname
    to an existing file as well as text or a file-like object. In the pathname
    case, ``python-gnupg`` will open and close the file for you.
 
@@ -942,7 +943,7 @@ output (defaults to ``None``)
     output is written directly to the file.
 
 .. versionchanged:: 0.5.0
-   The `stream` argument to :meth:`~gnupg.GPG.decrypt_file` can be a pathname
+   The `stream` argument to :hover:`meth:~gnupg.GPG.decrypt_file` can be a pathname
    to an existing file as well as text or a file-like object. In the pathname
    case, ``python-gnupg`` will open and close the file for you.
 
@@ -997,7 +998,8 @@ Finding the recipients for an encrypted message
 
 Sometimes, it's desirable to find the recipients for an encrypted message,
 without actually performing decryption. You can do this using the
-:meth:`~gnupg.GPG.get_recipients` or :meth:`get_recipients_file` methods:
+:hover:`meth:~gnupg.GPG.get_recipients` or
+:hover:`meth:~gnupg.GPG.get_recipients_file` methods:
 
     >>> ids = gpg.get_recipients(data)
 
@@ -1009,7 +1011,7 @@ or, with a file or file-like object:
    The ``get_recipients`` and ``get_recipients_file`` methods were added.
 
 .. versionchanged:: 0.5.0
-   The `stream` argument to :meth:`~gnupg.GPG.get_recipients_file` can be a
+   The `stream` argument to :hover:`meth:~gnupg.GPG.get_recipients_file` can be a
    pathname to an existing file as well as text or a file-like object. In the
    pathname case, ``python-gnupg`` will open and close the file for you.
 
@@ -1084,7 +1086,7 @@ The hash algorithm used when creating the signature can be found in the
    (which should happen if you specify ``extra_args=['--verbose']``).
 
 .. versionchanged:: 0.5.0
-   The *stream* argument to :meth:`~gnupg.GPG.sign_file` can be a pathname to
+   The *stream* argument to :hover:`meth:~gnupg.GPG.sign_file` can be a pathname to
    an existing file as well as text or a file-like object. In the pathname
    case, ``python-gnupg`` will open and close the file for you.
 
@@ -1194,7 +1196,7 @@ key, the ``key_status`` attribute will be ``None``.
    ``username`` attributes of the result, if this information is provided by ``gpg``.
 
 .. versionchanged:: 0.5.0
-   The `stream` argument to :meth:`~gnupg.GPG.verify_file` can be a pathname to
+   The `stream` argument to :hover:`meth:~gnupg.GPG.verify_file` can be a pathname to
    an existing file as well as text or a file-like object. In the pathname
    case, ``python-gnupg`` will open and close the file for you.
 

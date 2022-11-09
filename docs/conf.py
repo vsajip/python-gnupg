@@ -100,9 +100,23 @@ spelling_word_list_filename='spelling_wordlist.txt'
 # a list of builtin themes.
 html_theme = os.environ.get('DOCS_THEME', 'default')
 
+THEME_OPTIONS = {
+    'sizzle': {
+    }
+}
+
+if html_theme == 'sizzle' and os.path.isfile('hover.json'):
+    import json
+
+    with open('hover.json', encoding='utf-8') as f:
+        THEME_OPTIONS['sizzle']['custom_data'] = {'hovers': json.load(f) }
+
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
+if html_theme in THEME_OPTIONS:
+    html_theme_options = THEME_OPTIONS[html_theme]
+
 #html_theme_options = {'collapsiblesidebar': True}
 
 # Add any paths that contain custom themes here, relative to this directory.

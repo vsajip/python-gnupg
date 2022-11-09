@@ -1,5 +1,5 @@
 (build|dist|keys|\.(tox|egg-info))/
-(DETAILS|MANIFEST|random_binary_data|watcher.conf)$
+(DETAILS|MANIFEST|random_binary_data|watcher.conf|hover.json)$
 \.(pyc|log|dict-validwords|yapf)$
 local.*\.(sh|cmd)
 docs/themes/
