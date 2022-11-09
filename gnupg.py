@@ -1949,7 +1949,7 @@ class GPG(object):
 
             always_trust (bool): Whether to always trust keys.
 
-            passphrase (str): The passphrase to use.
+            passphrase (str): The passphrase to use for a signature.
 
             armor (bool): Whether to ASCII-armor the output.
 

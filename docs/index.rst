@@ -814,11 +814,12 @@ corresponding private key.
 Encryption
 ----------
 
-To encrypt a message, use the following approach::
+To encrypt a message, use the :hover:`meth:~gnupg.GPG.encrypt` method::
 
     >>> encrypted_ascii_data = gpg.encrypt(data, recipients)
 
-If you want to encrypt data in a file (or file-like object), use::
+If you want to encrypt data in a file (or file-like object), use
+:hover:`meth:~gnupg.GPG.encrypt_file` instead::
 
     >>> encrypted_ascii_data = gpg.encrypt_file(stream, recipients) # e.g. after stream = open(filename, 'rb')
 
@@ -876,7 +877,8 @@ symmetric (defaults to ``False``)
    recipient key.
 
 
-The ``encrypt_file`` method takes the following additional keyword arguments:
+The :hover:`meth:~gnupg.GPG.encrypt_file` method takes the following additional
+keyword arguments:
 
 armor (defaults to ``True``)
     Whether to use ASCII armor. If ``False``, binary data is produced.
@@ -905,11 +907,12 @@ output (defaults to ``None``)
 Decryption
 ----------
 
-To decrypt a message, use the following approach::
+To decrypt a message, use the :hover:`meth:~gnupg.GPG.decrypt` method::
 
     >>> decrypted_data = gpg.decrypt(data)
 
-If you want to decrypt data in a file (or file-like object), use::
+If you want to decrypt data in a file (or file-like object), use
+:hover:`meth:~gnupg.GPG.decrypt_file` instead::
 
     >>> decrypted_data = gpg.decrypt_file(stream) # e.g. after stream = open(filename, 'rb')
 
@@ -965,14 +968,16 @@ output (defaults to ``None``)
 Using signing and encryption together
 -------------------------------------
 
-If you want to use signing and encryption together, use the following approach::
+If you want to use signing and encryption together, use the
+:hover:`meth:~gnupg.GPG.encrypt` with signer fingerprint and the corresponding
+passphrase::
 
     >>> encrypted_data = gpg.encrypt(data, recipients, sign=signer_fingerprint, passphrase=signer_passphrase)
 
 The resulting encrypted data contains the signature. When decrypting the data, upon
 successful decryption, signature verification is also performed (assuming the relevant
 public keys are available at the recipient end). The results are stored in the object
-returned from the decrypt call::
+returned from the :hover:`meth:~gnupg.GPG.decrypt` call::
 
     >>> decrypted_data = gpg.decrypt(data, passphrase=recipient_passphrase)
 
