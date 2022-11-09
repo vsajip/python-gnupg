@@ -24,6 +24,7 @@ import datetime, os, sys
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx',
               'sphinx.ext.todo', 'sphinx.ext.coverage',
+              #'sphinx.ext.napoleon',
               #'sphinx.ext.imgmath',
               'sphinx.ext.ifconfig', 'sphinx.ext.viewcode',
               'sphinxcontrib.spelling']

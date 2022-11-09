@@ -1027,7 +1027,8 @@ recipient can verify the signed data using the corresponding public key.
 Signing
 -------
 
-To sign a message, do the following::
+To sign a message, use the :hover:`meth:~gnupg.GPG.sign` or
+:hover:`meth:~gnupg.GPG.sign_file` methods::
 
     >>> signed_data = gpg.sign(message)
 
@@ -1102,11 +1103,12 @@ The hash algorithm used when creating the signature can be found in the
 Verification
 ------------
 
-To verify some data which you've received, do the following::
+To verify some data which you've received, use the
+:hover:`meth:~gnupg.GPG.verify` method::
 
     >>> verified = gpg.verify(data)
 
-To verify data in a file (or file-like object), use::
+To verify data in a file (or file-like object), use :hover:`meth:~gnupg.GPG.verify_file`::
 
     >>> verified = gpg.verify_file(stream) # e.g. after stream = open(filename, "rb")
 
