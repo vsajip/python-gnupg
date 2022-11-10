@@ -1278,9 +1278,21 @@ class GPG(object):
 
         Args:
             message (str|bytes): The data to sign.
+            kwargs (dict): Keyword arguments, which are passed to `sign_file()`:
 
-        Returns:
-            A :class:`Sign` instance.
+                * keyid (str): The key id of the signer.
+
+                * passphrase (str): The passphrase for the key.
+
+                * clearsign (bool): Whether to use clear signing.
+
+                * detach (bool): Whether to produce a detached signature.
+
+                * binary (bool): Whether to produce a binary signature.
+
+                * output (str): The path to write a detached signature to.
+
+                * extra_args (list[str]): Additional arguments to pass to `gpg`.
         """
         f = _make_binary_stream(message, self.encoding)
         result = self.sign_file(f, **kwargs)
@@ -1393,6 +1405,15 @@ class GPG(object):
 
         Args:
             data (str|bytes): The data to verify.
+            kwargs (dict): Keyword arguments, which are passed to `verify_file()`:
+
+                * fileobj_or_path (str|file): A path to a signature, or a file-like object containing one.
+
+                * data_filename (str): If the signature is a detached one, the path to the data that was signed.
+
+                * close_file (bool): If a file-like object is passed in, whether to close it.
+
+                * extra_args (list[str]): Additional arguments to pass to `gpg`.
         """
         f = _make_binary_stream(data, self.encoding)
         result = self.verify_file(f, **kwargs)
@@ -1734,15 +1755,14 @@ class GPG(object):
         Args:
             filename (str): The path to the file containing the key(s).
 
-        .. warning:: Care needed.
+        .. warning:: Warning:
+            Care is needed. The function works on modern GnuPG by running:
 
-           The function works on modern GnuPG by running:
+                $ gpg --dry-run --import-options import-show --import filename
 
-               $ gpg --dry-run --import-options import-show --import filename
+            On older versions, it does the *much* riskier:
 
-           On older versions, it does the *much* riskier:
-
-               $ gpg --with-fingerprint --with-colons filename
+                $ gpg --with-fingerprint --with-colons filename
         """
         if self.version >= (2, 1):
             args = ['--dry-run', '--import-options', 'import-show', '--import']
@@ -1761,16 +1781,14 @@ class GPG(object):
         Args:
             key_data (str|bytes): The key data to import.
 
-        .. warning:: Care needed.
+        .. warning:: Warning:
+            Care is needed. The function works on modern GnuPG by running:
 
-           The function works on modern GnuPG by running:
+                $ gpg --dry-run --import-options import-show --import filename
 
-               $ gpg --dry-run --import-options import-show --import filename
+            On older versions, it does the *much* riskier:
 
-           On older versions, it does the *much* riskier:
-
-               $ gpg --with-fingerprint --with-colons filename
-
+                $ gpg --with-fingerprint --with-colons filename
         """
         result = self.result_map['scan'](self)
         logger.debug('scan_keys: %r', key_data[:256])
@@ -1896,7 +1914,7 @@ class GPG(object):
         """
         Add subkeys to a master key,
 
-        Ars:
+        Args:
             master_key (str): The master key.
 
             master_passphrase (str): The passphrase for the master key.
@@ -2005,6 +2023,20 @@ class GPG(object):
 
             recipients (str|list[str]): A key id of a recipient of the encrypted data, or a list of such key ids.
 
+            kwargs (dict): Keyword arguments, which are passed to `encrypt_file()`:
+                * sign (str): If specified, the key id of a signer to sign the encrypted data.
+
+                * always_trust (bool): Whether to always trust keys.
+
+                * passphrase (str): The passphrase to use for a signature.
+
+                * armor (bool): Whether to ASCII-armor the output.
+
+                * output (str): A path to write the encrypted output to.
+
+                * symmetric (bool): Whether to use symmetric encryption,
+
+                * extra_args (list[str]): A list of additional arguments to pass to `gpg`.
         """
         data = _make_binary_stream(data, self.encoding)
         result = self.encrypt_file(data, recipients, **kwargs)
@@ -2018,6 +2050,16 @@ class GPG(object):
 
         Args:
             message (str|bytes): The data to decrypt. A default key will be used for decryption.
+
+            kwargs (dict): Keyword arguments, which are passed to `decrypt_file()`:
+
+                * always_trust: Whether to always trust keys.
+
+                * passphrase (str): The passphrase to use.
+
+                * output (str): If specified, the path to write the decrypted data to.
+
+                * extra_args (list[str]): A list of extra arguments to pass to `gpg`.
         """
         data = _make_binary_stream(message, self.encoding)
         result = self.decrypt_file(data, **kwargs)
@@ -2060,6 +2102,10 @@ class GPG(object):
 
         Args:
             message (str|bytes): The encrypted message.
+
+            kwargs (dict): Keyword arguments, which are passed to `get_recipients_file()`:
+
+                * extra_args (list[str]): A list of extra arguments to pass to `gpg`.
         """
         data = _make_binary_stream(message, self.encoding)
         result = self.get_recipients_file(data, **kwargs)
