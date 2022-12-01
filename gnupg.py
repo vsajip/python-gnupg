@@ -299,11 +299,17 @@ class Verify(StatusHandler):
             if sig_id:
                 info = self.sig_info[sig_id]
                 info.update(kwargs)
+            else:
+                logger.debug('Ignored due to missing sig iD: %s', kwargs)
 
         if key in self.TRUST_LEVELS:
             self.trust_text = key
             self.trust_level = self.TRUST_LEVELS[key]
             update_sig_info(trust_level=self.trust_level, trust_text=self.trust_text)
+            # See Issue #214. Once we see this, we're done with the signature just seen.
+            # Zap the signature ID, because we don't see a SIG_ID unless we have a new
+            # good signature.
+            self.signature_id = None
         elif key in ('WARNING', 'ERROR'):  # pragma: no cover
             logger.warning('potential problem: %s: %s', key, value)
         elif key == 'BADSIG':  # pragma: no cover
@@ -404,8 +410,11 @@ class Verify(StatusHandler):
             self.status = 'signature expected but not found'
         elif key in ('DECRYPTION_INFO', 'PLAINTEXT', 'PLAINTEXT_LENGTH', 'BEGIN_SIGNING'):
             pass
+        elif key in ('NEWSIG',):
+            # Only sent in gpg2. Clear any signature ID, to be set by a following SIG_ID
+            self.signature_id = None
         else:  # pragma: no cover
-            logger.debug('message ignored: %s, %s', key, value)
+            logger.debug('message ignored: %r, %r', key, value)
 
 
 class ImportResult(StatusHandler):

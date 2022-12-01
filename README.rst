@@ -84,6 +84,8 @@ Released: Not yet
 * Add ``scan_keys_mem()`` function to scan keys in a string. Thanks to Sky Moore
   for the patch.
 
+* Fix #214: Handle multiple signatures when one of them is invalid or unverified.
+
 
 0.5.0
 -----
