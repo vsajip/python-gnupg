@@ -42,7 +42,7 @@ html:
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
 apidocs:
-	docfrag --venv local_tools --libs .. gnupg -f hovertip > hover.json
+	docfrag --libs .. gnupg -f hovertip > hover.json
 
 remote:
 	rsync -avz $(BUILDDIR)/html/* vopal:~/apps/rdc_docs/python-gnupg
