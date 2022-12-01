@@ -408,7 +408,8 @@ class Verify(StatusHandler):
             # See issue GH-191
             self.valid = False
             self.status = 'signature expected but not found'
-        elif key in ('DECRYPTION_INFO', 'PLAINTEXT', 'PLAINTEXT_LENGTH', 'BEGIN_SIGNING'):
+        elif key in ('DECRYPTION_INFO', 'PLAINTEXT', 'PLAINTEXT_LENGTH',
+                     'BEGIN_SIGNING', 'KEY_CONSIDERED'):
             pass
         elif key in ('NEWSIG',):
             # Only sent in gpg2. Clear any signature ID, to be set by a following SIG_ID
@@ -810,7 +811,7 @@ class Crypt(Verify, TextHandler):
             # ENC_TO <long_keyid> <keytype> <keylength>
             self.key_id = value.split(' ', 1)[0]
         elif key in ('USERID_HINT', 'GOODMDC', 'END_DECRYPTION', 'CARDCTRL', 'BADMDC', 'SC_OP_FAILURE',
-                     'SC_OP_SUCCESS', 'PINENTRY_LAUNCHED', 'KEY_CONSIDERED'):
+                     'SC_OP_SUCCESS', 'PINENTRY_LAUNCHED'):
             pass
         else:
             Verify.handle_status(self, key, value)
