@@ -286,6 +286,7 @@ class Verify(StatusHandler):
         self.trust_text = None
         self.trust_level = None
         self.sig_info = {}
+        self.problems = []
 
     def __nonzero__(self):  # pragma: no cover
         return self.valid
@@ -316,6 +317,11 @@ class Verify(StatusHandler):
             self.valid = False
             self.status = 'signature bad'
             self.key_id, self.username = value.split(None, 1)
+            self.problems.append({
+                'status': self.status,
+                'keyid': self.key_id,
+                'user': self.username
+            })
             update_sig_info(keyid=self.key_id, username=self.username, status=self.status)
         elif key == 'ERRSIG':  # pragma: no cover
             self.valid = False
@@ -329,11 +335,22 @@ class Verify(StatusHandler):
                             timestamp=self.timestamp,
                             fingerprint=self.fingerprint,
                             status=self.status)
+            self.problems.append({
+                'status': self.status,
+                'keyid': self.key_id,
+                'timestamp': self.timestamp,
+                'fingerprint': self.fingerprint
+            })
         elif key == 'EXPSIG':  # pragma: no cover
             self.valid = False
             self.status = 'signature expired'
             self.key_id, self.username = value.split(None, 1)
             update_sig_info(keyid=self.key_id, username=self.username, status=self.status)
+            self.problems.append({
+                'status': self.status,
+                'keyid': self.key_id,
+                'user': self.username
+            })
         elif key == 'GOODSIG':
             self.valid = True
             self.status = 'signature good'
@@ -362,10 +379,18 @@ class Verify(StatusHandler):
             self.valid = False
             self.key_id = value
             self.status = 'no public key'
+            self.problems.append({
+                'status': self.status,
+                'keyid': self.key_id
+            })
         elif key == 'NO_SECKEY':  # pragma: no cover
             self.valid = False
             self.key_id = value
             self.status = 'no secret key'
+            self.problems.append({
+                'status': self.status,
+                'keyid': self.key_id
+            })
         elif key in ('EXPKEYSIG', 'REVKEYSIG'):  # pragma: no cover
             # signed with expired or revoked key
             self.valid = False
@@ -376,6 +401,10 @@ class Verify(StatusHandler):
                 self.key_status = 'signing key was revoked'
             self.status = self.key_status
             update_sig_info(status=self.status, keyid=self.key_id)
+            self.problems.append({
+                'status': self.status,
+                'keyid': self.key_id
+            })
         elif key in ('UNEXPECTED', 'FAILURE'):  # pragma: no cover
             self.valid = False
             if key == 'UNEXPECTED':

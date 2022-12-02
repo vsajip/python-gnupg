@@ -1539,6 +1539,11 @@ class GPGTestCase(unittest.TestCase):
             actual = set(d['fingerprint'] for d in sig_info.values())
             expected = set([key1.fingerprint])
             self.assertEqual(actual, expected)
+            problems = verified.problems
+            self.assertEqual(len(problems), 1)
+            d = problems[0]
+            self.assertEqual(d['status'], 'signature bad')
+            self.assertTrue(key2.fingerprint.endswith(d['keyid']))
         finally:
             os.remove(fn)
 

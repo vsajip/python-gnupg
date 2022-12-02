@@ -1181,6 +1181,8 @@ data that was signed should be in a separate file whose path is indicated by
 
    * ``trust_text`` - the text corresponding to the trust level.
 
+   Note that only information for valid signatures will be present in ``sig_info``.
+
 When a signature is verified, signer information is held in attributes of
 ``verified``: ``username``, ``key_id``, ``signature_id``, ``fingerprint``,
 ``trust_level`` and ``trust_text``. If the message wasn't signed, these attributes
@@ -1216,6 +1218,12 @@ key, the ``key_status`` attribute will be ``None``.
    an existing file as well as text or a file-like object. In the pathname
    case, ``python-gnupg`` will open and close the file for you.
 
+.. versionadded:: 0.5.1
+   A ``problems`` attribute was added which holds problems reported by ``gpg``
+   during verification. This is a list of dictionaries, one for each reported
+   problem. Each dictionary will have ``status`` and ``keyid`` keys indicating
+   the problem and the corresponding key; other information in the dictionaries
+   will be error specific.
 
 
 Verifying detached signatures in memory
