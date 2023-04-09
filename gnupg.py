@@ -34,6 +34,7 @@ https://gnupg.readthedocs.io/
 """
 
 import codecs
+from datetime import date
 from io import StringIO
 import logging
 import os
@@ -1016,6 +1017,37 @@ class Sign(StatusHandler, TextHandler):
             logger.debug('message ignored: %s, %s', key, value)
 
 
+class AutoLocateKey(StatusHandler):
+    """
+    This class handles status messages during key auto-locating.
+    """
+    fingerprint: str
+    type: str
+    created_at: date
+    email: str
+    email_display_name: str
+
+    def __init__(self, gpg):
+        StatusHandler.__init__(self, gpg)
+        self.fingerprint = None
+        self.type = None
+        self.created_at = None
+        self.email = None
+        self.email_display_name = None
+
+    def handle_status(self, key, value):
+        if key == "IMPORTED":
+            _, email, display_name = value.split()
+
+            self.email = email
+            self.email_display_name = display_name[1:-1]
+        elif key == "KEY_CONSIDERED":
+            self.fingerprint = value.strip().split()[0]
+        else:
+            print(key, value)
+
+
+
 VERSION_RE = re.compile(r'gpg \(GnuPG(?:/MacGPG2)?\) (\d+(\.\d+)*)'.encode('ascii'), re.I)
 HEX_DIGITS_RE = re.compile(r'[0-9a-f]+$', re.I)
 PUBLIC_KEY_RE = re.compile(r'gpg: public key is (\w+)')
@@ -1043,6 +1075,7 @@ class GPG(object):
         'trust': TrustResult,
         'verify': Verify,
         'export': ExportResult,
+        'auto-locate-key': AutoLocateKey,
     }
     "A map of GPG operations to result object types."
 
@@ -1881,6 +1914,33 @@ class GPG(object):
             if keyword in valid_keywords:
                 getattr(result, keyword)(L)
         return result
+
+    def auto_locate_key(self, email, mechanisms=None, **kwargs):
+        """
+        Auto locate a public key by `email`.
+        
+        Args:
+            email (str): The email address to search for.
+            mechanisms (list[str]): A list of mechanisms to use. Valid mechanisms can be found
+            here https://www.gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html
+            under "--auto-key-locate". Default: ['wkd', 'ntds', 'ldap', 'cert', 'dane', 'local']
+        """
+        mechanisms = mechanisms or ['wkd', 'ntds', 'ldap', 'cert', 'dane', 'local']
+
+        args = ['--auto-key-locate', ','.join(mechanisms), '--locate-keys', email]
+
+        result = self.result_map['auto-locate-key'](self)
+        data = _make_binary_stream('', self.encoding)
+
+        if 'extra_args' in kwargs:
+            args.extend(kwargs['extra_args'])
+
+        try:
+            self._handle_io(args, data, result, binary=True)
+        finally:
+            data.close()
+        return result
+
 
     def gen_key(self, input):
         """

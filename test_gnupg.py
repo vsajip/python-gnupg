@@ -1547,6 +1547,17 @@ class GPGTestCase(unittest.TestCase):
         finally:
             os.remove(fn)
 
+    def test_auto_key_locating(self):
+        gpg = self.gpg
+
+        # Let's hope ProtonMail doesn't change their key anytime soon
+        expected_fingerprint = "90E619A84E85330A692F6D81A655882018DBFA9D"
+        expected_type = "rsa2048"
+
+        actual = self.gpg.auto_locate_key("no-reply@protonmail.com")
+
+        self.assertEqual(actual.fingerprint, expected_fingerprint)
+
 
 TEST_GROUPS = {
     'sign':
