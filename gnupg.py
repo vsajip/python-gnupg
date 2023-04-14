@@ -34,7 +34,8 @@ https://gnupg.readthedocs.io/
 """
 
 import codecs
-from datetime import date
+from datetime import date, datetime
+from email.utils import parseaddr
 from io import StringIO
 import logging
 import os
@@ -1022,10 +1023,10 @@ class AutoLocateKey(StatusHandler):
     This class handles status messages during key auto-locating.
     """
     fingerprint: str
-    type: str
+    key_length: int
     created_at: date
     email: str
-    email_display_name: str
+    email_real_name: str
 
     def __init__(self, gpg):
         StatusHandler.__init__(self, gpg)
@@ -1033,19 +1034,37 @@ class AutoLocateKey(StatusHandler):
         self.type = None
         self.created_at = None
         self.email = None
-        self.email_display_name = None
+        self.email_real_name = None
 
     def handle_status(self, key, value):
         if key == "IMPORTED":
             _, email, display_name = value.split()
 
             self.email = email
-            self.email_display_name = display_name[1:-1]
+            self.email_real_name = display_name[1:-1]
         elif key == "KEY_CONSIDERED":
             self.fingerprint = value.strip().split()[0]
-        else:
-            print(key, value)
 
+    def pub(self, args):
+        """
+        Internal method to handle the 'pub' status message.
+        `pub` message contains the fingerprint of the public key, its type and its creation date.
+        """
+        pass
+
+    def uid(self, args):
+        self.created_at = datetime.fromtimestamp(int(args[5]))
+        raw_email_content = args[9]
+        email, real_name = parseaddr(raw_email_content)
+        self.email = email
+        self.email_real_name = real_name
+
+    def sub(self, args):
+        self.key_length = int(args[2])
+
+    def fpr(self, args):
+        # Only store the first fingerprint
+        self.fingerprint = self.fingerprint or args[9]
 
 
 VERSION_RE = re.compile(r'gpg \(GnuPG(?:/MacGPG2)?\) (\d+(\.\d+)*)'.encode('ascii'), re.I)
@@ -1915,7 +1934,7 @@ class GPG(object):
                 getattr(result, keyword)(L)
         return result
 
-    def auto_locate_key(self, email, mechanisms=None, **kwargs):
+    def auto_locate_key(self, email, mechanisms=None, **kwargs) -> AutoLocateKey:
         """
         Auto locate a public key by `email`.
         
@@ -1930,17 +1949,14 @@ class GPG(object):
         args = ['--auto-key-locate', ','.join(mechanisms), '--locate-keys', email]
 
         result = self.result_map['auto-locate-key'](self)
-        data = _make_binary_stream('', self.encoding)
 
         if 'extra_args' in kwargs:
             args.extend(kwargs['extra_args'])
 
-        try:
-            self._handle_io(args, data, result, binary=True)
-        finally:
-            data.close()
+        process = self._open_subprocess(args)
+        self._collect_output(process, result, stdin=process.stdin)
+        self._decode_result(result)
         return result
-
 
     def gen_key(self, input):
         """
