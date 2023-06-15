@@ -1130,6 +1130,21 @@ You can use the returned value in a Boolean context::
 
     >>> if not verified: raise ValueError("Signature could not be verified!")
 
+Getting the signed data out while verifying
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you clearsign data, the signature envelops the signed data (whether text or
+binary) with the signature, but by default you won't get this data back from a
+:meth:`~gnupg.GPG.verify` or :meth:`~gnupg.GPG.verify_file` call. In order to
+extract the signed data, you need to pass more information to the ``verify``
+methods about where you want that data (if none is specified, the data is
+discarded). To write it to ``gpg``'s standard output, specify
+``extra_args=['-o', '-']``. In that case, it will be returned as a bytestring
+in ``verified.data``. Alternatively, to write to a file, you can pass
+``extra_args=['-o', 'path/to/write/data.to']`` and it will be written to the
+file you specify. (Thanks to Mark Neil for this suggestion.)
+
+
 Verifying detached signatures on disk
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
