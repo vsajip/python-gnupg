@@ -1016,7 +1016,7 @@ class Sign(StatusHandler, TextHandler):
             logger.debug('message ignored: %s, %s', key, value)
 
 
-VERSION_RE = re.compile(r'gpg \(GnuPG(?:/MacGPG2)?\) (\d+(\.\d+)*)'.encode('ascii'), re.I)
+VERSION_RE = re.compile(r'^cfg:version:(\d+(\.\d+)*)'.encode('ascii'))
 HEX_DIGITS_RE = re.compile(r'[0-9a-f]+$', re.I)
 PUBLIC_KEY_RE = re.compile(r'gpg: public key is (\w+)')
 
@@ -1105,7 +1105,7 @@ class GPG(object):
         if gnupghome and not os.path.isdir(self.gnupghome):  # pragma: no cover
             os.makedirs(self.gnupghome, 0o700)
         try:
-            p = self._open_subprocess(['--version'])
+            p = self._open_subprocess(['--list-config', '--with-colons'])
         except OSError:
             msg = 'Unable to run gpg (%s) - it may not be available.' % self.gpgbinary
             logger.exception(msg)
