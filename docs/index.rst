@@ -1048,7 +1048,7 @@ instance before you invoke the operation. When an operation with ``gpg`` is init
 ``python-gnupg`` buffers the data. At the end of the data stream, it will be called with
 a zero-length bytestring (allowing you do any necessary clean-up).
 
-If the ``on_data`` callable returns ``False``, the data will not be buffered by
+If the ``on_data`` callable returns ``False``, the data will *not* be buffered by
 ``python-gnupg``. For any other return value (including ``None``), the data *will* be
 buffered. (This slightly odd arrangement is for backwards compatibility.)
 
@@ -1090,7 +1090,7 @@ Example usages (not tested, error handling omitted):
 
     class Processor:
         def __init__(self, fn):
-            self.out = open(fn, 'w')
+            self.out = open(fn, 'w', encoding='utf-8')
             self.decoder =  codecs.getincrementaldecoder('utf-8')
             self.result = ''
 
