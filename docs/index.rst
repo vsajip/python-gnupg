@@ -190,7 +190,7 @@ env  (defaults to ``None``)
    when working with GnuPG >= 2.1.*
 
 .. note:: If you specify values in ``options``, make sure you don't specify values
-   which will conflict with other values added by python-gnupg. You should be familiar
+   which will conflict with other values added by ``python-gnupg``. You should be familiar
    with GPG command-line arguments and how they affect GPG's operation.
 
 .. versionchanged:: 0.3.7
@@ -202,7 +202,7 @@ env  (defaults to ``None``)
 If the ``gpgbinary`` executable cannot be found, a ``ValueError`` is raised in
 :meth:`GPG.__init__`.
 
-The low-level communication between the ``gpg`` executable and python-gnupg is in
+The low-level communication between the ``gpg`` executable and ``python-gnupg`` is in
 terms of bytes, and ``python-gnupg`` tries to convert gpg's ``stderr`` stream to text
 using an encoding. The default value of this is ``latin-1``, but you can override this
 by setting the encoding name in the GPG instance's ``encoding`` attribute after
@@ -1028,6 +1028,85 @@ or, with a file or file-like object:
    The `stream` argument to :meth:`~gnupg.GPG.get_recipients_file` can be a
    pathname to an existing file as well as text or a file-like object. In the
    pathname case, ``python-gnupg`` will open and close the file for you.
+
+
+Custom handling of data streams
+-------------------------------
+
+During processing, ``gpg`` often sends output to its ``stdout`` stream, which is captured
+by ``python-gnupg`` buffered, and returned as part of an operation's result (usually in
+the ``data`` attribute). However, there might be times when you want to:
+
+* Avoid buffering, as the data sizes involved are large.
+* Process the data as it becomes available, before it's all available at the end of an
+  operation. Most commonly, this will happen during decryption.
+
+In such cases, you can supply a callable in the ``on_data`` attribute of a :class:`GPG`
+instance before you invoke the operation. When an operation with ``gpg`` is initiated, if
+``on_data`` is given a value, it will be called with each chunk of data (of type
+``bytes``) received from ``gpg``, and its return value will be used to determine whether
+``python-gnupg`` buffers the data. At the end of the data stream, it will be called with
+a zero-length bytestring (allowing you do any necessary clean-up).
+
+If the ``on_data`` callable returns ``False``, the data will not be buffered by
+``python-gnupg``. For any other return value (including ``None``), the data *will* be
+buffered. (This slightly odd arrangement is for backwards compatibility.)
+
+Example usages (not tested, error handling omitted):
+
+.. code-block:: python
+
+    # Doing your own buffering in memory
+
+    chunks = []
+
+    def collector(chunk):
+        chunks.append(chunk)
+        return False  # Tell python-gnupg not to buffer the chunk
+
+    gpg = GPG(...)
+    gpg.on_data = collector
+    gpg.decrypt(...)
+
+    # Doing your own buffering in a file
+
+    class Collector:
+        def __init__(self, fn):
+            self.out = open(fn, 'wb')
+
+        def __call__(self, chunk):
+            self.out.write(chunk)
+            if not chunk:
+                self.out.close()
+            return False  # Tell python-gnupg not to buffer the chunk
+
+    gpg = GPG(...)
+    gpg.on_data = Collector('/tmp/plain.txt')
+    gpg.decrypt(...)
+
+    # Processing as you go (assuming the decrypted data is utf-8 encoded)
+
+    import codecs
+
+    class Processor:
+        def __init__(self, fn):
+            self.out = open(fn, 'w')
+            self.decoder =  codecs.getincrementaldecoder('utf-8')
+            self.result = ''
+
+        def __call__(self, chunk):
+            final = (len(chunk) == 0)
+            self.result += self.decoder.decode(chunk, final)
+            # Perhaps do custom processing of self.result here
+            self.out.write(self.result)
+            self.result = ''
+            if final:
+                self.out.close()
+            return False  # Tell python-gnupg not to buffer the chunk
+
+    gpg = GPG(...)
+    gpg.on_data = Processor('/tmp/plain.txt')
+    gpg.decrypt(...)
 
 
 Signing and Verification
