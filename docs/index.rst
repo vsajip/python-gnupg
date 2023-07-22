@@ -165,22 +165,23 @@ verbose (defaults to ``False``)
     Print information (e.g. the gpg command lines, and status messages returned by
     gpg) to the console. You don't generally need to set this option, since the module
     uses Python's ``logging`` package to provide more flexible functionality. The
-    status messages from GPG are quite voluminous, especially during key generation.
+    status messages from ``gpg`` are quite voluminous, especially during key generation.
 use_agent (defaults to ``False``)
-    If specified as True, the ``--use-agent`` parameter is passed to GPG, asking it to
+    If specified as True, the ``--use-agent`` parameter is passed to ``gpg``, asking it to
     use any in-memory GPG agent (which remembers your credentials).
 keyring (defaults to ``None``)
     If specified, the value is used as the name of the keyring file. The default
     keyring is not used. A list of paths to keyring files can also be specified.
 options (defaults to ``None``)
     If specified, the value should be a list of additional command-line options to
-    pass to GPG.
+    pass to ``gpg``.
 secret_keyring (defaults to ``None``)
     If specified, the value is used as the name of the secret keyring file. A list of
     paths to secret keyring files can also be specified. *Note that these files are
     not used by GnuPG >= 2.1.*
 env  (defaults to ``None``)
     If specified, the value is used as the environment variables used when calling the GPG
+    executable.
 
 .. versionchanged:: 0.3.4
    The ``keyring`` argument can now also be a list of keyring filenames.
@@ -198,6 +199,8 @@ env  (defaults to ``None``)
    ``locale.getpreferredencoding()`` or, failing that, ``sys.stdin.encoding``, and
    failing that, ``utf-8``.
 
+.. versionadded:: 0.5.0
+   The ``env`` argument was added.
 
 If the ``gpgbinary`` executable cannot be found, a ``ValueError`` is raised in
 :meth:`GPG.__init__`.
@@ -468,6 +471,8 @@ The ``export_keys`` method has some additional keyword arguments:
   passphrase is to be passed to ``gpg`` via pinentry, you wouldn't pass it here - so
   specify ``expect_passphrase=False`` in that case. If you don't do that, and don't
   pass a passphrase, a ``ValueError`` will be raised.
+* ``output`` - defaults to ``None``, but if specified, should be the pathname of a file
+  to which the exported keys should be written.
 
 .. versionadded:: 0.3.7
    The ``armor`` and ``minimal`` keyword arguments were added.
@@ -477,6 +482,9 @@ The ``export_keys`` method has some additional keyword arguments:
 
 .. versionadded:: 0.4.2
    The ``expect_passphrase`` keyword argument was added.
+
+.. versionadded:: 0.5.1
+   The ``output`` keyword argument was added.
 
 .. index:: Key; importing
 

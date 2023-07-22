@@ -2,7 +2,7 @@
 """
 A test harness for gnupg.py.
 
-Copyright (C) 2008-2022 Vinay Sajip. All rights reserved.
+Copyright (C) 2008-2023 Vinay Sajip. All rights reserved.
 """
 import argparse
 import json
@@ -15,6 +15,11 @@ import stat
 import sys
 import tempfile
 import unittest
+
+try:
+    unicode
+except NameError:
+    unicode = str
 
 try:
     from unittest import skipIf
@@ -30,7 +35,7 @@ except ImportError:  # pragma: no cover
 import gnupg
 
 __author__ = 'Vinay Sajip'
-__date__ = '$23-Aug-2022 16:37:02$'
+__date__ = '$22-Jul-2023 16:37:02$'
 
 ALL_TESTS = True
 
@@ -726,7 +731,7 @@ class GPGTestCase(unittest.TestCase):
             fd, key_fn = tempfile.mkstemp(prefix='pygpg-test-')
             os.write(fd, KEYS_TO_IMPORT.encode('ascii'))
             os.close(fd)
-            test_files = (key_fn,)
+            test_files = (key_fn, )
         try:
             for fn in test_files:
                 logger.debug('scanning keys in %s', fn)
@@ -746,7 +751,7 @@ class GPGTestCase(unittest.TestCase):
             'Gary Gross (A test user) <gary.gross@gamma.com>',
             'Danny Davis (A test user) <danny.davis@delta.com>',
         ])
-        for key in (KEYS_TO_IMPORT,):
+        for key in (KEYS_TO_IMPORT, ):
             logger.debug('testing scan_keys')
             data = self.gpg.scan_keys_mem(key)
             self.assertEqual(0, data.returncode, 'Non-zero return code')
@@ -1560,8 +1565,9 @@ TEST_GROUPS = {
     set([
         'test_deletion', 'test_import_and_export', 'test_list_keys_after_generation', 'test_list_signatures',
         'test_key_generation_with_invalid_key_type', 'test_key_generation_with_escapes', 'test_key_generation_input',
-        'test_key_generation_with_colons', 'test_search_keys', 'test_scan_keys', 'test_scan_keys_mem', 'test_key_trust', 'test_add_subkey',
-        'test_add_subkey_with_invalid_key_type', 'test_deletion_subkey', 'test_list_subkey_after_generation'
+        'test_key_generation_with_colons', 'test_search_keys', 'test_scan_keys', 'test_scan_keys_mem',
+        'test_key_trust', 'test_add_subkey', 'test_add_subkey_with_invalid_key_type', 'test_deletion_subkey',
+        'test_list_subkey_after_generation'
     ]),
     'import':
     set(['test_import_only', 'test_doctest_import_keys']),

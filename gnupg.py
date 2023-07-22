@@ -27,7 +27,7 @@ Vinay Sajip to make use of the subprocess module (Steve's version uses os.fork()
 and so does not work on Windows). Renamed to gnupg.py to avoid confusion with
 the previous versions.
 
-Modifications Copyright (C) 2008-2022 Vinay Sajip. All rights reserved.
+Modifications Copyright (C) 2008-2023 Vinay Sajip. All rights reserved.
 
 For the full documentation, see https://docs.red-dove.com/python-gnupg/ or
 https://gnupg.readthedocs.io/
@@ -43,9 +43,9 @@ from subprocess import Popen, PIPE
 import sys
 import threading
 
-__version__ = '0.5.1.dev0'
+__version__ = '0.5.1'
 __author__ = 'Vinay Sajip'
-__date__ = '$23-Aug-2022 16:36:40$'
+__date__ = '$22-Jul-2023 16:36:40$'
 
 STARTUPINFO = None
 if os.name == 'nt':  # pragma: no cover
@@ -317,11 +317,7 @@ class Verify(StatusHandler):
             self.valid = False
             self.status = 'signature bad'
             self.key_id, self.username = value.split(None, 1)
-            self.problems.append({
-                'status': self.status,
-                'keyid': self.key_id,
-                'user': self.username
-            })
+            self.problems.append({'status': self.status, 'keyid': self.key_id, 'user': self.username})
             update_sig_info(keyid=self.key_id, username=self.username, status=self.status)
         elif key == 'ERRSIG':  # pragma: no cover
             self.valid = False
@@ -346,11 +342,7 @@ class Verify(StatusHandler):
             self.status = 'signature expired'
             self.key_id, self.username = value.split(None, 1)
             update_sig_info(keyid=self.key_id, username=self.username, status=self.status)
-            self.problems.append({
-                'status': self.status,
-                'keyid': self.key_id,
-                'user': self.username
-            })
+            self.problems.append({'status': self.status, 'keyid': self.key_id, 'user': self.username})
         elif key == 'GOODSIG':
             self.valid = True
             self.status = 'signature good'
@@ -379,18 +371,12 @@ class Verify(StatusHandler):
             self.valid = False
             self.key_id = value
             self.status = 'no public key'
-            self.problems.append({
-                'status': self.status,
-                'keyid': self.key_id
-            })
+            self.problems.append({'status': self.status, 'keyid': self.key_id})
         elif key == 'NO_SECKEY':  # pragma: no cover
             self.valid = False
             self.key_id = value
             self.status = 'no secret key'
-            self.problems.append({
-                'status': self.status,
-                'keyid': self.key_id
-            })
+            self.problems.append({'status': self.status, 'keyid': self.key_id})
         elif key in ('EXPKEYSIG', 'REVKEYSIG'):  # pragma: no cover
             # signed with expired or revoked key
             self.valid = False
@@ -401,10 +387,7 @@ class Verify(StatusHandler):
                 self.key_status = 'signing key was revoked'
             self.status = self.key_status
             update_sig_info(status=self.status, keyid=self.key_id)
-            self.problems.append({
-                'status': self.status,
-                'keyid': self.key_id
-            })
+            self.problems.append({'status': self.status, 'keyid': self.key_id})
         elif key in ('UNEXPECTED', 'FAILURE'):  # pragma: no cover
             self.valid = False
             if key == 'UNEXPECTED':
@@ -437,10 +420,9 @@ class Verify(StatusHandler):
             # See issue GH-191
             self.valid = False
             self.status = 'signature expected but not found'
-        elif key in ('DECRYPTION_INFO', 'PLAINTEXT', 'PLAINTEXT_LENGTH',
-                     'BEGIN_SIGNING', 'KEY_CONSIDERED'):
+        elif key in ('DECRYPTION_INFO', 'PLAINTEXT', 'PLAINTEXT_LENGTH', 'BEGIN_SIGNING', 'KEY_CONSIDERED'):
             pass
-        elif key in ('NEWSIG',):
+        elif key in ('NEWSIG', ):
             # Only sent in gpg2. Clear any signature ID, to be set by a following SIG_ID
             self.signature_id = None
         else:  # pragma: no cover
@@ -1618,8 +1600,8 @@ class GPG(object):
 
             expect_passphrase (bool): Whether a passphrase is expected.
 
-            exclamation_mode (bool): If specified, a `'!'` is appended to each fingerprint. This deletes only a subkey or
-                                     an entire key, depending on what the fingerprint refers to.
+            exclamation_mode (bool): If specified, a `'!'` is appended to each fingerprint. This deletes only a subkey
+                                     or an entire key, depending on what the fingerprint refers to.
 
         .. note:: Passphrases
 
