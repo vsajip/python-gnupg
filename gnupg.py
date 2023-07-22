@@ -43,7 +43,7 @@ from subprocess import Popen, PIPE
 import sys
 import threading
 
-__version__ = '0.5.1'
+__version__ = '0.5.2.dev0'
 __author__ = 'Vinay Sajip'
 __date__ = '$22-Jul-2023 16:36:40$'
 
