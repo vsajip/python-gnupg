@@ -26,7 +26,8 @@ def main():
     adhf = argparse.ArgumentDefaultsHelpFormatter
     ap = argparse.ArgumentParser(formatter_class=adhf, prog=fn)
     aa = ap.add_argument
-    aa('--upload', default=False, action='store_true', help='Upload to PyPI')
+    aa('-b', '--build', default=False, action='store_true', help='Force a rebuild')
+    aa('-u', '--upload', default=False, action='store_true', help='Upload to PyPI')
     options = ap.parse_args()
     with open('gnupg.py') as f:
         data = f.read()
@@ -34,20 +35,28 @@ def main():
     assert m
     ver = m.groups()[0]
     sigs = list(glob.glob(f'dist/*{ver}*.asc'))
-    if sigs:
+    # import pdb; pdb.set_trace()
+    if sigs and not options.build:
         print(f'Signatures found: {", ".join(sigs)}')
     else:
-        print('Signatures not found ...')
-        files = list(glob.glob(f'dist/*{ver}*'))
-        if files:
+        if not sigs:
+            print('Signatures not found ...')
+        files = [fn for fn in glob.glob(f'dist/*{ver}*') if not fn.endswith('.asc')]
+        if files and not options.build:
             print(f'Archives found: {", ".join(files)}')
         else:
-            print('Archives not found ...')
+            if not files:
+                print('Archives not found ...')
             subprocess.check_call(['pybuild'])
-            files = list(glob.glob(f'dist/*{ver}*'))
+            files = [fn for fn in glob.glob(f'dist/*{ver}*') if not fn.endswith('.asc')]
         for fn in files:
-            cmd = ['gpg', '-abs', fn]
-            subprocess.check_call(cmd)
+            sfn = f'{fn}.asc'
+            if os.path.exists(sfn):
+                os.remove(sfn)
+            cmd = ['gpg2', '-abs', fn]
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p.communicate()
+            assert p.returncode == 0
     if options.upload:
         cmd = ['twine', 'upload', '-r', 'python-gnupg']
         cmd.extend(files)
