@@ -210,7 +210,7 @@ def _make_binary_stream(s, encoding):
 
 class StatusHandler(object):
     """
-    The base class for handling status messages from gpg.
+    The base class for handling status messages from `gpg`.
     """
 
     def __init__(self, gpg):
@@ -1043,7 +1043,7 @@ class GPG(object):
             gpgbinary (str): A pathname for the GPG binary to use.
 
             gnupghome (str): A pathname to where we can find the public and private keyrings. The default is
-                             whatever gpg defaults to.
+                             whatever `gpg` defaults to.
 
             keyring (str|list): The name of alternative keyring file to use, or a list of such keyring files. If
                                 specified, the default keyring is not used.
@@ -1111,7 +1111,7 @@ class GPG(object):
         """
         Make a list of command line elements for GPG. The value of ``args``
         will be appended. The ``passphrase`` argument needs to be True if
-        a passphrase will be sent to GPG, else False.
+        a passphrase will be sent to `gpg`, else False.
 
         Args:
             args (list[str]): A list of arguments.
@@ -1337,7 +1337,7 @@ class GPG(object):
 
     def is_valid_passphrase(self, passphrase):
         """
-        Confirm that the passphrase doesn't contain newline-type characters - it is passed in a pipe to gpg, and so not
+        Confirm that the passphrase doesn't contain newline-type characters - it is passed in a pipe to `gpg`, and so not
         checking could lead to spoofing attacks by passing arbitrary text after passphrase and newline.
 
         Args:
@@ -1606,7 +1606,7 @@ class GPG(object):
         .. note:: Passphrases
 
            Since GnuPG 2.1, you can't delete secret keys without providing a passphrase. However, if you're expecting
-           the passphrase to go to gpg via pinentry, you should specify expect_passphrase=False. (It's only checked
+           the passphrase to go to `gpg` via pinentry, you should specify expect_passphrase=False. (It's only checked
            for GnuPG >= 2.1).
         """
         if passphrase and not self.is_valid_passphrase(passphrase):  # pragma: no cover
@@ -1651,7 +1651,7 @@ class GPG(object):
                     expect_passphrase=True,
                     output=None):
         """
-        Export the indicated keys. A 'keyid' is anything gpg accepts.
+        Export the indicated keys. A 'keyid' is anything `gpg` accepts.
 
         Args:
             keyids (str|list[str]): A single keyid or a list of them.
@@ -1671,7 +1671,7 @@ class GPG(object):
         .. note:: Passphrases
 
            Since GnuPG 2.1, you can't export secret keys without providing a passphrase. However, if you're expecting
-           the passphrase to go to gpg via pinentry, you should specify expect_passphrase=False. (It's only checked
+           the passphrase to go to `gpg` via pinentry, you should specify expect_passphrase=False. (It's only checked
            for GnuPG >= 2.1).
         """
         if passphrase and not self.is_valid_passphrase(passphrase):  # pragma: no cover
@@ -1880,7 +1880,7 @@ class GPG(object):
 
     def gen_key_input(self, **kwargs):
         """
-        Generate `--gen-key` input  (see gpg documentation in DETAILS).
+        Generate `--gen-key` input  (see `gpg` documentation in DETAILS).
 
         Args:
             kwargs (dict): A list of keyword arguments.

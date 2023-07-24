@@ -460,7 +460,7 @@ accepts to identify a key - for example, the keyid or the fingerprint could be u
 If you want to pass a single keyid, then you can just pass in a string which
 identifies the key.
 
-The ``export_keys`` method has some additional keyword arguments:
+The :meth:`~gnupg.GPG.export_keys` method has some additional keyword arguments:
 
 * ``armor`` (defaulting to ``True``) - when ``True``, passes ``--armor`` to ``gpg``.
 * ``minimal`` (defaulting to ``False``) - when ``True``, passes
@@ -1344,7 +1344,7 @@ In addition, an ``extra_args`` keyword parameter can be specified. If provided, 
 is treated as a list of additional arguments to pass to the ``gpg`` executable.
 
 .. versionadded:: 0.3.6
-   The ``verify_data`` method was added.
+   The :meth:`~gnupg.GPG.verify_data` method was added.
 
 .. versionadded:: 0.4.1
    The ``extra_args`` keyword argument was added.
@@ -1353,10 +1353,10 @@ Accessing gpg's Return Code
 ===========================
 
 Starting with version 0.4.8, return values to all calls which implement ``gpg``
-operations, other than ``export_keys()``, will have a ``returncode`` attribute which
-is the return code returned by the ``gpg`` invocation made to perform the operation
-(the result of ``export_keys()`` is the set of exported keys and doesn't have this
-attribute).
+operations, other than :meth:`~gnupg.GPG.export_keys`, will have a ``returncode``
+attribute which is the return code returned by the ``gpg`` invocation made to perform the
+operation (the result of :meth:`~gnupg.GPG.export_keys` is the set of exported keys and
+doesn't have this attribute).
 
 .. versionadded:: 0.4.8
     The ``returncode`` attribute was added to result instances.
