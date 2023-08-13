@@ -867,6 +867,11 @@ extra_args (defaults to ``None``)
     could pass ``extra_args=['-z', '0']`` to disable compression, or you could pass
     ``extra_args=['--set-filename', 'name-to-embed-in-encrypted-file.txt']`` to embed
     a specific file name in the encrypted message.
+armor (defaults to ``True``)
+    Whether to use ASCII armor. If ``False``, binary data is produced.
+output (defaults to ``None``)
+    The name of an output file to write to. If a name is specified, the encrypted
+    output is written directly to the file.
 
 .. index:: Encryption; symmetric
 
@@ -892,16 +897,6 @@ symmetric (defaults to ``False``)
    and will contain more information about the failure in the form of ``reason:ident``
    where ``reason`` is a text description of the reason, and ``ident`` identifies the
    recipient key.
-
-
-The :meth:`~gnupg.GPG.encrypt_file` method takes the following additional
-keyword arguments:
-
-armor (defaults to ``True``)
-    Whether to use ASCII armor. If ``False``, binary data is produced.
-output (defaults to ``None``)
-    The name of an output file to write to. If a name is specified, the encrypted
-    output is written directly to the file.
 
 .. note:: Any public key provided for encryption should be trusted, otherwise
    encryption fails but without any warning. This is because gpg just prints a message
@@ -948,6 +943,9 @@ passphrase (defaults to ``None``)
     A passphrase to use when accessing the keyrings.
 extra_args (defaults to ``None``)
     A list of additional arguments to pass to the ``gpg`` executable.
+output (defaults to ``None``)
+    The name of an output file to write to. If a name is specified, the decrypted
+    output is written directly to the file.
 
 .. versionadded:: 0.4.1
    The ``extra_args`` keyword argument was added.
@@ -955,12 +953,6 @@ extra_args (defaults to ``None``)
 .. versionadded:: 0.4.2
    Upon a successful decryption, the keyid of the decrypting key is stored in the
    ``key_id`` attribute of the result, if this information is provided by ``gpg``.
-
-The ``decrypt_file`` method takes the following additional keyword argument:
-
-output (defaults to ``None``)
-    The name of an output file to write to. If a name is specified, the decrypted
-    output is written directly to the file.
 
 .. versionchanged:: 0.5.0
    The `stream` argument to :meth:`~gnupg.GPG.decrypt_file` can be a pathname
