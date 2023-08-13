@@ -1,4 +1,4 @@
-|badge1| |badge2|
+|badge1| |badge2| |badge3|
 
 .. |badge1| image:: https://img.shields.io/github/actions/workflow/status/vsajip/python-gnupg/python-package.yml
    :alt: GitHub test status
@@ -6,6 +6,10 @@
 .. |badge2| image:: https://img.shields.io/codecov/c/github/vsajip/python-gnupg
    :target: https://app.codecov.io/gh/vsajip/python-gnupg
    :alt: GitHub coverage status
+
+.. |badge3| image:: https://img.shields.io/pypi/v/python-gnupg
+   :target: https://pypi.org/project/python-gnupg/
+   :alt: PyPI package
 
 
 What is it?
@@ -72,6 +76,8 @@ Change log
 --------------
 
 Released: Not yet
+
+* Fix #228: Clarify documentation for encryption/decryption.
 
 
 0.5.1
