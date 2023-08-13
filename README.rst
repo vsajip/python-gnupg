@@ -1,6 +1,6 @@
 |badge1| |badge2|
 
-.. |badge1| image:: https://img.shields.io/github/workflow/status/vsajip/python-gnupg/Tests
+.. |badge1| image:: https://img.shields.io/github/actions/workflow/status/vsajip/python-gnupg/python-package.yml
    :alt: GitHub test status
 
 .. |badge2| image:: https://img.shields.io/codecov/c/github/vsajip/python-gnupg
