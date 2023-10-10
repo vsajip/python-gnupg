@@ -221,6 +221,13 @@ instantiation, like this::
    environment settings (e.g. environment variables, code page etc.) but defaults to
    latin-1.
 
+From version 0.5.2 onwards, you can also control the buffer size for the I/O between
+``gpg`` and ``python-gnupg`` by setting the ``buffer_size`` attribute on a GPG instance.
+
+.. versionadded:: 0.5.2
+   The ``buffer_size`` attribute was added.
+
+
 .. index:: Key; management
 
 Key Management

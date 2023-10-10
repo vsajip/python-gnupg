@@ -135,8 +135,9 @@ def no_quote(s):
     return s
 
 
-def _copy_data(instream, outstream):
+def _copy_data(instream, outstream, buffer_size):
     # Copy one stream to another
+    assert buffer_size > 0
     sent = 0
     if hasattr(sys.stdin, 'encoding'):
         enc = sys.stdin.encoding
@@ -146,7 +147,7 @@ def _copy_data(instream, outstream):
         # See issue #39: read can fail when e.g. a text stream is provided
         # for what is actually a binary file
         try:
-            data = instream.read(1024)
+            data = instream.read(buffer_size)
         except Exception:  # pragma: no cover
             logger.warning('Exception occurred while reading', exc_info=1)
             break
@@ -170,8 +171,9 @@ def _copy_data(instream, outstream):
     logger.debug('closed output, %d bytes sent', sent)
 
 
-def _threaded_copy_data(instream, outstream):
-    wr = threading.Thread(target=_copy_data, args=(instream, outstream))
+def _threaded_copy_data(instream, outstream, buffer_size):
+    assert buffer_size > 0
+    wr = threading.Thread(target=_copy_data, args=(instream, outstream, buffer_size))
     wr.daemon = True
     logger.debug('data copier: %r, %r, %r', wr, instream, outstream)
     wr.start()
@@ -1011,6 +1013,8 @@ class GPG(object):
 
     decode_errors = 'strict'
 
+    buffer_size = 1024  # override in instance if needed
+
     result_map = {
         'crypt': Crypt,
         'delete': DeleteResult,
@@ -1189,11 +1193,12 @@ class GPG(object):
                 result.handle_status(keyword, value)
         result.stderr = ''.join(lines)
 
-    def _read_data(self, stream, result, on_data=None):
+    def _read_data(self, stream, result, on_data=None, buffer_size=1024):
         # Read the contents of the file from GPG's stdout
+        assert buffer_size > 0
         chunks = []
         while True:
-            data = stream.read(1024)
+            data = stream.read(buffer_size)
             if len(data) == 0:
                 if on_data:
                     on_data(data)
@@ -1224,7 +1229,7 @@ class GPG(object):
         rr.start()
 
         stdout = process.stdout
-        dr = threading.Thread(target=self._read_data, args=(stdout, result, self.on_data))
+        dr = threading.Thread(target=self._read_data, args=(stdout, result, self.on_data, self.buffer_size))
         dr.daemon = True
         logger.debug('stdout reader: %r', dr)
         dr.start()
@@ -1281,7 +1286,7 @@ class GPG(object):
                 stdin = p.stdin
             if passphrase:
                 _write_passphrase(stdin, passphrase, self.encoding)
-            writer = _threaded_copy_data(fileobj, stdin)
+            writer = _threaded_copy_data(fileobj, stdin, self.buffer_size)
             self._collect_output(p, result, writer, stdin)
             return result
         finally:
@@ -1407,7 +1412,7 @@ class GPG(object):
             stdin = p.stdin
             if passphrase:
                 _write_passphrase(stdin, passphrase, self.encoding)
-            writer = _threaded_copy_data(fileobj, stdin)
+            writer = _threaded_copy_data(fileobj, stdin, self.buffer_size)
         except IOError:  # pragma: no cover
             logging.exception('error writing message')
             writer = None

@@ -79,6 +79,7 @@ Released: Not yet
 
 * Fix #228: Clarify documentation for encryption/decryption.
 
+* Make I/O buffer size configurable via ``buffer_size`` attribute on a ``GPG`` instance.
 
 0.5.1
 -----
