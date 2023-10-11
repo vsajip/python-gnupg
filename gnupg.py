@@ -1013,7 +1013,7 @@ class GPG(object):
 
     decode_errors = 'strict'
 
-    buffer_size = 1024  # override in instance if needed
+    buffer_size = 16384  # override in instance if needed
 
     result_map = {
         'crypt': Crypt,
