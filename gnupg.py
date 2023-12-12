@@ -43,9 +43,9 @@ from subprocess import Popen, PIPE
 import sys
 import threading
 
-__version__ = '0.5.2.dev0'
+__version__ = '0.5.2'
 __author__ = 'Vinay Sajip'
-__date__ = '$22-Jul-2023 16:36:40$'
+__date__ = '$12-Dec-2023 07:52:07$'
 
 STARTUPINFO = None
 if os.name == 'nt':  # pragma: no cover
@@ -1342,8 +1342,8 @@ class GPG(object):
 
     def is_valid_passphrase(self, passphrase):
         """
-        Confirm that the passphrase doesn't contain newline-type characters - it is passed in a pipe to `gpg`, and so not
-        checking could lead to spoofing attacks by passing arbitrary text after passphrase and newline.
+        Confirm that the passphrase doesn't contain newline-type characters - it is passed in a pipe to `gpg`,
+        and so not checking could lead to spoofing attacks by passing arbitrary text after passphrase and newline.
 
         Args:
             passphrase (str): The passphrase to test.

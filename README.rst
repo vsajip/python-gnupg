@@ -72,14 +72,21 @@ Change log
 .. note:: GCnn refers to an issue nn on Google Code.
 
 
-0.5.2 (future)
+0.5.3 (future)
 --------------
 
 Released: Not yet
 
+
+0.5.2
+-----
+
+Released: 2023-12-12
+
 * Fix #228: Clarify documentation for encryption/decryption.
 
 * Make I/O buffer size configurable via ``buffer_size`` attribute on a ``GPG`` instance.
+
 
 0.5.1
 -----

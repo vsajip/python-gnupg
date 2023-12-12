@@ -35,7 +35,7 @@ except ImportError:  # pragma: no cover
 import gnupg
 
 __author__ = 'Vinay Sajip'
-__date__ = '$22-Jul-2023 16:37:02$'
+__date__ = '$12-Dec-2023 07:57:43$'
 
 ALL_TESTS = True
 
