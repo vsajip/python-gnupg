@@ -1,11 +1,15 @@
-|badge1| |badge2|
+|badge1| |badge2| |badge3|
 
-.. |badge1| image:: https://img.shields.io/github/workflow/status/vsajip/python-gnupg/Tests
+.. |badge1| image:: https://img.shields.io/github/actions/workflow/status/vsajip/python-gnupg/python-package.yml
    :alt: GitHub test status
 
 .. |badge2| image:: https://img.shields.io/codecov/c/github/vsajip/python-gnupg
    :target: https://app.codecov.io/gh/vsajip/python-gnupg
    :alt: GitHub coverage status
+
+.. |badge3| image:: https://img.shields.io/pypi/v/python-gnupg
+   :target: https://pypi.org/project/python-gnupg/
+   :alt: PyPI package
 
 
 What is it?
@@ -68,23 +72,53 @@ Change log
 .. note:: GCnn refers to an issue nn on Google Code.
 
 
-0.5.1 (future)
+0.5.3 (future)
 --------------
 
 Released: Not yet
 
-* Added TRUST_EXPIRED to trust_keys. Thanks to Leif Liddy for the patch.
 
-* Fix #206: Remove deprecated --always-trust in favour of --trust-model always
+0.5.2
+-----
+
+Released: 2023-12-12
+
+* Fix #228: Clarify documentation for encryption/decryption.
+
+* Make I/O buffer size configurable via ``buffer_size`` attribute on a ``GPG`` instance.
+
+
+0.5.1
+-----
+
+Released: 2023-07-22
+
+* Added ``TRUST_EXPIRED`` to ``trust_keys``. Thanks to Leif Liddy for the patch.
+
+* Fix #206: Remove deprecated ``--always-trust`` in favour of ``--trust-model always``
 
 * Fix #208: Add ``status_detail`` attribute to result objects which is populated when
   the status is ``'invalid recipient'`` (encryption/decryption) or ``'invalid signer'``
-  (signing).
+  (signing). This attribute will be set when the result object's ``status`` attribute is
+  set to ``invalid recipient`` and will contain more information about the failure in the
+  form of ``reason:ident`` where ``reason`` is a text description of the reason, and
+  ``ident`` identifies the recipient key.
 
 * Add ``scan_keys_mem()`` function to scan keys in a string. Thanks to Sky Moore
   for the patch.
 
 * Fix #214: Handle multiple signatures when one of them is invalid or unverified.
+
+* A ``problems`` attribute was added which holds problems reported by ``gpg``
+  during verification. This is a list of dictionaries, one for each reported
+  problem. Each dictionary will have ``status`` and ``keyid`` keys indicating
+  the problem and the corresponding key; other information in the dictionaries
+  will be error specific.
+
+* Fix #217: Use machine-readable interface to query the ``gpg`` version. Thanks to Justus
+  Winter for the patch.
+
+* Added the ability to export keys to a file. Thanks to Leif Liddy for the patch.
 
 
 0.5.0

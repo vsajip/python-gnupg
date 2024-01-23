@@ -285,7 +285,7 @@ epub_copyright = u'2019, Vinay Sajip'
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'http://docs.python.org/': None}
+intersphinx_mapping = {'python': ('http://docs.python.org/', None)}
 
 def skip_module_docstring(app, what, name, obj, options, lines):
     if (what, name) == ('module', 'distlib'):

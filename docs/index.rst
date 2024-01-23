@@ -165,22 +165,23 @@ verbose (defaults to ``False``)
     Print information (e.g. the gpg command lines, and status messages returned by
     gpg) to the console. You don't generally need to set this option, since the module
     uses Python's ``logging`` package to provide more flexible functionality. The
-    status messages from GPG are quite voluminous, especially during key generation.
+    status messages from ``gpg`` are quite voluminous, especially during key generation.
 use_agent (defaults to ``False``)
-    If specified as True, the ``--use-agent`` parameter is passed to GPG, asking it to
+    If specified as True, the ``--use-agent`` parameter is passed to ``gpg``, asking it to
     use any in-memory GPG agent (which remembers your credentials).
 keyring (defaults to ``None``)
     If specified, the value is used as the name of the keyring file. The default
     keyring is not used. A list of paths to keyring files can also be specified.
 options (defaults to ``None``)
     If specified, the value should be a list of additional command-line options to
-    pass to GPG.
+    pass to ``gpg``.
 secret_keyring (defaults to ``None``)
     If specified, the value is used as the name of the secret keyring file. A list of
     paths to secret keyring files can also be specified. *Note that these files are
     not used by GnuPG >= 2.1.*
 env  (defaults to ``None``)
     If specified, the value is used as the environment variables used when calling the GPG
+    executable.
 
 .. versionchanged:: 0.3.4
    The ``keyring`` argument can now also be a list of keyring filenames.
@@ -190,7 +191,7 @@ env  (defaults to ``None``)
    when working with GnuPG >= 2.1.*
 
 .. note:: If you specify values in ``options``, make sure you don't specify values
-   which will conflict with other values added by python-gnupg. You should be familiar
+   which will conflict with other values added by ``python-gnupg``. You should be familiar
    with GPG command-line arguments and how they affect GPG's operation.
 
 .. versionchanged:: 0.3.7
@@ -198,11 +199,13 @@ env  (defaults to ``None``)
    ``locale.getpreferredencoding()`` or, failing that, ``sys.stdin.encoding``, and
    failing that, ``utf-8``.
 
+.. versionadded:: 0.5.0
+   The ``env`` argument was added.
 
 If the ``gpgbinary`` executable cannot be found, a ``ValueError`` is raised in
 :meth:`GPG.__init__`.
 
-The low-level communication between the ``gpg`` executable and python-gnupg is in
+The low-level communication between the ``gpg`` executable and ``python-gnupg`` is in
 terms of bytes, and ``python-gnupg`` tries to convert gpg's ``stderr`` stream to text
 using an encoding. The default value of this is ``latin-1``, but you can override this
 by setting the encoding name in the GPG instance's ``encoding`` attribute after
@@ -217,6 +220,14 @@ instantiation, like this::
    decoding output). The ``gpg`` executable will use an output encoding based on your
    environment settings (e.g. environment variables, code page etc.) but defaults to
    latin-1.
+
+From version 0.5.2 onwards, you can also control the buffer size for the I/O between
+``gpg`` and ``python-gnupg`` by setting the ``buffer_size`` attribute on a GPG instance.
+It defaults to 16K.
+
+.. versionadded:: 0.5.2
+   The ``buffer_size`` attribute was added.
+
 
 .. index:: Key; management
 
@@ -457,7 +468,7 @@ accepts to identify a key - for example, the keyid or the fingerprint could be u
 If you want to pass a single keyid, then you can just pass in a string which
 identifies the key.
 
-The ``export_keys`` method has some additional keyword arguments:
+The :meth:`~gnupg.GPG.export_keys` method has some additional keyword arguments:
 
 * ``armor`` (defaulting to ``True``) - when ``True``, passes ``--armor`` to ``gpg``.
 * ``minimal`` (defaulting to ``False``) - when ``True``, passes
@@ -468,6 +479,8 @@ The ``export_keys`` method has some additional keyword arguments:
   passphrase is to be passed to ``gpg`` via pinentry, you wouldn't pass it here - so
   specify ``expect_passphrase=False`` in that case. If you don't do that, and don't
   pass a passphrase, a ``ValueError`` will be raised.
+* ``output`` - defaults to ``None``, but if specified, should be the pathname of a file
+  to which the exported keys should be written.
 
 .. versionadded:: 0.3.7
    The ``armor`` and ``minimal`` keyword arguments were added.
@@ -477,6 +490,9 @@ The ``export_keys`` method has some additional keyword arguments:
 
 .. versionadded:: 0.4.2
    The ``expect_passphrase`` keyword argument was added.
+
+.. versionadded:: 0.5.1
+   The ``output`` keyword argument was added.
 
 .. index:: Key; importing
 
@@ -859,6 +875,11 @@ extra_args (defaults to ``None``)
     could pass ``extra_args=['-z', '0']`` to disable compression, or you could pass
     ``extra_args=['--set-filename', 'name-to-embed-in-encrypted-file.txt']`` to embed
     a specific file name in the encrypted message.
+armor (defaults to ``True``)
+    Whether to use ASCII armor. If ``False``, binary data is produced.
+output (defaults to ``None``)
+    The name of an output file to write to. If a name is specified, the encrypted
+    output is written directly to the file.
 
 .. index:: Encryption; symmetric
 
@@ -884,16 +905,6 @@ symmetric (defaults to ``False``)
    and will contain more information about the failure in the form of ``reason:ident``
    where ``reason`` is a text description of the reason, and ``ident`` identifies the
    recipient key.
-
-
-The :meth:`~gnupg.GPG.encrypt_file` method takes the following additional
-keyword arguments:
-
-armor (defaults to ``True``)
-    Whether to use ASCII armor. If ``False``, binary data is produced.
-output (defaults to ``None``)
-    The name of an output file to write to. If a name is specified, the encrypted
-    output is written directly to the file.
 
 .. note:: Any public key provided for encryption should be trusted, otherwise
    encryption fails but without any warning. This is because gpg just prints a message
@@ -940,6 +951,9 @@ passphrase (defaults to ``None``)
     A passphrase to use when accessing the keyrings.
 extra_args (defaults to ``None``)
     A list of additional arguments to pass to the ``gpg`` executable.
+output (defaults to ``None``)
+    The name of an output file to write to. If a name is specified, the decrypted
+    output is written directly to the file.
 
 .. versionadded:: 0.4.1
    The ``extra_args`` keyword argument was added.
@@ -947,12 +961,6 @@ extra_args (defaults to ``None``)
 .. versionadded:: 0.4.2
    Upon a successful decryption, the keyid of the decrypting key is stored in the
    ``key_id`` attribute of the result, if this information is provided by ``gpg``.
-
-The ``decrypt_file`` method takes the following additional keyword argument:
-
-output (defaults to ``None``)
-    The name of an output file to write to. If a name is specified, the decrypted
-    output is written directly to the file.
 
 .. versionchanged:: 0.5.0
    The `stream` argument to :meth:`~gnupg.GPG.decrypt_file` can be a pathname
@@ -1028,6 +1036,85 @@ or, with a file or file-like object:
    The `stream` argument to :meth:`~gnupg.GPG.get_recipients_file` can be a
    pathname to an existing file as well as text or a file-like object. In the
    pathname case, ``python-gnupg`` will open and close the file for you.
+
+
+Custom handling of data streams
+-------------------------------
+
+During processing, ``gpg`` often sends output to its ``stdout`` stream, which is captured
+by ``python-gnupg`` buffered, and returned as part of an operation's result (usually in
+the ``data`` attribute). However, there might be times when you want to:
+
+* Avoid buffering, as the data sizes involved are large.
+* Process the data as it becomes available, before it's all available at the end of an
+  operation. Most commonly, this will happen during decryption.
+
+In such cases, you can supply a callable in the ``on_data`` attribute of a :class:`GPG`
+instance before you invoke the operation. When an operation with ``gpg`` is initiated, if
+``on_data`` is given a value, it will be called with each chunk of data (of type
+``bytes``) received from ``gpg``, and its return value will be used to determine whether
+``python-gnupg`` buffers the data. At the end of the data stream, it will be called with
+a zero-length bytestring (allowing you do any necessary clean-up).
+
+If the ``on_data`` callable returns ``False``, the data will *not* be buffered by
+``python-gnupg``. For any other return value (including ``None``), the data *will* be
+buffered. (This slightly odd arrangement is for backwards compatibility.)
+
+Example usages (not tested, error handling omitted):
+
+.. code-block:: python
+
+    # Doing your own buffering in memory
+
+    chunks = []
+
+    def collector(chunk):
+        chunks.append(chunk)
+        return False  # Tell python-gnupg not to buffer the chunk
+
+    gpg = GPG(...)
+    gpg.on_data = collector
+    gpg.decrypt(...)
+
+    # Doing your own buffering in a file
+
+    class Collector:
+        def __init__(self, fn):
+            self.out = open(fn, 'wb')
+
+        def __call__(self, chunk):
+            self.out.write(chunk)
+            if not chunk:
+                self.out.close()
+            return False  # Tell python-gnupg not to buffer the chunk
+
+    gpg = GPG(...)
+    gpg.on_data = Collector('/tmp/plain.txt')
+    gpg.decrypt(...)
+
+    # Processing as you go (assuming the decrypted data is utf-8 encoded)
+
+    import codecs
+
+    class Processor:
+        def __init__(self, fn):
+            self.out = open(fn, 'w', encoding='utf-8')
+            self.decoder =  codecs.getincrementaldecoder('utf-8')
+            self.result = ''
+
+        def __call__(self, chunk):
+            final = (len(chunk) == 0)
+            self.result += self.decoder.decode(chunk, final)
+            # Perhaps do custom processing of self.result here
+            self.out.write(self.result)
+            self.result = ''
+            if final:
+                self.out.close()
+            return False  # Tell python-gnupg not to buffer the chunk
+
+    gpg = GPG(...)
+    gpg.on_data = Processor('/tmp/plain.txt')
+    gpg.decrypt(...)
 
 
 Signing and Verification
@@ -1129,6 +1216,21 @@ To verify data in a file (or file-like object), use :meth:`~gnupg.GPG.verify_fil
 You can use the returned value in a Boolean context::
 
     >>> if not verified: raise ValueError("Signature could not be verified!")
+
+Getting the signed data out while verifying
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you clearsign data, the signature envelops the signed data (whether text or
+binary) with the signature, but by default you won't get this data back from a
+:meth:`~gnupg.GPG.verify` or :meth:`~gnupg.GPG.verify_file` call. In order to
+extract the signed data, you need to pass more information to the ``verify``
+methods about where you want that data (if none is specified, the data is
+discarded). To write it to ``gpg``'s standard output, specify
+``extra_args=['-o', '-']``. In that case, it will be returned as a bytestring
+in ``verified.data``. Alternatively, to write to a file, you can pass
+``extra_args=['-o', 'path/to/write/data.to']`` and it will be written to the
+file you specify. (Thanks to Mark Neil for this suggestion.)
+
 
 Verifying detached signatures on disk
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1242,7 +1344,7 @@ In addition, an ``extra_args`` keyword parameter can be specified. If provided, 
 is treated as a list of additional arguments to pass to the ``gpg`` executable.
 
 .. versionadded:: 0.3.6
-   The ``verify_data`` method was added.
+   The :meth:`~gnupg.GPG.verify_data` method was added.
 
 .. versionadded:: 0.4.1
    The ``extra_args`` keyword argument was added.
@@ -1251,10 +1353,10 @@ Accessing gpg's Return Code
 ===========================
 
 Starting with version 0.4.8, return values to all calls which implement ``gpg``
-operations, other than ``export_keys()``, will have a ``returncode`` attribute which
-is the return code returned by the ``gpg`` invocation made to perform the operation
-(the result of ``export_keys()`` is the set of exported keys and doesn't have this
-attribute).
+operations, other than :meth:`~gnupg.GPG.export_keys`, will have a ``returncode``
+attribute which is the return code returned by the ``gpg`` invocation made to perform the
+operation (the result of :meth:`~gnupg.GPG.export_keys` is the set of exported keys and
+doesn't have this attribute).
 
 .. versionadded:: 0.4.8
     The ``returncode`` attribute was added to result instances.

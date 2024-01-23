@@ -27,7 +27,7 @@ Vinay Sajip to make use of the subprocess module (Steve's version uses os.fork()
 and so does not work on Windows). Renamed to gnupg.py to avoid confusion with
 the previous versions.
 
-Modifications Copyright (C) 2008-2022 Vinay Sajip. All rights reserved.
+Modifications Copyright (C) 2008-2023 Vinay Sajip. All rights reserved.
 
 For the full documentation, see https://docs.red-dove.com/python-gnupg/ or
 https://gnupg.readthedocs.io/
@@ -45,9 +45,9 @@ from subprocess import Popen, PIPE
 import sys
 import threading
 
-__version__ = '0.5.1.dev0'
+__version__ = '0.5.3.dev0'
 __author__ = 'Vinay Sajip'
-__date__ = '$23-Aug-2022 16:36:40$'
+__date__ = '$12-Dec-2023 07:52:07$'
 
 STARTUPINFO = None
 if os.name == 'nt':  # pragma: no cover
@@ -137,8 +137,9 @@ def no_quote(s):
     return s
 
 
-def _copy_data(instream, outstream):
+def _copy_data(instream, outstream, buffer_size):
     # Copy one stream to another
+    assert buffer_size > 0
     sent = 0
     if hasattr(sys.stdin, 'encoding'):
         enc = sys.stdin.encoding
@@ -148,7 +149,7 @@ def _copy_data(instream, outstream):
         # See issue #39: read can fail when e.g. a text stream is provided
         # for what is actually a binary file
         try:
-            data = instream.read(1024)
+            data = instream.read(buffer_size)
         except Exception:  # pragma: no cover
             logger.warning('Exception occurred while reading', exc_info=1)
             break
@@ -172,8 +173,9 @@ def _copy_data(instream, outstream):
     logger.debug('closed output, %d bytes sent', sent)
 
 
-def _threaded_copy_data(instream, outstream):
-    wr = threading.Thread(target=_copy_data, args=(instream, outstream))
+def _threaded_copy_data(instream, outstream, buffer_size):
+    assert buffer_size > 0
+    wr = threading.Thread(target=_copy_data, args=(instream, outstream, buffer_size))
     wr.daemon = True
     logger.debug('data copier: %r, %r, %r', wr, instream, outstream)
     wr.start()
@@ -212,7 +214,7 @@ def _make_binary_stream(s, encoding):
 
 class StatusHandler(object):
     """
-    The base class for handling status messages from gpg.
+    The base class for handling status messages from `gpg`.
     """
 
     def __init__(self, gpg):
@@ -319,11 +321,7 @@ class Verify(StatusHandler):
             self.valid = False
             self.status = 'signature bad'
             self.key_id, self.username = value.split(None, 1)
-            self.problems.append({
-                'status': self.status,
-                'keyid': self.key_id,
-                'user': self.username
-            })
+            self.problems.append({'status': self.status, 'keyid': self.key_id, 'user': self.username})
             update_sig_info(keyid=self.key_id, username=self.username, status=self.status)
         elif key == 'ERRSIG':  # pragma: no cover
             self.valid = False
@@ -348,11 +346,7 @@ class Verify(StatusHandler):
             self.status = 'signature expired'
             self.key_id, self.username = value.split(None, 1)
             update_sig_info(keyid=self.key_id, username=self.username, status=self.status)
-            self.problems.append({
-                'status': self.status,
-                'keyid': self.key_id,
-                'user': self.username
-            })
+            self.problems.append({'status': self.status, 'keyid': self.key_id, 'user': self.username})
         elif key == 'GOODSIG':
             self.valid = True
             self.status = 'signature good'
@@ -381,18 +375,12 @@ class Verify(StatusHandler):
             self.valid = False
             self.key_id = value
             self.status = 'no public key'
-            self.problems.append({
-                'status': self.status,
-                'keyid': self.key_id
-            })
+            self.problems.append({'status': self.status, 'keyid': self.key_id})
         elif key == 'NO_SECKEY':  # pragma: no cover
             self.valid = False
             self.key_id = value
             self.status = 'no secret key'
-            self.problems.append({
-                'status': self.status,
-                'keyid': self.key_id
-            })
+            self.problems.append({'status': self.status, 'keyid': self.key_id})
         elif key in ('EXPKEYSIG', 'REVKEYSIG'):  # pragma: no cover
             # signed with expired or revoked key
             self.valid = False
@@ -403,10 +391,7 @@ class Verify(StatusHandler):
                 self.key_status = 'signing key was revoked'
             self.status = self.key_status
             update_sig_info(status=self.status, keyid=self.key_id)
-            self.problems.append({
-                'status': self.status,
-                'keyid': self.key_id
-            })
+            self.problems.append({'status': self.status, 'keyid': self.key_id})
         elif key in ('UNEXPECTED', 'FAILURE'):  # pragma: no cover
             self.valid = False
             if key == 'UNEXPECTED':
@@ -439,10 +424,9 @@ class Verify(StatusHandler):
             # See issue GH-191
             self.valid = False
             self.status = 'signature expected but not found'
-        elif key in ('DECRYPTION_INFO', 'PLAINTEXT', 'PLAINTEXT_LENGTH',
-                     'BEGIN_SIGNING', 'KEY_CONSIDERED'):
+        elif key in ('DECRYPTION_INFO', 'PLAINTEXT', 'PLAINTEXT_LENGTH', 'BEGIN_SIGNING', 'KEY_CONSIDERED'):
             pass
-        elif key in ('NEWSIG',):
+        elif key in ('NEWSIG', ):
             # Only sent in gpg2. Clear any signature ID, to be set by a following SIG_ID
             self.signature_id = None
         else:  # pragma: no cover
@@ -1067,7 +1051,7 @@ class AutoLocateKey(StatusHandler):
         self.fingerprint = self.fingerprint or args[9]
 
 
-VERSION_RE = re.compile(r'gpg \(GnuPG(?:/MacGPG2)?\) (\d+(\.\d+)*)'.encode('ascii'), re.I)
+VERSION_RE = re.compile(r'^cfg:version:(\d+(\.\d+)*)'.encode('ascii'))
 HEX_DIGITS_RE = re.compile(r'[0-9a-f]+$', re.I)
 PUBLIC_KEY_RE = re.compile(r'gpg: public key is (\w+)')
 
@@ -1079,6 +1063,8 @@ class GPG(object):
     error_map = None
 
     decode_errors = 'strict'
+
+    buffer_size = 16384  # override in instance if needed
 
     result_map = {
         'crypt': Crypt,
@@ -1113,7 +1099,7 @@ class GPG(object):
             gpgbinary (str): A pathname for the GPG binary to use.
 
             gnupghome (str): A pathname to where we can find the public and private keyrings. The default is
-                             whatever gpg defaults to.
+                             whatever `gpg` defaults to.
 
             keyring (str|list): The name of alternative keyring file to use, or a list of such keyring files. If
                                 specified, the default keyring is not used.
@@ -1157,7 +1143,7 @@ class GPG(object):
         if gnupghome and not os.path.isdir(self.gnupghome):  # pragma: no cover
             os.makedirs(self.gnupghome, 0o700)
         try:
-            p = self._open_subprocess(['--version'])
+            p = self._open_subprocess(['--list-config', '--with-colons'])
         except OSError:
             msg = 'Unable to run gpg (%s) - it may not be available.' % self.gpgbinary
             logger.exception(msg)
@@ -1181,7 +1167,7 @@ class GPG(object):
         """
         Make a list of command line elements for GPG. The value of ``args``
         will be appended. The ``passphrase`` argument needs to be True if
-        a passphrase will be sent to GPG, else False.
+        a passphrase will be sent to `gpg`, else False.
 
         Args:
             args (list[str]): A list of arguments.
@@ -1259,11 +1245,12 @@ class GPG(object):
                 result.handle_status(keyword, value)
         result.stderr = ''.join(lines)
 
-    def _read_data(self, stream, result, on_data=None):
+    def _read_data(self, stream, result, on_data=None, buffer_size=1024):
         # Read the contents of the file from GPG's stdout
+        assert buffer_size > 0
         chunks = []
         while True:
-            data = stream.read(1024)
+            data = stream.read(buffer_size)
             if len(data) == 0:
                 if on_data:
                     on_data(data)
@@ -1294,7 +1281,7 @@ class GPG(object):
         rr.start()
 
         stdout = process.stdout
-        dr = threading.Thread(target=self._read_data, args=(stdout, result, self.on_data))
+        dr = threading.Thread(target=self._read_data, args=(stdout, result, self.on_data, self.buffer_size))
         dr.daemon = True
         logger.debug('stdout reader: %r', dr)
         dr.start()
@@ -1351,7 +1338,7 @@ class GPG(object):
                 stdin = p.stdin
             if passphrase:
                 _write_passphrase(stdin, passphrase, self.encoding)
-            writer = _threaded_copy_data(fileobj, stdin)
+            writer = _threaded_copy_data(fileobj, stdin, self.buffer_size)
             self._collect_output(p, result, writer, stdin)
             return result
         finally:
@@ -1407,8 +1394,8 @@ class GPG(object):
 
     def is_valid_passphrase(self, passphrase):
         """
-        Confirm that the passphrase doesn't contain newline-type characters - it is passed in a pipe to gpg, and so not
-        checking could lead to spoofing attacks by passing arbitrary text after passphrase and newline.
+        Confirm that the passphrase doesn't contain newline-type characters - it is passed in a pipe to `gpg`,
+        and so not checking could lead to spoofing attacks by passing arbitrary text after passphrase and newline.
 
         Args:
             passphrase (str): The passphrase to test.
@@ -1477,7 +1464,7 @@ class GPG(object):
             stdin = p.stdin
             if passphrase:
                 _write_passphrase(stdin, passphrase, self.encoding)
-            writer = _threaded_copy_data(fileobj, stdin)
+            writer = _threaded_copy_data(fileobj, stdin, self.buffer_size)
         except IOError:  # pragma: no cover
             logging.exception('error writing message')
             writer = None
@@ -1670,13 +1657,13 @@ class GPG(object):
 
             expect_passphrase (bool): Whether a passphrase is expected.
 
-            exclamation_mode (bool): If specified, a `'!'` is appended to each fingerprint. This deletes only a subkey or
-                                     an entire key, depending on what the fingerprint refers to.
+            exclamation_mode (bool): If specified, a `'!'` is appended to each fingerprint. This deletes only a subkey
+                                     or an entire key, depending on what the fingerprint refers to.
 
         .. note:: Passphrases
 
            Since GnuPG 2.1, you can't delete secret keys without providing a passphrase. However, if you're expecting
-           the passphrase to go to gpg via pinentry, you should specify expect_passphrase=False. (It's only checked
+           the passphrase to go to `gpg` via pinentry, you should specify expect_passphrase=False. (It's only checked
            for GnuPG >= 2.1).
         """
         if passphrase and not self.is_valid_passphrase(passphrase):  # pragma: no cover
@@ -1721,7 +1708,7 @@ class GPG(object):
                     expect_passphrase=True,
                     output=None):
         """
-        Export the indicated keys. A 'keyid' is anything gpg accepts.
+        Export the indicated keys. A 'keyid' is anything `gpg` accepts.
 
         Args:
             keyids (str|list[str]): A single keyid or a list of them.
@@ -1741,7 +1728,7 @@ class GPG(object):
         .. note:: Passphrases
 
            Since GnuPG 2.1, you can't export secret keys without providing a passphrase. However, if you're expecting
-           the passphrase to go to gpg via pinentry, you should specify expect_passphrase=False. (It's only checked
+           the passphrase to go to `gpg` via pinentry, you should specify expect_passphrase=False. (It's only checked
            for GnuPG >= 2.1).
         """
         if passphrase and not self.is_valid_passphrase(passphrase):  # pragma: no cover
@@ -1974,7 +1961,7 @@ class GPG(object):
 
     def gen_key_input(self, **kwargs):
         """
-        Generate `--gen-key` input  (see gpg documentation in DETAILS).
+        Generate `--gen-key` input  (see `gpg` documentation in DETAILS).
 
         Args:
             kwargs (dict): A list of keyword arguments.

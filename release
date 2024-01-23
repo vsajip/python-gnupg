@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2023 Red Dove Consultants Limited
+#
+import argparse
+import glob
+import logging
+import os
+import re
+import subprocess
+import sys
+
+DEBUGGING = 'PY_DEBUG' in os.environ
+
+logger = logging.getLogger(__name__)
+
+
+def main():
+    fn = os.path.basename(__file__)
+    fn = os.path.splitext(fn)[0]
+    lfn = os.path.expanduser('~/logs/%s.log' % fn)
+    if os.path.isdir(os.path.dirname(lfn)):
+        logging.basicConfig(level=logging.DEBUG, filename=lfn, filemode='w',
+                            format='%(message)s')
+    adhf = argparse.ArgumentDefaultsHelpFormatter
+    ap = argparse.ArgumentParser(formatter_class=adhf, prog=fn)
+    aa = ap.add_argument
+    aa('-b', '--build', default=False, action='store_true', help='Force a rebuild')
+    aa('-u', '--upload', default=False, action='store_true', help='Upload to PyPI')
+    options = ap.parse_args()
+    with open('gnupg.py') as f:
+        data = f.read()
+    m = re.search(r"__version__\s*=\s*'(.*)'", data)
+    assert m
+    ver = m.groups()[0]
+    sigs = list(glob.glob(f'dist/*{ver}*.asc'))
+    # import pdb; pdb.set_trace()
+    if sigs and not options.build:
+        print(f'Signatures found: {", ".join(sigs)}')
+    else:
+        if not sigs:
+            print('Signatures not found ...')
+        files = [fn for fn in glob.glob(f'dist/*{ver}*') if not fn.endswith('.asc')]
+        if files and not options.build:
+            print(f'Archives found: {", ".join(files)}')
+        else:
+            if not files:
+                print('Archives not found ...')
+            subprocess.check_call(['pybuild'])
+            files = [fn for fn in glob.glob(f'dist/*{ver}*') if not fn.endswith('.asc')]
+        for fn in files:
+            sfn = f'{fn}.asc'
+            if os.path.exists(sfn):
+                os.remove(sfn)
+            cmd = ['gpg2', '-abs', fn]
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p.communicate()
+            assert p.returncode == 0
+    if options.upload:
+        cmd = ['twine', 'upload', '-r', 'python-gnupg']
+        cmd.extend(files)
+        subprocess.check_call(cmd)
+
+
+if __name__ == '__main__':
+    try:
+        rc = main()
+    except KeyboardInterrupt:
+        rc = 2
+    except Exception as e:
+        if DEBUGGING:
+            s = ' %s:' % type(e).__name__
+        else:
+            s = ''
+        sys.stderr.write('Failed:%s %s\n' % (s, e))
+        if DEBUGGING: import traceback; traceback.print_exc()
+        rc = 1
+    sys.exit(rc)
