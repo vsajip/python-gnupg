@@ -1005,12 +1005,12 @@ class Sign(StatusHandler, TextHandler):
 class AutoLocateKey(StatusHandler):
     """
     This class handles status messages during key auto-locating.
-    """
     fingerprint: str
     key_length: int
     created_at: date
     email: str
     email_real_name: str
+    """
 
     def __init__(self, gpg):
         StatusHandler.__init__(self, gpg)
