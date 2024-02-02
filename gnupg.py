@@ -1921,7 +1921,7 @@ class GPG(object):
                 getattr(result, keyword)(L)
         return result
 
-    def auto_locate_key(self, email, mechanisms=None, **kwargs) -> AutoLocateKey:
+    def auto_locate_key(self, email, mechanisms=None, **kwargs):
         """
         Auto locate a public key by `email`.
         
