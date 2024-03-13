@@ -34,6 +34,8 @@ https://gnupg.readthedocs.io/
 """
 
 import codecs
+from datetime import date, datetime
+from email.utils import parseaddr
 from io import StringIO
 import logging
 import os
@@ -1000,6 +1002,55 @@ class Sign(StatusHandler, TextHandler):
             logger.debug('message ignored: %s, %s', key, value)
 
 
+class AutoLocateKey(StatusHandler):
+    """
+    This class handles status messages during key auto-locating.
+    fingerprint: str
+    key_length: int
+    created_at: date
+    email: str
+    email_real_name: str
+    """
+
+    def __init__(self, gpg):
+        StatusHandler.__init__(self, gpg)
+        self.fingerprint = None
+        self.type = None
+        self.created_at = None
+        self.email = None
+        self.email_real_name = None
+
+    def handle_status(self, key, value):
+        if key == "IMPORTED":
+            _, email, display_name = value.split()
+
+            self.email = email
+            self.email_real_name = display_name[1:-1]
+        elif key == "KEY_CONSIDERED":
+            self.fingerprint = value.strip().split()[0]
+
+    def pub(self, args):
+        """
+        Internal method to handle the 'pub' status message.
+        `pub` message contains the fingerprint of the public key, its type and its creation date.
+        """
+        pass
+
+    def uid(self, args):
+        self.created_at = datetime.fromtimestamp(int(args[5]))
+        raw_email_content = args[9]
+        email, real_name = parseaddr(raw_email_content)
+        self.email = email
+        self.email_real_name = real_name
+
+    def sub(self, args):
+        self.key_length = int(args[2])
+
+    def fpr(self, args):
+        # Only store the first fingerprint
+        self.fingerprint = self.fingerprint or args[9]
+
+
 VERSION_RE = re.compile(r'^cfg:version:(\d+(\.\d+)*)'.encode('ascii'))
 HEX_DIGITS_RE = re.compile(r'[0-9a-f]+$', re.I)
 PUBLIC_KEY_RE = re.compile(r'gpg: public key is (\w+)')
@@ -1029,6 +1080,7 @@ class GPG(object):
         'trust': TrustResult,
         'verify': Verify,
         'export': ExportResult,
+        'auto-locate-key': AutoLocateKey,
     }
     "A map of GPG operations to result object types."
 
@@ -1867,6 +1919,30 @@ class GPG(object):
             keyword = L[0]
             if keyword in valid_keywords:
                 getattr(result, keyword)(L)
+        return result
+
+    def auto_locate_key(self, email, mechanisms=None, **kwargs):
+        """
+        Auto locate a public key by `email`.
+
+        Args:
+            email (str): The email address to search for.
+            mechanisms (list[str]): A list of mechanisms to use. Valid mechanisms can be found
+            here https://www.gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html
+            under "--auto-key-locate". Default: ['wkd', 'ntds', 'ldap', 'cert', 'dane', 'local']
+        """
+        mechanisms = mechanisms or ['wkd', 'ntds', 'ldap', 'cert', 'dane', 'local']
+
+        args = ['--auto-key-locate', ','.join(mechanisms), '--locate-keys', email]
+
+        result = self.result_map['auto-locate-key'](self)
+
+        if 'extra_args' in kwargs:
+            args.extend(kwargs['extra_args'])
+
+        process = self._open_subprocess(args)
+        self._collect_output(process, result, stdin=process.stdin)
+        self._decode_result(result)
         return result
 
     def gen_key(self, input):

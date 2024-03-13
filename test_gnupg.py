@@ -370,7 +370,7 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(uid, 'Test Name (Funny chars: '
                          '\r\n\x0c\x0b\x00\x08) <test.name@example.com>')
 
-    @unittest.skipIf(os.name == 'nt', 'Test requires POSIX-style permissions')
+    @skipIf(os.name == 'nt', 'Test requires POSIX-style permissions')
     def test_key_generation_failure(self):
         if self.gpg.version < (2, 0):  # pragma: no cover
             raise unittest.SkipTest('gpg 1.x hangs in this test')
@@ -1552,6 +1552,18 @@ class GPGTestCase(unittest.TestCase):
         finally:
             os.remove(fn)
 
+    @skipIf('CI' not in os.environ, "Don't test locally")
+    def test_auto_key_locating(self):
+        gpg = self.gpg
+
+        # Let's hope ProtonMail doesn't change their key anytime soon
+        expected_fingerprint = "90E619A84E85330A692F6D81A655882018DBFA9D"
+        expected_type = "rsa2048"
+
+        actual = self.gpg.auto_locate_key("no-reply@protonmail.com")
+
+        self.assertEqual(actual.fingerprint, expected_fingerprint)
+
 
 TEST_GROUPS = {
     'sign':
@@ -1574,7 +1586,7 @@ TEST_GROUPS = {
     'basic':
     set(['test_environment', 'test_list_keys_initial', 'test_nogpg', 'test_make_args', 'test_quote_with_shell']),
     'test':
-    set(['test_multiple_signatures_one_invalid']),
+    set(['test_auto_key_locating']),
 }
 
 
