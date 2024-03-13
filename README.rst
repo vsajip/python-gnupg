@@ -77,6 +77,7 @@ Change log
 
 Released: Not yet
 
+* Fix #117: Add WKD support for auto-locating keys. Thanks to Myzel394 for the patch.
 
 0.5.2
 -----
