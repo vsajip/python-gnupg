@@ -21,6 +21,9 @@ on:
       - '.hgignore'
       - '.gitignore'
 
+  schedule:  # at 03:07 on day-of-month 7
+    - cron: '7 3 7 * *'
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
