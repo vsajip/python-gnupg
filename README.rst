@@ -77,7 +77,11 @@ Change log
 
 Released: Not yet
 
-* Fix #117: Add WKD support for auto-locating keys. Thanks to Myzel394 for the patch.
+* Fix #117: Add WKD (Web Key Directory) support for auto-locating keys. Thanks to Myzel394
+  for the patch.
+
+* Fix #237: Ensure local variable is initialized even when an exception occurs.
+
 
 0.5.2
 -----

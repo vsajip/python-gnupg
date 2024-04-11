@@ -2,7 +2,7 @@
 """
 A test harness for gnupg.py.
 
-Copyright (C) 2008-2023 Vinay Sajip. All rights reserved.
+Copyright (C) 2008-2024 Vinay Sajip. All rights reserved.
 """
 import argparse
 import json
@@ -1554,15 +1554,16 @@ class GPGTestCase(unittest.TestCase):
 
     @skipIf('CI' not in os.environ, "Don't test locally")
     def test_auto_key_locating(self):
-        gpg = self.gpg
-
         # Let's hope ProtonMail doesn't change their key anytime soon
-        expected_fingerprint = "90E619A84E85330A692F6D81A655882018DBFA9D"
-        expected_type = "rsa2048"
+        expected_fingerprint = '90E619A84E85330A692F6D81A655882018DBFA9D'
+        # expected_type = 'rsa2048'
 
-        actual = self.gpg.auto_locate_key("no-reply@protonmail.com")
+        actual = self.gpg.auto_locate_key('no-reply@protonmail.com')
 
         self.assertEqual(actual.fingerprint, expected_fingerprint)
+
+    def test_passphrase_encoding(self):
+        self.assertRaises(UnicodeEncodeError, self.gpg.decrypt, 'foo', passphrase=u'I’ll')
 
 
 TEST_GROUPS = {
@@ -1586,7 +1587,7 @@ TEST_GROUPS = {
     'basic':
     set(['test_environment', 'test_list_keys_initial', 'test_nogpg', 'test_make_args', 'test_quote_with_shell']),
     'test':
-    set(['test_auto_key_locating']),
+    set(['test_passphrase_encoding']),
 }
 
 

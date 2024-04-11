@@ -27,14 +27,14 @@ Vinay Sajip to make use of the subprocess module (Steve's version uses os.fork()
 and so does not work on Windows). Renamed to gnupg.py to avoid confusion with
 the previous versions.
 
-Modifications Copyright (C) 2008-2023 Vinay Sajip. All rights reserved.
+Modifications Copyright (C) 2008-2024 Vinay Sajip. All rights reserved.
 
 For the full documentation, see https://docs.red-dove.com/python-gnupg/ or
 https://gnupg.readthedocs.io/
 """
 
 import codecs
-from datetime import date, datetime
+from datetime import datetime
 from email.utils import parseaddr
 from io import StringIO
 import logging
@@ -1336,13 +1336,15 @@ class GPG(object):
                 stdin = codecs.getwriter(self.encoding)(p.stdin)
             else:
                 stdin = p.stdin
+            writer = None  # See issue #237
             if passphrase:
                 _write_passphrase(stdin, passphrase, self.encoding)
             writer = _threaded_copy_data(fileobj, stdin, self.buffer_size)
             self._collect_output(p, result, writer, stdin)
             return result
         finally:
-            writer.join(0.01)
+            if writer:
+                writer.join(0.01)
             if fileobj is not fileobj_or_path:
                 fileobj.close()
 
