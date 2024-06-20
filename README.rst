@@ -82,6 +82,7 @@ Released: Not yet
 
 * Fix #237: Ensure local variable is initialized even when an exception occurs.
 
+* Fix #239: Remove logging of decryption result.
 
 0.5.2
 -----

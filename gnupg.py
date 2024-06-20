@@ -2197,7 +2197,7 @@ class GPG(object):
             args.extend(extra_args)
         result = self.result_map['crypt'](self)
         self._handle_io(args, fileobj_or_path, result, passphrase, binary=True)
-        logger.debug('decrypt result[:100]: %r', result.data[:100])
+        # logger.debug('decrypt result[:100]: %r', result.data[:100])
         return result
 
     def get_recipients(self, message, **kwargs):
