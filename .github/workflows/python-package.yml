@@ -68,6 +68,8 @@ jobs:
       env:
         NO_EXTERNAL_TESTS: 1
     - name: Upload coverage to Codecov
+      # Repeated failures of Codecov on macos-12
+      if: ${{ matrix.os != 'macos-12' }}
       uses: codecov/codecov-action@v3
       with:
         flags: unittests
