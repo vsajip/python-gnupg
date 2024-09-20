@@ -72,10 +72,16 @@ Change log
 .. note:: GCnn refers to an issue nn on Google Code.
 
 
-0.5.3 (future)
+0.5.4 (future)
 --------------
 
 Released: Not yet
+
+
+0.5.3
+-----
+
+Released: 2024-09-20
 
 * Fix #117: Add WKD (Web Key Directory) support for auto-locating keys. Thanks to Myzel394
   for the patch.
@@ -83,6 +89,7 @@ Released: Not yet
 * Fix #237: Ensure local variable is initialized even when an exception occurs.
 
 * Fix #239: Remove logging of decryption result.
+
 
 0.5.2
 -----
