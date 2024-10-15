@@ -832,6 +832,7 @@ class GPGTestCase(unittest.TestCase):
         gpg.on_data = collector
         result = gpg.encrypt(data, barbara)
         self.assertEqual(0, result.returncode, 'Non-zero return code')
+        self.assertIsNone(result.on_data_failure)
         edata = str(result)
         self.assertTrue(chunks)
         expected = type(chunks[0])().join(chunks)
@@ -840,8 +841,20 @@ class GPGTestCase(unittest.TestCase):
         ddata = gpg.decrypt(edata, passphrase='bbrown')
         self.assertEqual(0, ddata.returncode, 'Non-zero return code')
         self.assertEqual(data.encode('ascii'), ddata.data, 'Round-trip must work')
+        self.assertIsNone(result.on_data_failure)
         expected = type(chunks[0])().join(chunks)
         self.assertEqual(expected.decode('ascii'), data)
+
+        # test with on-data  generating an exception
+
+        def exceptor(data):
+            raise ValueError('exception in on_data')
+
+        chunks = []
+        gpg.on_data = exceptor
+        ddata = gpg.decrypt(edata, passphrase='bbrown')
+        self.assertIs(type(ddata.on_data_failure), ValueError)
+        self.assertEqual(str(ddata.on_data_failure), 'exception in on_data')
 
         # test signing with encryption and verification during decryption
         logger.debug('encrypting with signature')

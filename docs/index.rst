@@ -663,6 +663,15 @@ user-friendly, but nevertheless it should be usable.)
    a separate stream. The callable should not raise any exceptions (unless it wants
    the current operation to fail).
 
+.. versionadded:: 0.5.4
+   Instances of the result classes from operations now have an ``on_data_failure``
+   attribute, which defaults to ``None``. If an ``on_data`` callable raises an exception,
+   the ``on_data_failure`` attribute of the returned object from a high-level operation
+   is set to the first exception that was raised. The ``on_data`` callable will continue
+   to be called with future chunks. If you use ``on_data`` with code that can raise any
+   exceptions, be sure to check the ``on_data_failure`` attribute of a returned object
+   before using any other aspects of the result.
+
 .. versionadded:: 0.4.2
    Information on keys returned by :meth:`~gnupg.GPG.list_keys` or
    :meth:`~gnupg.GPG.scan_keys` now incudes a ``subkey_info`` dictionary, which

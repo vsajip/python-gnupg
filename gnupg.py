@@ -217,6 +217,8 @@ class StatusHandler(object):
     The base class for handling status messages from `gpg`.
     """
 
+    on_data_failure = None  # set at instance level when failures occur
+
     def __init__(self, gpg):
         """
         Initialize an instance.
@@ -1249,17 +1251,27 @@ class GPG(object):
         # Read the contents of the file from GPG's stdout
         assert buffer_size > 0
         chunks = []
+        on_data_failure = None
         while True:
             data = stream.read(buffer_size)
             if len(data) == 0:
                 if on_data:
-                    on_data(data)
+                    try:
+                        on_data(data)
+                    except Exception as e:
+                        if on_data_failure is None:
+                            on_data_failure = e
                 break
             if log_everything:
                 logger.debug('chunk: %r' % data[:256])
             append = True
             if on_data:
-                append = on_data(data) is not False
+                try:
+                    on_data_result = on_data(data)
+                    append = on_data_result is not False
+                except Exception as e:
+                    if on_data_failure is None:
+                        on_data_failure = e
             if append:
                 chunks.append(data)
         if _py3k:
@@ -1267,6 +1279,8 @@ class GPG(object):
             result.data = type(data)().join(chunks)
         else:
             result.data = ''.join(chunks)
+        if on_data_failure:
+            result.on_data_failure = on_data_failure
 
     def _collect_output(self, process, result, writer=None, stdin=None):
         """
