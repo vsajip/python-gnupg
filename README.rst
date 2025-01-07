@@ -77,6 +77,7 @@ Change log
 
 Released: Not yet
 
+* Fix #242: Handle exceptions in ``on_data`` callable.
 
 0.5.3
 -----
