@@ -72,12 +72,19 @@ Change log
 .. note:: GCnn refers to an issue nn on Google Code.
 
 
-0.5.4 (future)
+0.5.5 (future)
 --------------
 
 Released: Not yet
 
+
+0.5.4
+-----
+
+Released: 2025-01-07
+
 * Fix #242: Handle exceptions in ``on_data`` callable.
+
 
 0.5.3
 -----
