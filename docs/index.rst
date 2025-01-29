@@ -1126,6 +1126,42 @@ Example usages (not tested, error handling omitted):
     gpg.decrypt(...)
 
 
+Threading constraints on processing data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The `on_data` callable is called from a background thread which is reading data from the
+`gpg` child process. Sometimes, there are constraints on where certain processing can be
+done (e.g. code involving SQLAlchemy sessions or Qt GUI updates needs to be run on a
+specific thread, not just any thread). To handle this, you can use a queue, as in this
+example (not tested, error handling omitted):
+
+.. code-block:: python
+
+    import queue
+
+    class ChunkForwarder:
+        def __init__(self, queue):
+            self.queue = queue
+
+        def __call__(self, chunk):
+            self.queue.put(chunk)
+            return False  # Tell python-gnupg not to buffer the chunk
+
+    # In the thread where you need to process chunks
+    gpg = GPG(...)
+    q = queue.Queue()
+    gpg.on_data = ChunkForwarder(q)
+    # call the operation you want to perform. Chunks will be sent to the queue.
+    gpg.decrypt(...)
+    while True:
+        chunk = q.get()
+        q.task_done()  # keep things tidy
+        if not chunk:
+            break
+        # process the chunk using a SQLAlchemy session, Qt widget or whatever
+        process_chunk(chunk)
+
+
 Signing and Verification
 ========================
 
