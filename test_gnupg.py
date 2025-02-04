@@ -1578,6 +1578,15 @@ class GPGTestCase(unittest.TestCase):
     def test_passphrase_encoding(self):
         self.assertRaises(UnicodeEncodeError, self.gpg.decrypt, 'foo', passphrase=u'I’ll')
 
+    def test_configured_group(self):
+        # See issue #249
+        conf = 'group somegroup = BADF00D15BAD\n'
+        fn = os.path.join(self.homedir, 'gpg.conf')
+        with open(fn, 'w') as f:
+            f.write(conf)
+        gpg = gnupg.GPG(gnupghome=self.homedir, gpgbinary=GPGBINARY)
+        self.assertEqual(gpg.version, self.gpg.version)
+
 
 TEST_GROUPS = {
     'sign':
@@ -1600,7 +1609,7 @@ TEST_GROUPS = {
     'basic':
     set(['test_environment', 'test_list_keys_initial', 'test_nogpg', 'test_make_args', 'test_quote_with_shell']),
     'test':
-    set(['test_passphrase_encoding']),
+    set(['test_configured_group']),
 }
 
 
