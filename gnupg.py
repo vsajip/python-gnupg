@@ -1053,7 +1053,7 @@ class AutoLocateKey(StatusHandler):
         self.fingerprint = self.fingerprint or args[9]
 
 
-VERSION_RE = re.compile(r'^cfg:version:(\d+(\.\d+)*)'.encode('ascii'))
+VERSION_RE = re.compile(r'\bcfg:version:(\d+(\.\d+)*)'.encode('ascii'))
 HEX_DIGITS_RE = re.compile(r'[0-9a-f]+$', re.I)
 PUBLIC_KEY_RE = re.compile(r'gpg: public key is (\w+)')
 
@@ -1154,7 +1154,7 @@ class GPG(object):
         self._collect_output(p, result, stdin=p.stdin)
         if p.returncode != 0:  # pragma: no cover
             raise ValueError('Error invoking gpg: %s: %s' % (p.returncode, result.stderr))
-        m = VERSION_RE.match(result.data)
+        m = VERSION_RE.search(result.data)
         if not m:  # pragma: no cover
             self.version = None
         else:

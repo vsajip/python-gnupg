@@ -77,6 +77,8 @@ Change log
 
 Released: Not yet
 
+* Fix #249: Handle fetching GPG version when not the first item in the configuration.
+
 
 0.5.4
 -----
