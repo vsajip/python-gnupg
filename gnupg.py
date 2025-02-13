@@ -1344,13 +1344,13 @@ class GPG(object):
         # Handle a basic data call - pass data to GPG, handle the output
         # including status information. Garbage In, Garbage Out :)
         fileobj = self._get_fileobj(fileobj_or_path)
+        writer = None  # See issue #237
         try:
             p = self._open_subprocess(args, passphrase is not None)
             if not binary:  # pragma: no cover
                 stdin = codecs.getwriter(self.encoding)(p.stdin)
             else:
                 stdin = p.stdin
-            writer = None  # See issue #237
             if passphrase:
                 _write_passphrase(stdin, passphrase, self.encoding)
             writer = _threaded_copy_data(fileobj, stdin, self.buffer_size)
