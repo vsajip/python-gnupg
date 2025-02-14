@@ -628,6 +628,10 @@ For more information about the values in this dictionary, refer to the GnuPG
 documentation linked above. (Note that that documentation is not terribly
 user-friendly, but nevertheless it should be usable.)
 
+The returned value from :meth:`~gnupg.GPG.list_keys` has an attribute ``uids``, which is a
+list of userids associated with the listed keys, and an attribute ``fingerprints``, which
+is a list of the key fingerprints associated with the listed keys.
+
 .. versionadded:: 0.3.8
    The returned value from :meth:`~gnupg.GPG.list_keys` now has a new
    attribute, ``key_map``, which is a dictionary mapping key and subkey
