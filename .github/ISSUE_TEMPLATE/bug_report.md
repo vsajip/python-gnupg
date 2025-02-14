@@ -26,6 +26,7 @@ If applicable, add screenshots to help explain your problem.
 **Environment**
  - OS, including version
  - Version of this library
+ - Version of GnuPG
 
 **Additional information**
 Add any other information about the problem here.
