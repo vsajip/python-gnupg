@@ -641,6 +641,81 @@ is a list of the key fingerprints associated with the listed keys.
    straight to the key info, whether the fingerprint you have is for a key or a
    subkey.
 
+.. versionadded:: 0.3.8
+   You can also list a subset of keys by specifying a ``keys=`` keyword
+   argument to :meth:`~gnupg.GPG.list_keys` whose value is either a single
+   string matching a key, or a list of strings matching multiple keys. In this
+   case, the return value only includes matching keys.
+
+.. versionadded:: 0.3.9
+   A new ``sigs=`` keyword argument has been added to
+   :meth:`~gnupg.GPG.list_keys`, defaulting to ``False``. If you specify true,
+   the ``sigs`` entry in the key information returned will contain a list of
+   signatures which apply to the key. Each entry in the list is a 3-tuple of
+   (``keyid``, ``user-id``, ``signature-class``) where the ``signature-class``
+   is as defined by RFC-4880_.
+
+   It doesn't make sense to supply both ``secret=True`` *and* ``sigs=True`` (people
+   can't sign your secret keys), so in case ``secret=True`` is specified, the
+   ``sigs=`` value has no effect.
+
+.. versionadded:: 0.4.1
+   Instances of the ``GPG`` class now have an additional ``on_data`` attribute, which
+   defaults to ``None``. It can be set to a callable which will be called with a
+   single argument - a binary chunk of data received from the ``gpg`` executable. The
+   callable can do whatever it likes with the chunks passed to it - e.g. write them to
+   a separate stream. The callable should not raise any exceptions (unless it wants
+   the current operation to fail).
+
+.. versionadded:: 0.4.2
+   Information on keys returned by :meth:`~gnupg.GPG.list_keys` or
+   :meth:`~gnupg.GPG.scan_keys` now incudes a ``subkey_info`` dictionary, which
+   contains any returned information on subkeys such as creation and expiry
+   dates. The dictionary is keyed on the subkey ID. The following additional
+   keys are present in key information dictionaries: ``cap``, ``issuer``,
+   ``flag``, ``token``, ``hash``, ``curve``, ``compliance``, ``updated`` and
+   ``origin``.
+
+.. versionadded:: 0.4.4
+   Instances of the ``GPG`` class now have an additional
+   ``check_fingerprint_collisions`` attribute, which defaults to ``False``. If set to
+   a truthy value, fingerprint collisions are checked for (and a ``ValueError`` raised
+   if a collision is detected) when listing or scanning keys. It appears that ``gpg``
+   is quite lenient about allowing duplicated keys in keyrings, which would lead to
+   collisions.
+
+.. versionchanged:: 0.4.4
+   The ``on_data`` callable will now be called with an empty chunk when the data
+   stream from ``gpg`` is exhausted. It can now also return a value: if the value
+   ``False`` is returned, the chunk will *not* be buffered within ``python-gnupg``.
+   This might be useful if you want to do your own buffering or avoid buffering
+   altogether. If any other value is returned (including the value ``None``, for
+   backward compatibility) the chunk will be buffered as normal by ``python-gnupg``.
+
+.. versionadded:: 0.4.6
+   Instances of the ``GPG`` class now have an additional ``error_map`` attribute,
+   which defaults to ``None``. If you set this, the value should be a dictionary
+   mapping error codes to error messages. The source distribution includes a file
+   ``messages.json`` which contains such a mapping, gleaned from the GnuPG library
+   libgpg-error, version 1.37. The test suite shows how to convert that JSON to a form
+   suitable for converting to an ``error_map`` value (basically, converting the string
+   keys in the JSON to integers using base 16).
+
+.. versionadded:: 0.4.9
+   Information on keys returned by :meth:`~gnupg.GPG.list_keys` now includes
+   the ``keygrip`` attribute. The ``subkeys`` attribute now also consists of four
+   values with the ``keygrip`` being the fourth. Note that you'll need GnuPG >=
+   2.1 for this to work.
+
+.. versionadded:: 0.5.4
+   Instances of the result classes from operations now have an ``on_data_failure``
+   attribute, which defaults to ``None``. If an ``on_data`` callable raises an exception,
+   the ``on_data_failure`` attribute of the returned object from a high-level operation
+   is set to the first exception that was raised. The ``on_data`` callable will continue
+   to be called with future chunks. If you use ``on_data`` with code that can raise any
+   exceptions, be sure to check the ``on_data_failure`` attribute of a returned object
+   before using any other aspects of the result.
+
 .. versionadded:: 0.5.5
    The returned value from :meth:`~gnupg.GPG.list_keys` now has a new
    attribute, ``uid_map``, which is a dictionary mapping uids to dicts with
@@ -702,80 +777,6 @@ is a list of the key fingerprints associated with the listed keys.
     The first two of these dictionaries show normal uids (trust is 'u', for ultimate), whereas the third
     shows a revoked uid (trust is 'r', for revoked).
 
-.. versionadded:: 0.3.8
-   You can also list a subset of keys by specifying a ``keys=`` keyword
-   argument to :meth:`~gnupg.GPG.list_keys` whose value is either a single
-   string matching a key, or a list of strings matching multiple keys. In this
-   case, the return value only includes matching keys.
-
-.. versionadded:: 0.3.9
-   A new ``sigs=`` keyword argument has been added to
-   :meth:`~gnupg.GPG.list_keys`, defaulting to ``False``. If you specify true,
-   the ``sigs`` entry in the key information returned will contain a list of
-   signatures which apply to the key. Each entry in the list is a 3-tuple of
-   (``keyid``, ``user-id``, ``signature-class``) where the ``signature-class``
-   is as defined by RFC-4880_.
-
-   It doesn't make sense to supply both ``secret=True`` *and* ``sigs=True`` (people
-   can't sign your secret keys), so in case ``secret=True`` is specified, the
-   ``sigs=`` value has no effect.
-
-.. versionadded:: 0.4.1
-   Instances of the ``GPG`` class now have an additional ``on_data`` attribute, which
-   defaults to ``None``. It can be set to a callable which will be called with a
-   single argument - a binary chunk of data received from the ``gpg`` executable. The
-   callable can do whatever it likes with the chunks passed to it - e.g. write them to
-   a separate stream. The callable should not raise any exceptions (unless it wants
-   the current operation to fail).
-
-.. versionadded:: 0.5.4
-   Instances of the result classes from operations now have an ``on_data_failure``
-   attribute, which defaults to ``None``. If an ``on_data`` callable raises an exception,
-   the ``on_data_failure`` attribute of the returned object from a high-level operation
-   is set to the first exception that was raised. The ``on_data`` callable will continue
-   to be called with future chunks. If you use ``on_data`` with code that can raise any
-   exceptions, be sure to check the ``on_data_failure`` attribute of a returned object
-   before using any other aspects of the result.
-
-.. versionadded:: 0.4.2
-   Information on keys returned by :meth:`~gnupg.GPG.list_keys` or
-   :meth:`~gnupg.GPG.scan_keys` now incudes a ``subkey_info`` dictionary, which
-   contains any returned information on subkeys such as creation and expiry
-   dates. The dictionary is keyed on the subkey ID. The following additional
-   keys are present in key information dictionaries: ``cap``, ``issuer``,
-   ``flag``, ``token``, ``hash``, ``curve``, ``compliance``, ``updated`` and
-   ``origin``.
-
-.. versionadded:: 0.4.4
-   Instances of the ``GPG`` class now have an additional
-   ``check_fingerprint_collisions`` attribute, which defaults to ``False``. If set to
-   a truthy value, fingerprint collisions are checked for (and a ``ValueError`` raised
-   if a collision is detected) when listing or scanning keys. It appears that ``gpg``
-   is quite lenient about allowing duplicated keys in keyrings, which would lead to
-   collisions.
-
-.. versionchanged:: 0.4.4
-   The ``on_data`` callable will now be called with an empty chunk when the data
-   stream from ``gpg`` is exhausted. It can now also return a value: if the value
-   ``False`` is returned, the chunk will *not* be buffered within ``python-gnupg``.
-   This might be useful if you want to do your own buffering or avoid buffering
-   altogether. If any other value is returned (including the value ``None``, for
-   backward compatibility) the chunk will be buffered as normal by ``python-gnupg``.
-
-.. versionadded:: 0.4.6
-   Instances of the ``GPG`` class now have an additional ``error_map`` attribute,
-   which defaults to ``None``. If you set this, the value should be a dictionary
-   mapping error codes to error messages. The source distribution includes a file
-   ``messages.json`` which contains such a mapping, gleaned from the GnuPG library
-   libgpg-error, version 1.37. The test suite shows how to convert that JSON to a form
-   suitable for converting to an ``error_map`` value (basically, converting the string
-   keys in the JSON to integers using base 16).
-
-.. versionadded:: 0.4.9
-   Information on keys returned by :meth:`~gnupg.GPG.list_keys` now includes
-   the ``keygrip`` attribute. The ``subkeys`` attribute now also consists of four
-   values with the ``keygrip`` being the fourth. Note that you'll need GnuPG >=
-   2.1 for this to work.
 
 .. _RFC-4880: https://tools.ietf.org/html/rfc4880#section-5.2.1
 
