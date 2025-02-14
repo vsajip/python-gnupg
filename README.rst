@@ -79,6 +79,8 @@ Released: Not yet
 
 * Fix #249: Handle fetching GPG version when not the first item in the configuration.
 
+* Fix #250: Capture uid info in a uid_map attribute of ScanKeys/ListKeys.
+
 
 0.5.4
 -----

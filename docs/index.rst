@@ -641,6 +641,67 @@ is a list of the key fingerprints associated with the listed keys.
    straight to the key info, whether the fingerprint you have is for a key or a
    subkey.
 
+.. versionadded:: 0.5.5
+   The returned value from :meth:`~gnupg.GPG.list_keys` now has a new
+   attribute, ``uid_map``, which is a dictionary mapping uids to dicts with
+   detailed information about the corresponding uid. The keys of the information
+   provided are listed in the table above. Refer to the `GnuPG documentation
+   <https://github.com/gpg/gnupg/blob/master/doc/DETAILS>`_ for more information.
+
+   You could use this information as in the following example:
+
+    .. code-block:: pycon
+
+        >>> from pprint import pprint
+        >>> keys = gpg.list_keys()
+        >>> pprint(keys.uids)
+        ['Andrew Able (A test user) <andrew.able@alpha.com>',
+         'Barb Bruin <barb.bruin@beta.com>',
+         'Babs Broon <babs.broon@beta.com>',
+         'Barbara Brown (A test user) <barbara.brown@beta.com>',
+         'Charlie Clark (A test user) <charlie.clark@gamma.com>',
+         'Donna Davis (A test user) <donna.davis@delta.com>']
+        >>> pprint(keys.uid_map('Barbara Brown (A test user) <barbara.brown@beta.com>')
+        {'algo': '',
+         'date': '1739485458',
+         'dummy': '8B989767967370B894C53279A3BDF655F00CD4DE',
+         'expires': '',
+         'keyid': '',
+         'length': '',
+         'ownertrust': '',
+         'sig': '',
+         'trust': 'u',
+         'type': 'uid',
+         'uid': 'Barbara Brown (A test user) <barbara.brown@beta.com>'}
+        >>> pprint(keys.uid_map['Barb Bruin <barb.bruin@beta.com>'])
+        {'algo': '',
+         'date': '1739485886',
+         'dummy': '951261047308BCA0B45FD738AD8630B336B88ECF',
+         'expires': '',
+         'keyid': '',
+         'length': '',
+         'ownertrust': '',
+         'sig': '',
+         'trust': 'u',
+         'type': 'uid',
+         'uid': 'Barb Bruin <barb.bruin@beta.com>'}
+        >>> pprint(keys.uid_map['Babs Broon <babs.broon@beta.com>'])
+        {'algo': '',
+         'date': '',
+         'dummy': '2BDB74660AC54DF33DE523429386E2D460904E74',
+         'expires': '',
+         'keyid': '',
+         'length': '',
+         'ownertrust': '',
+         'sig': '',
+         'trust': 'r',
+         'type': 'uid',
+         'uid': 'Babs Broon <babs.broon@beta.com>'}
+        >>>
+
+    The first two of these dictionaries show normal uids (trust is 'u', for ultimate), whereas the third
+    shows a revoked uid (trust is 'r', for revoked).
+
 .. versionadded:: 0.3.8
    You can also list a subset of keys by specifying a ``keys=`` keyword
    argument to :meth:`~gnupg.GPG.list_keys` whose value is either a single

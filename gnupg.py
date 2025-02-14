@@ -569,6 +569,7 @@ class SearchKeys(StatusHandler, list):
         self.curkey = None
         self.fingerprints = []
         self.uids = []
+        self.uid_map = {}
 
     def get_fields(self, args):
         """
@@ -597,6 +598,10 @@ class SearchKeys(StatusHandler, list):
             uid = uid.replace(k, v)
         self.curkey['uids'].append(uid)
         self.uids.append(uid)
+        uid_data = {}
+        self.uid_map[uid] = uid_data
+        for fn, fv in zip(self.FIELDS, args):
+            uid_data[fn] = fv
 
     def handle_status(self, key, value):  # pragma: no cover
         pass
