@@ -466,7 +466,7 @@ To export keys, use the :meth:`~gnupg.GPG.export_keys` method::
 For the ``keyids`` parameter, you can use a sequence of anything which GnuPG itself
 accepts to identify a key - for example, the keyid or the fingerprint could be used.
 If you want to pass a single keyid, then you can just pass in a string which
-identifies the key.
+identifies the key. If you pass an empty list in ``keyids``, all keys are exported.
 
 The :meth:`~gnupg.GPG.export_keys` method has some additional keyword arguments:
 
