@@ -1816,7 +1816,7 @@ class GPG(object):
         self._collect_output(p, result, stdin=p.stdin)
         return self._decode_result(result)
 
-    def list_keys(self, secret=False, keys=None, sigs=False):
+    def list_keys(self, secret=False, keys=None, sigs=False) -> ListKeys:
         """
         List the keys currently in the keyring.
 
@@ -1847,7 +1847,7 @@ class GPG(object):
         p = self._open_subprocess(args)
         return self._get_list_output(p, 'list')
 
-    def scan_keys(self, filename):
+    def scan_keys(self, filename) -> ScanKeys:
         """
         List details of an ascii armored or binary key file without first importing it to the local keyring.
 
