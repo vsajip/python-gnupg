@@ -5,6 +5,7 @@ A test harness for gnupg.py.
 Copyright (C) 2008-2024 Vinay Sajip. All rights reserved.
 """
 import argparse
+import io
 import json
 import logging
 import os.path
@@ -1167,12 +1168,12 @@ class GPGTestCase(unittest.TestCase):
             # Try opening the encrypted file in text mode (Issue #39)
             # this doesn't fail in 2.x
             if gnupg._py3k:
-                efile = open(encfname, 'r')
-                ddata = self.gpg.decrypt_file(efile, passphrase='bbrown', output=decfname)
-                self.assertEqual(2, ddata.returncode, 'Unexpected return code')
-                self.assertFalse(ddata)
-                self.assertEqual(ddata.status, 'no data was provided')
-                efile.close()
+                logger.debug('about to pass text stream to decrypt_file')
+                with open(encfname, 'r') as efile:
+                    self.assertRaises(UnicodeDecodeError, self.gpg.decrypt_file, efile, passphrase='bbrown', output=decfname)
+                    # self.assertEqual(2, ddata.returncode, 'Unexpected return code')
+                    # self.assertFalse(ddata)
+                    # self.assertEqual(ddata.status, 'no data was provided')
         finally:
             for fn in (encfname, decfname):
                 if os.name == 'posix' and mode is not None:
@@ -1587,6 +1588,15 @@ class GPGTestCase(unittest.TestCase):
         gpg = gnupg.GPG(gnupghome=self.homedir, gpgbinary=GPGBINARY)
         self.assertEqual(gpg.version, self.gpg.version)
 
+    def test_exception_propagation(self):
+        if sys.version_info[0] < 3:
+            raise unittest.SkipTest('python 2 is too loose with Unicode')
+        key = self.generate_key('Andrew', 'Able', 'alpha.com', passphrase='andy')
+        self.assertEqual(0, key.returncode, 'Non-zero return code')
+        andrew = key.fingerprint
+        stream = io.StringIO(u'Hello, world!')  # make the wrong type of stream
+        self.assertRaises(TypeError, self.gpg.encrypt_file, stream, [andrew], armor=False)
+
 
 TEST_GROUPS = {
     'sign':
@@ -1609,7 +1619,7 @@ TEST_GROUPS = {
     'basic':
     set(['test_environment', 'test_list_keys_initial', 'test_nogpg', 'test_make_args', 'test_quote_with_shell']),
     'test':
-    set(['test_configured_group']),
+    set(['test_filenames_with_spaces']),
 }
 
 
@@ -1630,11 +1640,19 @@ def suite(args=None):
 
 
 def init_logging():
+    class PrimegenFilter(logging.Filter):
+        def filter(self, record):
+            arg = record.args
+            if isinstance(arg, (list, tuple)) and len(arg) > 0:
+                arg = arg[0]
+            return not arg or not isinstance(arg, unicode) or '[GNUPG:] PROGRESS primegen' not in arg
+
     logging.basicConfig(level=logging.DEBUG,
                         filename='test_gnupg.log',
                         filemode='w',
                         format='%(asctime)s %(levelname)-5s %(name)-10s '
                         '%(threadName)-10s %(lineno)4d %(message)s')
+    logging.root.handlers[0].addFilter(PrimegenFilter())
 
 
 def main():

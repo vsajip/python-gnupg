@@ -39,6 +39,10 @@ from email.utils import parseaddr
 from io import StringIO
 import logging
 import os
+try:
+    from queue import Queue, Empty
+except ImportError:
+    from Queue import Queue, Empty
 import re
 import socket
 from subprocess import Popen, PIPE
@@ -137,7 +141,7 @@ def no_quote(s):
     return s
 
 
-def _copy_data(instream, outstream, buffer_size):
+def _copy_data(instream, outstream, buffer_size, error_queue):
     # Copy one stream to another
     assert buffer_size > 0
     sent = 0
@@ -150,8 +154,10 @@ def _copy_data(instream, outstream, buffer_size):
         # for what is actually a binary file
         try:
             data = instream.read(buffer_size)
-        except Exception:  # pragma: no cover
+        except Exception as e:  # pragma: no cover
             logger.warning('Exception occurred while reading', exc_info=1)
+            error_queue.put_nowait(e)
+            logger.debug('queued exception: %s', e)
             break
         if not data:
             break
@@ -161,10 +167,12 @@ def _copy_data(instream, outstream, buffer_size):
             outstream.write(data)
         except UnicodeError:  # pragma: no cover
             outstream.write(data.encode(enc))
-        except Exception:  # pragma: no cover
+        except Exception as e:  # pragma: no cover
             # Can sometimes get 'broken pipe' errors even when the data has all
             # been sent
             logger.exception('Error sending data')
+            error_queue.put_nowait(e)
+            logger.debug('queued exception: %s', e)
             break
     try:
         outstream.close()
@@ -173,9 +181,9 @@ def _copy_data(instream, outstream, buffer_size):
     logger.debug('closed output, %d bytes sent', sent)
 
 
-def _threaded_copy_data(instream, outstream, buffer_size):
+def _threaded_copy_data(instream, outstream, buffer_size, error_queue):
     assert buffer_size > 0
-    wr = threading.Thread(target=_copy_data, args=(instream, outstream, buffer_size))
+    wr = threading.Thread(target=_copy_data, args=(instream, outstream, buffer_size, error_queue))
     wr.daemon = True
     logger.debug('data copier: %r, %r, %r', wr, instream, outstream)
     wr.start()
@@ -1358,8 +1366,15 @@ class GPG(object):
                 stdin = p.stdin
             if passphrase:
                 _write_passphrase(stdin, passphrase, self.encoding)
-            writer = _threaded_copy_data(fileobj, stdin, self.buffer_size)
+            error_queue = Queue()
+            writer = _threaded_copy_data(fileobj, stdin, self.buffer_size, error_queue)
             self._collect_output(p, result, writer, stdin)
+            try:
+                exc = error_queue.get_nowait()
+                # if we get here, that means an error occurred in the copying thread
+                raise exc
+            except Empty:
+                pass
             return result
         finally:
             if writer:
@@ -1481,14 +1496,21 @@ class GPG(object):
         # passphrase is bad, gpg bails and you can't write the message.
         fileobj = self._get_fileobj(fileobj_or_path)
         p = self._open_subprocess(args, passphrase is not None)
+        writer = None
         try:
             stdin = p.stdin
             if passphrase:
                 _write_passphrase(stdin, passphrase, self.encoding)
-            writer = _threaded_copy_data(fileobj, stdin, self.buffer_size)
+            error_queue = Queue()
+            writer = _threaded_copy_data(fileobj, stdin, self.buffer_size, error_queue)
+            try:
+                exc = error_queue.get_nowait()
+                # if we get here, that means an error occurred in the copying thread
+                raise exc
+            except Empty:
+                pass
         except IOError:  # pragma: no cover
             logging.exception('error writing message')
-            writer = None
         finally:
             if writer:
                 writer.join(0.01)
