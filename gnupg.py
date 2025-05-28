@@ -157,7 +157,6 @@ def _copy_data(instream, outstream, buffer_size, error_queue):
         except Exception as e:  # pragma: no cover
             logger.warning('Exception occurred while reading', exc_info=1)
             error_queue.put_nowait(e)
-            logger.debug('queued exception: %s', e)
             break
         if not data:
             break
@@ -172,7 +171,6 @@ def _copy_data(instream, outstream, buffer_size, error_queue):
             # been sent
             logger.exception('Error sending data')
             error_queue.put_nowait(e)
-            logger.debug('queued exception: %s', e)
             break
     try:
         outstream.close()

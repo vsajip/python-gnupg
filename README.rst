@@ -81,7 +81,7 @@ Released: Not yet
 
 * Fix #250: Capture uid info in a uid_map attribute of ScanKeys/ListKeys.
 
-* Fix #255: Improve handling of exceptions raised in background threads,
+* Fix #255: Improve handling of exceptions raised in background threads.
 
 
 0.5.4

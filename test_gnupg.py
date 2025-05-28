@@ -1171,9 +1171,6 @@ class GPGTestCase(unittest.TestCase):
                 logger.debug('about to pass text stream to decrypt_file')
                 with open(encfname, 'r') as efile:
                     self.assertRaises(UnicodeDecodeError, self.gpg.decrypt_file, efile, passphrase='bbrown', output=decfname)
-                    # self.assertEqual(2, ddata.returncode, 'Unexpected return code')
-                    # self.assertFalse(ddata)
-                    # self.assertEqual(ddata.status, 'no data was provided')
         finally:
             for fn in (encfname, decfname):
                 if os.name == 'posix' and mode is not None:
