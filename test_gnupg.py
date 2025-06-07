@@ -1204,8 +1204,13 @@ class GPGTestCase(unittest.TestCase):
         data = 'Hello, world!'
         for badout, message in cases:
             stream = gnupg._make_binary_stream(data, self.gpg.encoding)
-            edata = self.gpg.encrypt_file(stream, barbara, armor=False, output=badout)
-            self.assertEqual(2, edata.returncode, 'Unexpecteds return code')
+            try:
+                # On Ubuntu and pypy-2.7, you often get an IOError "Broken pipe"
+                # during the encrypt operation ...
+                edata = self.gpg.encrypt_file(stream, barbara, armor=False, output=badout)
+                self.assertEqual(2, edata.returncode, 'Unexpecteds return code')
+            except IOError:
+                pass
             # on GnuPG 1.4, you sometimes don't get any FAILURE messages, in
             # which case status will not be set
             if edata.status:
