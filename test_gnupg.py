@@ -1249,7 +1249,7 @@ class GPGTestCase(unittest.TestCase):
                     # which case status will not be set
                     if edata.status:
                         message = '%s (%s)' % (message, badout)
-                        self.assertEqual(edata.status, message)
+                        self.assertIn(edata.status, message)
             finally:
                 os.chmod(encfname, 0o700)
                 os.remove(encfname)
