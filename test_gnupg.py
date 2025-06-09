@@ -1248,6 +1248,7 @@ class GPGTestCase(unittest.TestCase):
                     # on GnuPG 1.4, you sometimes don't get any FAILURE messages, in
                     # which case status will not be set
                     if edata.status:
+                        message = '%s (%s)' % (message, badout)
                         self.assertEqual(edata.status, message)
             finally:
                 os.chmod(encfname, 0o700)
