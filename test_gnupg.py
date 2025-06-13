@@ -2,7 +2,7 @@
 """
 A test harness for gnupg.py.
 
-Copyright (C) 2008-2024 Vinay Sajip. All rights reserved.
+Copyright (C) 2008-2025 Vinay Sajip. All rights reserved.
 """
 import argparse
 import io
@@ -1208,7 +1208,7 @@ class GPGTestCase(unittest.TestCase):
                 # On Ubuntu and pypy-2.7, you often get an IOError "Broken pipe"
                 # during the encrypt operation ...
                 edata = self.gpg.encrypt_file(stream, barbara, armor=False, output=badout)
-                self.assertEqual(2, edata.returncode, 'Unexpecteds return code')
+                self.assertEqual(2, edata.returncode, 'Unexpected return code')
             except IOError:
                 pass
             # on GnuPG 1.4, you sometimes don't get any FAILURE messages, in

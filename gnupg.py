@@ -27,7 +27,7 @@ Vinay Sajip to make use of the subprocess module (Steve's version uses os.fork()
 and so does not work on Windows). Renamed to gnupg.py to avoid confusion with
 the previous versions.
 
-Modifications Copyright (C) 2008-2024 Vinay Sajip. All rights reserved.
+Modifications Copyright (C) 2008-2025 Vinay Sajip. All rights reserved.
 
 For the full documentation, see https://docs.red-dove.com/python-gnupg/ or
 https://gnupg.readthedocs.io/
