@@ -11,3 +11,6 @@ random_binary_data
 .dict-validwords
 docs/themes
 docs/_build
+.idea/
+.vscode/
+.venv/
