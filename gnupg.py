@@ -49,9 +49,9 @@ from subprocess import Popen, PIPE
 import sys
 import threading
 
-__version__ = '0.5.5.dev0'
+__version__ = '0.5.5'
 __author__ = 'Vinay Sajip'
-__date__ = '$07-Jan-2025 10:13:17$'
+__date__ = '$04-Aug-2025 19:49:23$'
 
 STARTUPINFO = None
 if os.name == 'nt':  # pragma: no cover

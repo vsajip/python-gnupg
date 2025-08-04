@@ -72,10 +72,16 @@ Change log
 .. note:: GCnn refers to an issue nn on Google Code.
 
 
-0.5.5 (future)
+0.5.6 (future)
 --------------
 
 Released: Not yet
+
+
+0.5.5
+-----
+
+Released: 2025-08-04
 
 * Fix #249: Handle fetching GPG version when not the first item in the configuration.
 
