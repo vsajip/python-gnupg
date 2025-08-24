@@ -431,6 +431,16 @@ class GPGTestCase(unittest.TestCase):
                                      usage='sign',
                                      expire=0)
         self.assertEqual(0, result.returncode, 'Non-zero return code')
+        pubkeys = self.gpg.list_keys()
+        for key in pubkeys:
+            sklist = key['subkeys']
+            skmap = key['subkey_info']
+            self.assertEqual(len(sklist), 1)
+            self.assertTrue(len(skmap), 1)
+            for sk in sklist:
+                skid, capability, fp, grp = sk
+                self.assertEqual(skmap[skid]['fingerprint'], fp)
+                self.assertEqual(skmap[skid]['keygrip'], grp)
 
     def test_add_subkey_with_invalid_key_type(self):
         "Test that subkey generation handles invalid key type"
@@ -1627,7 +1637,7 @@ TEST_GROUPS = {
     'basic':
     set(['test_environment', 'test_list_keys_initial', 'test_nogpg', 'test_make_args', 'test_quote_with_shell']),
     'test':
-    set(['test_filenames_with_spaces']),
+    set(['test_add_subkey']),
 }
 
 

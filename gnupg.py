@@ -1865,7 +1865,18 @@ class GPG(object):
                 keys = [keys]
             args.extend(keys)
         p = self._open_subprocess(args)
-        return self._get_list_output(p, 'list')
+        result = self._get_list_output(p, 'list')
+        # Fix up subkey_info with fingerprint and grip values
+        for key in result:
+            # import pdb; pdb.set_trace()
+            subkeys = key['subkeys']
+            subkey_info = key.get('subkey_info')
+            if subkey_info:
+                for sk in subkeys:
+                    skid, capability, fp, grp = sk
+                    subkey_info[skid]['fingerprint'] = fp
+                    subkey_info[skid]['keygrip'] = grp
+        return result
 
     def scan_keys(self, filename):
         """

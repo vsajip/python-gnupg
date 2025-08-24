@@ -77,6 +77,7 @@ Change log
 
 Released: Not yet
 
+* Fix #261: Ensure fingerprint and keygrip are added to subkey_info.
 
 0.5.5
 -----
