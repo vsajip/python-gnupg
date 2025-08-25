@@ -392,7 +392,7 @@ class Verify(StatusHandler):
         elif key in ('EXPKEYSIG', 'REVKEYSIG'):  # pragma: no cover
             # signed with expired or revoked key
             self.valid = False
-            self.key_id = value.split()[0]
+            self.key_id, self.username = value.split(None, 1)
             if key == 'EXPKEYSIG':
                 self.key_status = 'signing key has expired'
             else:
