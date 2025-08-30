@@ -1874,8 +1874,10 @@ class GPG(object):
             if subkey_info:
                 for sk in subkeys:
                     skid, capability, fp, grp = sk
-                    subkey_info[skid]['fingerprint'] = fp
-                    subkey_info[skid]['keygrip'] = grp
+                    d = subkey_info[skid]
+                    d['capability'] = capability
+                    d['fingerprint'] = fp
+                    d['keygrip'] = grp
         return result
 
     def scan_keys(self, filename):

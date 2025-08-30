@@ -22,12 +22,18 @@ import datetime, os, sys
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx',
-              'sphinx.ext.todo', 'sphinx.ext.coverage',
-              #'sphinx.ext.napoleon',
-              #'sphinx.ext.imgmath',
-              'sphinx.ext.ifconfig', 'sphinx.ext.viewcode',
-              'sphinxcontrib.spelling']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.todo',
+    'sphinx.ext.coverage',
+    #'sphinx.ext.napoleon',
+    #'sphinx.ext.imgmath',
+    'sphinx.ext.ifconfig',
+    'sphinx.ext.viewcode',
+    'sphinxcontrib.spelling'
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -43,14 +49,15 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Python Wrapper for GnuPG'
-copyright = u'2008-%s, Vinay Sajip' %  datetime.date.today().year
+copyright = u'2008-%s, Vinay Sajip' % datetime.date.today().year
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-from gnupg import __version__ as release, __date__ as today
+from gnupg import __version__ as release  # , __date__ as today
+
 version = '.'.join(release.split('.')[:2])
 if '.dev' in release:
     today = datetime.date.today().strftime('%b %d, %Y')
@@ -92,8 +99,8 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
-spelling_lang='en_GB'
-spelling_word_list_filename='spelling_wordlist.txt'
+spelling_lang = 'en_GB'
+spelling_word_list_filename = 'spelling_wordlist.txt'
 
 # -- Options for HTML output ---------------------------------------------------
 
@@ -101,16 +108,13 @@ spelling_word_list_filename='spelling_wordlist.txt'
 # a list of builtin themes.
 html_theme = os.environ.get('DOCS_THEME', 'default')
 
-THEME_OPTIONS = {
-    'sizzle': {
-    }
-}
+THEME_OPTIONS = {'sizzle': {}}
 
 if html_theme == 'sizzle' and os.path.isfile('hover.json'):
     import json
 
     with open('hover.json', encoding='utf-8') as f:
-        THEME_OPTIONS['sizzle']['custom_data'] = {'hovers': json.load(f) }
+        THEME_OPTIONS['sizzle']['custom_data'] = {'hovers': json.load(f)}
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -155,10 +159,10 @@ html_static_path = ['_static']
 # Custom sidebar templates, maps document names to template names.
 
 # html_sidebars = {
-    # '**': [
-        # 'localtoc.html', 'globaltoc.html',  'relations.html',
-        # 'sourcelink.html', 'searchbox.html'
-    # ],
+# '**': [
+# 'localtoc.html', 'globaltoc.html',  'relations.html',
+# 'sourcelink.html', 'searchbox.html'
+# ],
 # }
 
 # Additional templates that should be rendered to pages, maps page names to
@@ -166,7 +170,7 @@ html_static_path = ['_static']
 #html_additional_pages = {}
 
 # If false, no module index is generated.
-#html_domain_indices = True
+# html_domain_indices = True
 
 # If false, no index is generated.
 #html_use_index = True
@@ -194,7 +198,6 @@ html_static_path = ['_static']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'GnuPGWrapperforPythondoc'
 
-
 # -- Options for LaTeX output --------------------------------------------------
 
 # The paper size ('letter' or 'a4').
@@ -206,8 +209,7 @@ htmlhelp_basename = 'GnuPGWrapperforPythondoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'GnuPGWrapperforPython.tex', u'GnuPG Wrapper for Python Documentation',
-   u'Vinay Sajip', 'manual'),
+    ('index', 'GnuPGWrapperforPython.tex', u'GnuPG Wrapper for Python Documentation', u'Vinay Sajip', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -233,16 +235,11 @@ latex_documents = [
 # If false, no module index is generated.
 #latex_domain_indices = True
 
-
 # -- Options for manual page output --------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    ('index', 'python-gnupg', u'python-gnupg Documentation',
-     [u'Vinay Sajip'], 1)
-]
-
+man_pages = [('index', 'python-gnupg', u'python-gnupg Documentation', [u'Vinay Sajip'], 1)]
 
 # -- Options for Epub output ---------------------------------------------------
 
@@ -283,13 +280,14 @@ epub_copyright = u'2019, Vinay Sajip'
 # Allow duplicate toc entries.
 #epub_tocdup = True
 
-
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'python': ('http://docs.python.org/', None)}
+
 
 def skip_module_docstring(app, what, name, obj, options, lines):
     if (what, name) == ('module', 'distlib'):
         del lines[:]
+
 
 def setup(app):
     app.connect('autodoc-process-docstring', skip_module_docstring)

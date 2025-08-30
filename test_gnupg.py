@@ -1180,7 +1180,8 @@ class GPGTestCase(unittest.TestCase):
             if gnupg._py3k:
                 logger.debug('about to pass text stream to decrypt_file')
                 with open(encfname, 'r') as efile:
-                    self.assertRaises(UnicodeDecodeError, self.gpg.decrypt_file, efile, passphrase='bbrown', output=decfname)
+                    self.assertRaises(UnicodeDecodeError, self.gpg.decrypt_file, efile,
+                                      passphrase='bbrown', output=decfname)
         finally:
             for fn in (encfname, decfname):
                 if os.name == 'posix' and mode is not None:

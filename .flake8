@@ -1,0 +1,12 @@
+[flake8]
+max-line-length=120
+ignore =
+    E731
+    W504
+
+exclude =
+    build
+    .tox
+
+per-file-ignores =
+    docs/conf.py:E265,E401,E402

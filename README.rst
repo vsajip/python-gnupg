@@ -79,6 +79,9 @@ Released: Not yet
 
 * Fix #261: Ensure fingerprint and keygrip are added to subkey_info.
 
+* Set username in the result when Verify uses a signing key that has expired or been
+  revoked. Thanks to Steven Galgano for the patch.
+
 0.5.5
 -----
 
