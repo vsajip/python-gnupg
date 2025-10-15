@@ -1074,7 +1074,7 @@ returned from the :meth:`~gnupg.GPG.decrypt` call::
     >>> decrypted_data = gpg.decrypt(data, passphrase=recipient_passphrase)
 
 At this point, if a signature is verified, signer information is held in attributes of
-``decrpyted_data``: ``username``, ``key_id``, ``signature_id``, ``fingerprint``,
+``decrypted_data``: ``username``, ``key_id``, ``signature_id``, ``fingerprint``,
 ``trust_level`` and ``trust_text``. If the message wasn't signed, these attributes
 will all be set to ``None``.
 
