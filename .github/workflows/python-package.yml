@@ -24,6 +24,10 @@ on:
   schedule:  # at 03:07 on day-of-month 7
     - cron: '7 3 7 * *'
 
+env:
+  FORCE_COLOR: 1
+  PIP_DISABLE_PIP_VERSION_CHECK: 1
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
