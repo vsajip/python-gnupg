@@ -24,6 +24,10 @@ on:
   schedule:  # at 03:07 on day-of-month 7
     - cron: '7 3 7 * *'
 
+env:
+  FORCE_COLOR: 1
+  PIP_DISABLE_PIP_VERSION_CHECK: 1
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -31,12 +35,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.13t', 'pypy-3.9']
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.13t', '3.14', '3.14t', 'pypy-3.9']
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Windows-only dependencies
@@ -64,7 +68,7 @@ jobs:
       env:
         NO_EXTERNAL_TESTS: 1
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         flags: unittests
         files: coverage.xml
