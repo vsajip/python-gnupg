@@ -1,7 +1,6 @@
 [run]
 branch = True
 omit =
-    /home/travis/virtualenv/*
     /opt/python/*
 
 [report]
