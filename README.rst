@@ -72,12 +72,17 @@ Change log
 .. note:: GCnn refers to an issue nn on Google Code.
 
 
-0.5.6 (future)
+0.5.7 (future)
 --------------
 
 Released: Not yet
 
-* Fix #261: Ensure fingerprint and keygrip are added to subkey_info.
+0.5.6
+-----
+
+Released: 2925-12-31
+
+* Fix #261: Ensure capability, fingerprint and keygrip are added to subkey_info.
 
 * Set username in the result when Verify uses a signing key that has expired or been
   revoked. Thanks to Steven Galgano for the patch.
