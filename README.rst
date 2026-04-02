@@ -80,7 +80,7 @@ Released: Not yet
 0.5.6
 -----
 
-Released: 2925-12-31
+Released: 2025-12-31
 
 * Fix #261: Ensure capability, fingerprint and keygrip are added to subkey_info.
 
