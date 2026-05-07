@@ -1562,9 +1562,12 @@ class GPG(object):
         else:
             logger.debug('Handling detached verification')
             import tempfile
+            fileobj = self._get_fileobj(fileobj_or_path)
             fd, fn = tempfile.mkstemp(prefix='pygpg-')
-            s = fileobj_or_path.read()
-            if close_file:
+            s = fileobj.read()
+            if fileobj is not fileobj_or_path:
+                fileobj.close()
+            elif close_file:
                 fileobj_or_path.close()
             logger.debug('Wrote to temp file: %r', s)
             os.write(fd, s)
@@ -2097,6 +2100,34 @@ class GPG(object):
         self._handle_io(args, f, result, passphrase=master_passphrase, binary=True)
         return result
 
+    def quick_sign_key(self, certifier_fingerprint, recipient_fingerprint, certifier_passphrase=None):
+        """
+        Certify a key using quick-sign-key function.
+
+        Args:
+            certifier_fingerprint (str): The fingerprint for the certifying key.
+
+            recipient_fingerprint (str): The fingerprint of the key being signed.
+
+            certifier_passphrase (str): The passphrase for the certifing key.
+        """
+        if self.version[0] < 2:
+            raise NotImplementedError('Not available in GnuPG 1.x')
+        if not certifier_fingerprint:  # pragma: no cover
+            raise ValueError('No certifier key fingerprint specified')
+        if not recipient_fingerprint:  # pragma: no cover
+            raise ValueError('No recipient key fingerprint specified')
+        if certifier_passphrase and not self.is_valid_passphrase(certifier_passphrase):  # pragma: no cover
+            raise ValueError('Invalid passphrase')
+
+        args = ['--local-user', certifier_fingerprint, '--quick-sign-key', recipient_fingerprint]
+
+        result = self.result_map['sign'](self)
+
+        f = _make_binary_stream('', self.encoding)
+        self._handle_io(args, f, result, passphrase=certifier_passphrase, binary=True)
+        return result
+
     #
     # ENCRYPTION
     #
@@ -2104,6 +2135,7 @@ class GPG(object):
     def encrypt_file(self,
                      fileobj_or_path,
                      recipients,
+                     hidden_recipients=None,
                      sign=None,
                      always_trust=False,
                      passphrase=None,
@@ -2118,6 +2150,8 @@ class GPG(object):
             fileobj_or_path (str|file): A path to a file or a file-like object containing the data to be encrypted.
 
             recipients (str|list): A key id of a recipient of the encrypted data, or a list of such key ids.
+
+            hidden_recipients (str|list): A key id of a hidden recipient of the encrypted data, or a list of such key ids.
 
             sign (str): If specified, the key id of a signer to sign the encrypted data.
 
@@ -2144,13 +2178,20 @@ class GPG(object):
                 args.extend(['--cipher-algo', no_quote(symmetric)])
             # else use the default, currently CAST5
         else:
-            if not recipients:
-                raise ValueError('No recipients specified with asymmetric '
-                                 'encryption')
-            if not _is_sequence(recipients):
-                recipients = (recipients, )
-            for recipient in recipients:
-                args.extend(['--recipient', no_quote(recipient)])
+            if not recipients and not hidden_recipients:
+                raise ValueError('No recipients or hidden recipients specified with '
+                                 'asymmetric encryption')
+            if recipients:
+                if not _is_sequence(recipients):
+                    recipients = (recipients, )
+                for recipient in recipients:
+                    args.extend(['--recipient', no_quote(recipient)])
+
+            if hidden_recipients:
+                if not _is_sequence(hidden_recipients):
+                    hidden_recipients = (hidden_recipients, )
+                for hidden_recipient in hidden_recipients:
+                    args.extend(['--hidden-recipient', no_quote(hidden_recipient)])
         if armor:  # create ascii-armored output - False for binary output
             args.append('--armor')
         if output:  # pragma: no cover
