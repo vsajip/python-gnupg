@@ -2,7 +2,7 @@
 """
 A test harness for gnupg.py.
 
-Copyright (C) 2008-2025 Vinay Sajip. All rights reserved.
+Copyright (C) 2008-2026 Vinay Sajip. All rights reserved.
 """
 import argparse
 import io
@@ -801,6 +801,8 @@ class GPGTestCase(unittest.TestCase):
 
     def test_quick_sign_key(self):
         "Test the quick-sign-key functionality"
+        if self.gpg.version < (2, 0):  # pragma: no cover
+            raise unittest.SkipTest('No support for feature in gpg 1.x')
         # GPG requires real random when signing keys
         self.gpg.options.remove('--debug-quick-random')
 
