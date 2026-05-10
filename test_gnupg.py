@@ -181,6 +181,34 @@ tO8f06R3yfjxLRD8y89frVP3+tGMvt2yGOd5TT0zht5yYcG6QkiHlfdgXqeE8nsU
 -----END PGP PRIVATE KEY BLOCK-----
 """
 
+CERTIFYING_KEY = """
+-----BEGIN PGP PRIVATE KEY BLOCK-----
+
+lHcEaeE/WBMIKoZIzj0DAQcCAwQJX+QJbszp7FFHIaGY1ZOwLJCTnwjzy1Z5vnKw
+1AZ9UnIRO+TMPEEUizEc4FO1nQBUgCS2nOccwXpnZtavc8d5AAD/TitHUDwl1CbF
+f2FGF4alBhMBuWohWcAUNOopbKgaNO4MubQfQ2VydGlmaWVyIFRlc3QgPGNlcnRp
+ZmllckB0ZXN0PoiQBBMTCAA4FiEEl+gdlmY3v7p/43AlhW+ORWgM16QFAmnhP1gC
+GwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AACgkQhW+ORWgM16RwdQEA9CTM/Zz+
+rWNl3ToKdsPKS7s3KaPfvGPKNIqVwUJzhT8BAN58ziizYcb85HREsFHtYOJs0Uti
+7GYLD4MPZxhIz5sr
+=he2w
+-----END PGP PRIVATE KEY BLOCK-----
+"""
+
+RECIPIENT_KEY = """
+-----BEGIN PGP PRIVATE KEY BLOCK-----
+
+lHcEaeE//hMIKoZIzj0DAQcCAwRraYDaESix05+l8b69fKzIvYmIoXbaOVPoCnjA
+Qe6hYEKQrO7p5zOUp6lLXhnZ6JWD6B7RcoGSHpAHQMWzpzkWAAEA92FWKM7TZolx
+Wpvuj+6lLf6wrg/gOVofvjKDoj9IbfARALQfUmVjaXBpZW50IFRlc3QgPFJlY2lw
+aWVudEB0ZXN0PoiQBBMTCAA4FiEEqHrbKqME4ufCGsGh2ILlpHJXa3EFAmnhP/4C
+GwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AACgkQ2ILlpHJXa3E2NAEAlbZ+sUpL
+j88bPK7sBA0pgiAItWYclDgZXAmqBCXz9ggBAM4khSii4pshJh0XavURaYnoC2SU
+qlWoXWGVJkVDlHla
+=1zeo
+-----END PGP PRIVATE KEY BLOCK-----
+"""
+
 
 def is_list_with_len(o, n):
     return isinstance(o, list) and len(o) == n
@@ -771,6 +799,28 @@ class GPGTestCase(unittest.TestCase):
                 uids.add(d['uids'][0])
             self.assertEqual(uids, expected)
 
+    def test_quick_sign_key(self):
+        "Test the quick-sign-key functionality"
+        # GPG requires real random when signing keys
+        self.gpg.options.remove('--debug-quick-random')
+
+        recipient_key = self.gpg.import_keys(RECIPIENT_KEY)
+        certifying_key = self.gpg.import_keys(CERTIFYING_KEY)
+        self.assertEqual(len(set(recipient_key.fingerprints)), 1)
+        self.assertEqual(len(set(certifying_key.fingerprints)), 1)
+        certifying_fingerprint = certifying_key.fingerprints[0]
+        recipient_fingerprint = recipient_key.fingerprints[0]
+
+        sign_result = self.gpg.quick_sign_key(certifying_fingerprint, recipient_fingerprint)
+        self.assertEqual(sign_result.returncode, 0)
+        sigs = self.gpg.list_keys(keys=recipient_fingerprint, sigs=True)[0]['sigs']
+        key_id = sigs[1][0]
+        self.assertIn(key_id, certifying_key.fingerprints[0])
+
+        # Revert our test environment changes
+        self.gpg.options.append('--debug-quick-random')
+
+
     def test_encryption_and_decryption(self):
         "Test that encryption and decryption works"
         key = self.generate_key('Andrew', 'Able', 'alpha.com', passphrase='andy')
@@ -807,6 +857,30 @@ class GPGTestCase(unittest.TestCase):
         self.assertEqual(data, ddata.data, 'Round-trip must work')
         ddata = gpg.decrypt(edata, passphrase='bbrown')
         self.assertEqual(data, ddata.data, 'Round-trip must work')
+        # Test with hidden recipients
+        result = gpg.encrypt(data, andrew, hidden_recipients=barbara)
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
+        edata = str(result)
+        self.assertNotEqual(data, edata, 'Data must have changed')
+        ddata = gpg.decrypt(edata, passphrase='andy')
+        self.assertEqual(0, ddata.returncode, 'Non-zero return code')
+        self.assertEqual(data, ddata.data, 'Round-trip must work')
+        ddata = gpg.decrypt(edata, passphrase='bbrown')
+        self.assertEqual(data, ddata.data, 'Round-trip must work')
+        # Test only hidden recipients
+        result = gpg.encrypt(data, None, hidden_recipients=[andrew, barbara])
+        self.assertEqual(0, result.returncode, 'Non-zero return code')
+        edata = str(result)
+        self.assertNotEqual(data, edata, 'Data must have changed')
+        ddata = gpg.decrypt(edata, passphrase='andy')
+        self.assertEqual(0, ddata.returncode, 'Non-zero return code')
+        self.assertEqual(data, ddata.data, 'Round-trip must work')
+        ddata = gpg.decrypt(edata, passphrase='bbrown')
+        self.assertEqual(data, ddata.data, 'Round-trip must work')
+        # Test with no recipients
+        self.assertRaises(ValueError, gpg.encrypt, data, None)
+        self.assertRaises(ValueError, gpg.encrypt, data, None, hidden_recipients=None)
+        self.assertRaises(ValueError, gpg.encrypt, data, None, hidden_recipients=None, symmetric=False)
         # Test symmetric encryption
         data = 'chippy was here'
         self.assertRaises(ValueError, gpg.encrypt, data, None, passphrase='bbr\x00own', symmetric=True)
@@ -1053,10 +1127,23 @@ class GPGTestCase(unittest.TestCase):
         data_file.close()
         try:
             verified = self.gpg.verify_data(sig_file, data)
-            self.assertTrue(verified.username.startswith('Andrew Able'))
-            self.assertTrue(key.fingerprint.endswith(verified.key_id))
+        except Exception as e:
+            os.remove(sig_file)
+            self.fail(e)
+        self.assertTrue(verified.username.startswith('Andrew Able'))
+        self.assertTrue(key.fingerprint.endswith(verified.key_id))
+        self.assertEqual(0, verified.returncode, 'Non-zero return code')
+        if key.fingerprint != verified.fingerprint:  # pragma: no cover
+            logger.debug('key: %r', key.fingerprint)
+            logger.debug('ver: %r', verified.fingerprint)
+        self.assertEqual(key.fingerprint, verified.fingerprint, 'Fingerprints must match')
+        # Test file path verification
+        try:
+            verified = self.gpg.verify_file(sig_file, self.test_fn)
         finally:
             os.remove(sig_file)
+        self.assertTrue(verified.username.startswith('Andrew Able'))
+        self.assertTrue(key.fingerprint.endswith(verified.key_id))
         self.assertEqual(0, verified.returncode, 'Non-zero return code')
         if key.fingerprint != verified.fingerprint:  # pragma: no cover
             logger.debug('key: %r', key.fingerprint)
@@ -1631,7 +1718,7 @@ TEST_GROUPS = {
         'test_key_generation_with_invalid_key_type', 'test_key_generation_with_escapes', 'test_key_generation_input',
         'test_key_generation_with_colons', 'test_search_keys', 'test_scan_keys', 'test_scan_keys_mem',
         'test_key_trust', 'test_add_subkey', 'test_add_subkey_with_invalid_key_type', 'test_deletion_subkey',
-        'test_list_subkey_after_generation'
+        'test_list_subkey_after_generation', 'test_quick_sign_key'
     ]),
     'import':
     set(['test_import_only', 'test_doctest_import_keys']),
