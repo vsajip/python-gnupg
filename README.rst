@@ -77,6 +77,10 @@ Change log
 
 Released: Not yet
 
+* Add quick_sign_key function, add hidden recipients to encrypt_file, and allow paths in
+  verify_file. Thanks to Zach Szczesniak for the patch.
+
+
 0.5.6
 -----
 

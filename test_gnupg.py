@@ -822,7 +822,6 @@ class GPGTestCase(unittest.TestCase):
         # Revert our test environment changes
         self.gpg.options.append('--debug-quick-random')
 
-
     def test_encryption_and_decryption(self):
         "Test that encryption and decryption works"
         key = self.generate_key('Andrew', 'Able', 'alpha.com', passphrase='andy')
@@ -1232,6 +1231,7 @@ class GPGTestCase(unittest.TestCase):
             # pick a mode that won't be already in effect via umask
             if os.path.exists(encfname) and os.path.exists(decfname):
                 mode = os.stat(encfname).st_mode | stat.S_IXUSR
+                logger.debug('Setting mode to %s', oct(mode))
                 os.chmod(encfname, mode)
                 # assume same for decfname
                 os.chmod(decfname, mode)
@@ -1269,21 +1269,28 @@ class GPGTestCase(unittest.TestCase):
             if gnupg._py3k:
                 logger.debug('about to pass text stream to decrypt_file')
                 with open(encfname, 'r') as efile:
-                    self.assertRaises(UnicodeDecodeError, self.gpg.decrypt_file, efile,
-                                      passphrase='bbrown', output=decfname)
+                    self.assertRaises(UnicodeDecodeError,
+                                      self.gpg.decrypt_file,
+                                      efile,
+                                      passphrase='bbrown',
+                                      output=decfname)
         finally:
             for fn in (encfname, decfname):
-                if os.name == 'posix' and mode is not None:
+                if os.name == 'posix' and mode is not None and self.gpg.version < (2, 5, 21):
                     # Check that the file wasn't deleted, and that the
                     # mode bits we set are still in effect
-                    self.assertEqual(os.stat(fn).st_mode, mode)
+                    # gpg 2.5.21 introduced a change whereby the mode does change
+                    msg = 'Mode changed for %s: %s vs. %s' % (fn, oct(os.stat(fn).st_mode), oct(mode))
+                    if os.stat(fn).st_mode != mode:
+                        logger.error('Mode changed for %s: %s vs. %s', fn, oct(os.stat(fn).st_mode), oct(mode))
+                    self.assertEqual(os.stat(fn).st_mode, mode, msg)
                 if os.path.exists(fn):
                     os.remove(fn)
 
     def test_file_encryption_and_decryption(self):
         "Test that encryption/decryption to/from file works"
-        encfno, encfname = tempfile.mkstemp(prefix='pygpg-test-')
-        decfno, decfname = tempfile.mkstemp(prefix='pygpg-test-')
+        encfno, encfname = tempfile.mkstemp(prefix='pygpg-test-', suffix='.enc')
+        decfno, decfname = tempfile.mkstemp(prefix='pygpg-test-', suffix='.dec')
         # On Windows, if the handles aren't closed, the files can't be deleted
         os.close(encfno)
         os.close(decfno)
@@ -1718,8 +1725,8 @@ TEST_GROUPS = {
     set([
         'test_deletion', 'test_import_and_export', 'test_list_keys_after_generation', 'test_list_signatures',
         'test_key_generation_with_invalid_key_type', 'test_key_generation_with_escapes', 'test_key_generation_input',
-        'test_key_generation_with_colons', 'test_search_keys', 'test_scan_keys', 'test_scan_keys_mem',
-        'test_key_trust', 'test_add_subkey', 'test_add_subkey_with_invalid_key_type', 'test_deletion_subkey',
+        'test_key_generation_with_colons', 'test_search_keys', 'test_scan_keys', 'test_scan_keys_mem', 'test_key_trust',
+        'test_add_subkey', 'test_add_subkey_with_invalid_key_type', 'test_deletion_subkey',
         'test_list_subkey_after_generation', 'test_quick_sign_key'
     ]),
     'import':
@@ -1727,7 +1734,7 @@ TEST_GROUPS = {
     'basic':
     set(['test_environment', 'test_list_keys_initial', 'test_nogpg', 'test_make_args', 'test_quote_with_shell']),
     'test':
-    set(['test_add_subkey']),
+    set(['test_file_encryption_and_decryption']),
 }
 
 
@@ -1748,7 +1755,9 @@ def suite(args=None):
 
 
 def init_logging():
+
     class PrimegenFilter(logging.Filter):
+
         def filter(self, record):
             arg = record.args
             if isinstance(arg, (list, tuple)) and len(arg) > 0:
