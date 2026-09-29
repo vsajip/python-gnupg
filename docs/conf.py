@@ -56,7 +56,7 @@ copyright = u'2008-%s, Vinay Sajip' % datetime.date.today().year
 # built documents.
 #
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-from gnupg import __version__ as release  # , __date__ as today
+from gnupg import __version__ as release, __date__ as today
 
 version = '.'.join(release.split('.')[:2])
 if '.dev' in release:
