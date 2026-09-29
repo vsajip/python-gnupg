@@ -179,9 +179,11 @@ secret_keyring (defaults to ``None``)
     If specified, the value is used as the name of the secret keyring file. A list of
     paths to secret keyring files can also be specified. *Note that these files are
     not used by GnuPG >= 2.1.*
-env  (defaults to ``None``)
+env (defaults to ``None``)
     If specified, the value is used as the environment variables used when calling the GPG
     executable.
+encoding (defaults to ``'latin-1'``)
+    If specified, the value is used as the encoding to use for the instance.
 
 .. versionchanged:: 0.3.4
    The ``keyring`` argument can now also be a list of keyring filenames.
@@ -202,6 +204,9 @@ env  (defaults to ``None``)
 .. versionadded:: 0.5.0
    The ``env`` argument was added.
 
+.. versionadded:: 0.5.7
+   The ``encoding`` argument was added.
+
 If the ``gpgbinary`` executable cannot be found, a ``ValueError`` is raised in
 :meth:`GPG.__init__`.
 
@@ -220,6 +225,13 @@ instantiation, like this::
    decoding output). The ``gpg`` executable will use an output encoding based on your
    environment settings (e.g. environment variables, code page etc.) but defaults to
    latin-1.
+
+.. note:: The encoding is also used to encode passphrases sent to ``gpg``. The default
+   ``latin-1`` encoding will fail if you pass Unicode which contains characters which are
+   larger than what a byte can hold (many accented characters fall into this category).
+   Use the appropriate encoding, perhaps ``utf-8``. From version 0.5.7, you can pass an
+   ``encoding=`` keyword parameter to the :class:`GPG` initializer with the encoding to
+   be used. This just sets the ``encoding`` attribute of the instance.
 
 From version 0.5.2 onwards, you can also control the buffer size for the I/O between
 ``gpg`` and ``python-gnupg`` by setting the ``buffer_size`` attribute on a GPG instance.

@@ -72,10 +72,15 @@ Change log
 .. note:: GCnn refers to an issue nn on Google Code.
 
 
-0.5.7 (future)
+0.5.8 (future)
 --------------
 
 Released: Not yet
+
+0.5.7
+-----
+
+Released: 2026-09-30
 
 * Add quick_sign_key function, add hidden recipients to encrypt_file, and allow paths in
   verify_file. Thanks to Zach Szczesniak for the patch.
