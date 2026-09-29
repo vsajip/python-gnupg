@@ -1105,7 +1105,8 @@ class GPG(object):
                  keyring=None,
                  options=None,
                  secret_keyring=None,
-                 env=None):
+                 env=None,
+                 encoding='latin-1'):
         """Initialize a GPG process wrapper.
 
         Args:
@@ -1151,8 +1152,8 @@ class GPG(object):
         # Changed in 0.3.7 to use Latin-1 encoding rather than
         # locale.getpreferredencoding falling back to sys.stdin.encoding
         # falling back to utf-8, because gpg itself uses latin-1 as the default
-        # encoding.
-        self.encoding = 'latin-1'
+        # encoding. Changed in 0.5.7 to use a new kwarg defaulting to Latin-1.
+        self.encoding = encoding
         if gnupghome and not os.path.isdir(self.gnupghome):  # pragma: no cover
             os.makedirs(self.gnupghome, 0o700)
         try:

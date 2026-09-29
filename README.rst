@@ -80,6 +80,8 @@ Released: Not yet
 * Add quick_sign_key function, add hidden recipients to encrypt_file, and allow paths in
   verify_file. Thanks to Zach Szczesniak for the patch.
 
+* Fix #277: Allow passing an encoding to the GPG initializer though a keyword parameter.
+
 
 0.5.6
 -----
