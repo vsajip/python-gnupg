@@ -1571,13 +1571,18 @@ class GPGTestCase(unittest.TestCase):
         key2 = gpg.gen_key(inp)
         data = 'super secret'.encode(gpg.encoding)
         edata = gpg.encrypt(data, (key1.fingerprint, key2.fingerprint))
-        logger.debug('Getting recipients')
-        ids = gpg.get_recipients(edata.data.decode(gpg.encoding))
-        self.assertGreater(len(ids), 0)
-        idlen = len(ids[0])
-        ids = set(ids)
-        expected = set((key1.fingerprint[-idlen:], key2.fingerprint[-idlen:]))
-        self.assertEqual(expected, ids)
+        # See issue 276: try with a non-English locale
+        for lang in (None, 'cs_CZ.UTF-8'):
+            if lang is not None:
+                gpg.env = dict(os.environ)
+                gpg.env['LANG'] = lang
+            logger.debug('Getting recipients')
+            ids = gpg.get_recipients(edata.data.decode(gpg.encoding))
+            self.assertGreater(len(ids), 0)
+            idlen = len(ids[0])
+            ids = set(ids)
+            expected = set((key1.fingerprint[-idlen:], key2.fingerprint[-idlen:]))
+            self.assertEqual(expected, ids)
 
     def test_passing_paths(self):
         key1 = self.generate_key('Andrew', 'Able', 'alpha.com', passphrase='andy')

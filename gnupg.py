@@ -2323,7 +2323,26 @@ class GPG(object):
         if extra_args:  # pragma: no cover
             args.extend(extra_args)
         result = self.result_map['crypt'](self)
+        # See issue 276: PUBLIC_KEY_RE currently relies on having a language-dependent
+        # message to parse. We can try to force LANG=C in the environment just for this
+        # subprocess call, and restore it later.
+        old_lang = None
+        old_env = self.env
+        if old_env is None:
+            self.env = dict(os.environ)
+            self.env['LANG'] = 'C'
+        else:
+            old_lang = old_env.get('LANG')
+            self.env['LANG'] = 'C'
         self._handle_io(args, fileobj_or_path, result, binary=True)
+        # Restore environment
+        if old_env is None:
+            self.env = None
+        else:
+            if old_lang is not None:
+                self.env['LANG'] = old_lang
+            else:
+                self.env.pop('LANG')
         ids = []
         for m in PUBLIC_KEY_RE.finditer(result.stderr):
             ids.append(m.group(1))
