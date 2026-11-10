@@ -38,9 +38,9 @@ jobs:
         python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.13t', '3.14', '3.14t', '3.15', '3.15t', 'pypy-3.9']
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Windows-only dependencies
@@ -68,7 +68,7 @@ jobs:
       env:
         NO_EXTERNAL_TESTS: 1
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@v7
       with:
         flags: unittests
         files: coverage.xml
